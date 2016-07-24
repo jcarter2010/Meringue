@@ -405,22 +405,31 @@ class App:
         return False
 
     def list_files(self, path, tree, parent, full_path):
-        if path == '.':
-            tree.insert('', 3, full_path + '/' + path, text=path, tags = ('directory',))
-        else:
-            tree.insert(full_path, 3, full_path + '/'+ path, text=path, tags = ('directory',))
+    	try:
+            if path == '.':
+                tree.insert('', 3, full_path + '/' + path, text=path, tags = ('directory',))
+            else:
+                tree.insert(full_path, 3, full_path + '/'+ path, text=path, tags = ('directory',))
+        except:
+            print('already exitsts')
         files = [f for f in listdir(full_path+'/'+path) if isfile(join(full_path+'/'+path, f))]
         dirs = [d for d in listdir(full_path+'/'+path) if not isfile(join(full_path+'/'+path, d))]
         tn = Tree_Node(path)
         for d in dirs:
-            if parent != '':
-                tree, n2 = self.list_files(d, tree, path, full_path + '/' + path)
-            else:
-                tree, n2 = self.list_files(d, tree, path, full_path + '/' + path)
-            tn.nodes.append(n2)
+            try:
+                if parent != '':
+                    tree, n2 = self.list_files(d, tree, path, full_path + '/' + path)
+                else:
+                    tree, n2 = self.list_files(d, tree, path, full_path + '/' + path)
+                tn.nodes.append(n2)
+            except:
+                print('already exitsts')
         for f in files:
-                tree.insert(full_path + '/' + path, 3, full_path + '/' + f, text=f, tags = ('file',))
-                tn.nodes.append(Tree_Node(f))
+                try:
+                    tree.insert(full_path + '/' + path, 3, full_path + '/' + f, text=f, tags = ('file',))
+                    tn.nodes.append(Tree_Node(f))
+                except:
+                    print('already exitsts')
         return tree, tn
 
     def on_double_click(self, event):
