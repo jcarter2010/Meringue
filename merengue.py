@@ -10,6 +10,8 @@ from subprocess import Popen
 from subprocess import PIPE
 from tkMessageBox import *
 import keyword
+import tkFileDialog
+import tkMessageBox
 
 
 class EditorClass(object):
@@ -424,9 +426,21 @@ class App:
 
     def on_double_click(self, event):
         item = self.tree.selection()[0]
-        path, found = self.find_path('', self.tree_array, item)
+        path, found = self.find_path('', self.tree_array, item[item.rfind('/')+1:])
+        print(found)
         if found:
+            print('found')
             self.open_file(path)
+
+
+    def close_all_tabs(self):
+        val = tkMessageBox.askokcancel('Open New Folder', "This will close all current tabs, continue?")
+        if val:
+            for i in range(0, len(self.n.tabs())):
+                self.n.forget(0)
+                del(self.tab_names[0])
+                del(self.eds[0])
+        return val
 
     def close_tab(self):
         index = self.n.tabs().index(self.n.select())
@@ -472,6 +486,15 @@ class App:
         print "--"
         if event.keysym == 's':
             self.save_click
+
+    def open_folder_click(self):
+        val = self.close_all_tabs()
+        if val:
+            folder = tkFileDialog.askdirectory()
+            os.chdir(folder)
+            self.tree.delete(*self.tree.get_children())
+            self.tree, self.tree_array = self.list_files('.', self.tree, "", '.')
+            self.tree.item("./.", open=True)
 
     def find_type(self, event):
         path = self.n.tab(self.n.select())['text']
@@ -537,26 +560,13 @@ class App:
         self.tree.item("./.", open=True)
 
     def show_menu(self, event):
-        #w = self.tree
-        #w = e.widget
-        #the_menu.entryconfigure("Cut",
-        #command=lambda: w.event_generate("<<Cut>>"))
-        #the_menu.entryconfigure("Copy",
-        #command=lambda: w.event_generate("<<Copy>>"))
-        #the_menu.entryconfigure("Paste",
-        #command=lambda: w.event_generate("<<Paste>>"))
-        #self.directory_menu.add_command("Delete", command=delete_file)
-        #self.directory_menu.add_command("Rename", command=tree_rename)
-        #self.directory_menu.tk.call("tk_popup", the_menu, e.x_root, e.y_root)
         self.directory_menu.post(event.x_root, event.y_root)
 
     def on_right_click(self, event):
-        #try:
         if len(self.tree.selection()) > 0:
             self.selected_file_dir = self.tree.selection()[0]
             self.show_menu(event)
-        #except:
-        #    print('nothing selected')
+
     def tab_rename(self, event):
         path = self.n.tab(self.n.select())['text']
         args = ['python2', 'rename.py', path[path.rfind('/')+1:]]
@@ -596,22 +606,17 @@ class App:
         self.tree.pack(side=LEFT, fill=BOTH)
         self.pane.pack(fill='both', expand=1)
         self.n.add(self.pane, text='untitled')
-        #self.n.bind("<3>", self.on_right_click)
         self.n.bind("<Double-1>", self.tab_rename)
         self.n.pack(fill='both', expand=1)
         self.tab_names.append('untitled')
 
         filemenu = Menu(self.menubar, tearoff=0)
         filemenu.add_command(label="Open", command=self.open_click)
+        filemenu.add_command(label="Open Folder", command=self.open_folder_click)
         filemenu.add_command(label="Save", command=self.save_click)
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.exit_click)
         self.menubar.add_cascade(label="File", menu=filemenu)
-        #editmenu = Menu(self.menubar, tearoff=0)
-        #editmenu.add_command(label="Cut", command=self.cut_click)
-        #editmenu.add_command(label="Copy", command=self.copy_click)
-        #editmenu.add_command(label="Paste", command=self.cut_click)
-        #self.menubar.add_cascade(label="Edit", menu=editmenu)
         helpmenu = Menu(self.menubar, tearoff=0)
         helpmenu.add_command(label="About")
         self.menubar.add_cascade(label="Help", menu=helpmenu)
@@ -623,9 +628,6 @@ class App:
         self.root.bind('<Control-f>', self.find_type)
         self.root.bind('<Escape>', self.end_find)
         self.root.config(menu=self.menubar)
-        #w, h = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
-        #self.root.overrideredirect(1)
-        #self.root.geometry("%dx%d+0+0" % (w, h))
         self.root.attributes("-zoomed", True)
 
     def make_directory_menu(self, w):
