@@ -4,6 +4,6 @@ import os
 
 setup(name='merengue',
       description='A Raspberry Pi text editor',
-      version='1.0.1',
+      version='1.0.2',
       py_modules=['merengue'],
       )
