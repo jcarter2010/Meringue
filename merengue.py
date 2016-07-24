@@ -646,7 +646,7 @@ class App:
         self.directory_menu.add_command(label="Rename", command=self.tree_rename)
 
     def __init__(self):
-    	os.chdir('~/Documents')
+    	os.chdir(os.path.join(os.path.expanduser('~'), 'Documents'))
         self.root = Tk()
         self.eds = []
         self.n = ttk.Notebook(self.root)
