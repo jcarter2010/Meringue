@@ -363,7 +363,7 @@ class App:
                 ed.text.tag_configure("number", foreground='cyan')
                 ed.text.tag_configure("operator", foreground='blue')
                 ed.text.tag_configure('normal', foreground='white')
-                ed.text.syntax_coloring(None)
+                #ed.text.syntax_coloring(None)
                 self.eds.append(ed)
             self.n.select(self.tab_names.index(path))
 
@@ -419,9 +419,8 @@ class App:
                 tree, n2 = self.list_files(d, tree, path, full_path + '/' + path)
             tn.nodes.append(n2)
         for f in files:
-                if full_path != '.':
-                    tree.insert(full_path, 3, full_path + '/' + f, text=f, tags = ('file',))
-                    tn.nodes.append(Tree_Node(f))
+                tree.insert(full_path + '/' + path, 3, full_path + '/' + f, text=f, tags = ('file',))
+                tn.nodes.append(Tree_Node(f))
         return tree, tn
 
     def on_double_click(self, event):
@@ -453,6 +452,8 @@ class App:
         p = Popen(args, stdin=PIPE, stdout=PIPE, shell=False)
         p.wait()
         out = p.stdout.read().replace('\n', '')
+        if out.startswith('./') == False:
+            out ='./' + out
         if not out == '!!DO NOT OPEN!!':
             try:
                 self.open_file(out)
