@@ -57,6 +57,15 @@ class EditorClass(object):
         self.text.bind('<Key>', self.syntax_coloring)
         self.text.bind('<4>', self.syntax_coloring)
         self.text.bind('<5>', self.syntax_coloring)
+        self.text.bind('<Tab>', self.tab)
+        self.text.bind('<Enter>', self.enter)
+
+    def enter(self, event):
+        print('Pressed enter')
+
+    def tab(self, event):
+        self.text.insert(INSERT, " " * 4)
+        return 'break'
 
     def getLineNumbers(self):
         x = 0
@@ -456,17 +465,27 @@ class App:
             return True
         return False
 
-    def list_files(self, path, tree, parent):
-        tree.insert(parent, 3, path, text=path, tags = ('directory',))
-        files = [f for f in listdir(path) if isfile(join(path, f))]
-        dirs = [d for d in listdir(path) if not isfile(join(path, d))]
+    def list_files(self, path, tree, parent, full_path):
+        print(full_path + '/' + path)
+        print(os.listdir(full_path+'/'+path))
+        if path == '.':
+            tree.insert('', 3, full_path + '/' + path, text=path, tags = ('directory',))
+        else:
+            tree.insert(full_path, 3, full_path + '/'+ path, text=path, tags = ('directory',))
+        files = [f for f in listdir(full_path+'/'+path) if isfile(join(full_path+'/'+path, f))]
+        dirs = [d for d in listdir(full_path+'/'+path) if not isfile(join(full_path+'/'+path, d))]
         tn = Tree_Node(path)
         for d in dirs:
-            tree, n2 = self.list_files(d, tree, path)
+            if parent != '':
+                tree, n2 = self.list_files(d, tree, path, full_path + '/' + path)
+            else:
+                tree, n2 = self.list_files(d, tree, path, full_path + '/' + path)
             tn.nodes.append(n2)
         for f in files:
-                tree.insert(path, 3, f, text=f, tags = ('file',))
-                tn.nodes.append(Tree_Node(f))
+                print(full_path)
+                if full_path != '.':
+                    tree.insert(full_path, 3, full_path + '/' + f, text=f, tags = ('file',))
+                    tn.nodes.append(Tree_Node(f))
         return tree, tn
 
     def on_double_click(self, event):
@@ -499,8 +518,8 @@ class App:
         with open(path, 'w') as f_out:
             f_out.write(self.eds[index].text.get("1.0",END))
         self.tree.delete(*self.tree.get_children())
-        self.tree, self.tree_array = self.list_files('.', self.tree, "")
-        self.tree.item(".", open=True)
+        self.tree, self.tree_array = self.list_files('.', self.tree, "", '.')
+        self.tree.item("./.", open=True)
 
     def save_type(self, event):
         path = self.n.tab(self.n.select())['text']
@@ -509,8 +528,8 @@ class App:
         with open(path, 'w') as f_out:
             f_out.write(self.eds[index].text.get("1.0",END))
         self.tree.delete(*self.tree.get_children())
-        self.tree, self.tree_array = self.list_files('.', self.tree, "")
-        self.tree.item(".", open=True)
+        self.tree, self.tree_array = self.list_files('.', self.tree, "", '.')
+        self.tree.item("./.", open=True)
 
     def exit_click(self):
         sys.exit()
@@ -564,8 +583,8 @@ class App:
                 except:
                     print('file does not exist, not renaming anything but the tab')
         self.tree.delete(*self.tree.get_children())
-        self.tree, self.tree_array = self.list_files('.', self.tree, "")
-        self.tree.item(".", open=True)
+        self.tree, self.tree_array = self.list_files('.', self.tree, "", '.')
+        self.tree.item("./.", open=True)
 
     def delete_file(self):
         item = self.selected_file_dir
@@ -580,8 +599,8 @@ class App:
             except:
                 print('Not a directory')
         self.tree.delete(*self.tree.get_children())
-        self.tree, self.tree_array = self.list_files('.', self.tree, "")
-        self.tree.item(".", open=True)
+        self.tree, self.tree_array = self.list_files('.', self.tree, "", '.')
+        self.tree.item("./.", open=True)
 
     def show_menu(self, event):
         #w = self.tree
@@ -633,8 +652,8 @@ class App:
         self.pane.add(ed.frame)
         self.eds.append(ed)
         self.tree = ttk.Treeview(self.root)
-        self.tree, self.tree_array = self.list_files('.', self.tree, "")
-        self.tree.item(".", open=True)
+        self.tree, self.tree_array = self.list_files('.', self.tree, "", '.')
+        self.tree.item("./.", open=True)
         self.tree.tag_configure('directory', background='black', foreground='magenta')
         self.tree.tag_configure('file', background='black', foreground='lime')
         ttk.Style().configure("Treeview", fieldbackground="black")
@@ -694,6 +713,6 @@ class App:
         mainloop()
 
 if __name__ == '__main__':
-    path = os.path.abspath(__file__)
-    print(path)
+    #path = os.path.abspath(__file__)
+    #print(path)
     App()
