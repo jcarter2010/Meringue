@@ -7,8 +7,3 @@ setup(name='merengue',
       version='1.0.1',
       py_modules=['merengue'],
       )
-
-path = os.path.abspath(__file__)
-
-#sys.path.insert(0, path)
-os.system('PATH=$PATH:' + path)
