@@ -76,7 +76,6 @@ class EditorClass(object):
         line = '0'
         col= ''
         ln = ''
-        # assume each line is at least 6 pixels high
         step = 6
         nl = '\n'
         lineMask = '    %s\n'
@@ -115,35 +114,24 @@ class EditorClass(object):
 
     def syntax_coloring(self, event):
         self.highlight_numbers(event)
-        #self.reset_var_names(event)
         self.highlight_keywords(event)
         self.highlight_function_names(event)
         self.highlight_functions(event)
         self.highlight_True_False(event)
         self.highlight_operators(event)
         self.highlight_strings(event)
-    #def open_file(self):
-    #    ext_widget.index(Tkinter.INSERT),
 
-    def highlight_pattern(self, pattern, tag, start="1.0", end="end",
-                          regexp=False):
-        '''Apply the given tag to all text that matches the given pattern
-
-        If 'regexp' is set to True, pattern will be treated as a regular
-        expression according to Tcl's regular expression syntax.
-        '''
+    def highlight_pattern(self, pattern, tag, start="1.0", end="end", regexp=False):
         start = self.text.index(start)
         end = self.text.index(end)
         self.text.mark_set("matchStart", start)
         self.text.mark_set("matchEnd", start)
         self.text.mark_set("searchLimit", end)
-
         count = tk.IntVar()
         while True:
-            index = self.text.search(pattern, "matchEnd","searchLimit",
-                                count=count, regexp=regexp)
+            index = self.text.search(pattern, "matchEnd", "searchLimit", count=count, regexp=regexp)
             if index == "": break
-            if count.get() == 0: break # degenerate pattern which matches zero-length strings
+            if count.get() == 0: break
             self.text.mark_set("matchStart", index)
             self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
             self.text.tag_add(tag, "matchStart", "matchEnd")
@@ -160,12 +148,11 @@ class EditorClass(object):
                 self.text.mark_set("matchStart", start)
                 self.text.mark_set("matchEnd", start)
                 self.text.mark_set("searchLimit", end)
-
                 count = tk.IntVar()
                 while True:
                     index = self.text.search('\y' + pattern + '\y', "matchEnd","searchLimit", count=count, regexp=regexp)
                     if index == "": break
-                    if count.get() == 0: break # degenerate pattern which matches zero-length strings
+                    if count.get() == 0: break
                     self.text.mark_set("matchStart", index)
                     self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                     self.text.tag_add(tag, "matchStart", "matchEnd")
@@ -181,7 +168,6 @@ class EditorClass(object):
             self.text.mark_set("matchStart", start)
             self.text.mark_set("matchEnd", start)
             self.text.mark_set("searchLimit", end)
-
             count = tk.IntVar()
             while True:
                 index = self.text.search('def .*\\(', "matchEnd", "searchLimit", count=count, regexp=regexp)
@@ -189,7 +175,7 @@ class EditorClass(object):
                 arr = index.split('.')
                 index = arr[0] + '.' + str(int(arr[1]) + 4)
                 count_temp = str(int(count.get()) - 5)
-                if count.get() == 0: break # degenerate pattern which matches zero-length strings
+                if count.get() == 0: break
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count_temp))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
@@ -205,7 +191,6 @@ class EditorClass(object):
             self.text.mark_set("matchStart", start)
             self.text.mark_set("matchEnd", start)
             self.text.mark_set("searchLimit", end)
-
             count = tk.IntVar()
             while True:
                 index = self.text.search('\\..*\\(', "matchEnd", "searchLimit", count=count, regexp=regexp)
@@ -213,36 +198,10 @@ class EditorClass(object):
                 arr = index.split('.')
                 index = arr[0] + '.' + str(int(arr[1]) + 1)
                 count_temp = str(int(count.get()) - 2)
-                if count.get() == 0: break # degenerate pattern which matches zero-length strings
+                if count.get() == 0: break
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count_temp))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
-
-    def reset_var_names(self, event):
-        if self.fname.endswith('.py'):
-            tag = 'normal'
-            start=self.text.index('@0,0')
-            end=self.text.index('@0,%d' % self.text.winfo_height())
-            regexp=True
-            #for i in range(0, 10):
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('[a-zA-Z\d]+', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                #arr = index.split('.')
-                #index = arr[0] + '.' + str(int(arr[1]) + 1)
-                #count_temp = str(int(count.get()) - 2)
-                if count.get() == 0: break # degenerate pattern which matches zero-length strings
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-
 
     def highlight_numbers(self, event):
         if self.fname.endswith('.py'):
@@ -250,21 +209,16 @@ class EditorClass(object):
             start=self.text.index('@0,0')
             end=self.text.index('@0,%d' % self.text.winfo_height())
             regexp=True
-            #for i in range(0, 10):
             start = self.text.index(start)
             end = self.text.index(end)
             self.text.mark_set("matchStart", start)
             self.text.mark_set("matchEnd", start)
             self.text.mark_set("searchLimit", end)
-
             count = tk.IntVar()
             while True:
                 index = self.text.search('[^a-zA-Z](\d+)', "matchEnd", "searchLimit", count=count, regexp=regexp)
                 if index == "": break
-                #arr = index.split('.')
-                #index = arr[0] + '.' + str(int(arr[1]) + 1)
-                #count_temp = str(int(count.get()) - 2)
-                if count.get() == 0: break # degenerate pattern which matches zero-length strings
+                if count.get() == 0: break
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
@@ -280,15 +234,11 @@ class EditorClass(object):
             self.text.mark_set("matchStart", start)
             self.text.mark_set("matchEnd", start)
             self.text.mark_set("searchLimit", end)
-
             count = tk.IntVar()
             while True:
                 index = self.text.search('[\\(\\)\\+\\\\\-\\*\\/\\.\\]\\[\\=]', "matchEnd", "searchLimit", count=count, regexp=regexp)
                 if index == "": break
-                #arr = index.split('.')
-                #index = arr[0] + '.' + str(int(arr[1]) + 1)
-                #count_temp = str(int(count.get()) - 2)
-                if count.get() == 0: break # degenerate pattern which matches zero-length strings
+                if count.get() == 0: break
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
@@ -304,33 +254,27 @@ class EditorClass(object):
             self.text.mark_set("matchStart", start)
             self.text.mark_set("matchEnd", start)
             self.text.mark_set("searchLimit", end)
-
             count = tk.IntVar()
             while True:
                 index = self.text.search('\yTrue\y', "matchEnd", "searchLimit", count=count, regexp=regexp)
                 if index == "": break
                 arr = index.split('.')
-                #index = arr[0] + '.' + str(int(arr[1]) + 4)
-                #count_temp = str(int(count.get()) - 5)
-                if count.get() == 0: break # degenerate pattern which matches zero-length strings
+                if count.get() == 0: break
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
-
             start = self.text.index(start)
             end = self.text.index(end)
             self.text.mark_set("matchStart", start)
             self.text.mark_set("matchEnd", start)
             self.text.mark_set("searchLimit", end)
-
             count = tk.IntVar()
             while True:
                 index = self.text.search('\yFalse\y', "matchEnd", "searchLimit", count=count, regexp=regexp)
                 if index == "": break
                 arr = index.split('.')
-                #index = arr[0] + '.' + str(int(arr[1]) + 4)
                 count_temp = str(int(count.get()) - 5)
-                if count.get() == 0: break # degenerate pattern which matches zero-length strings
+                if count.get() == 0: break
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
@@ -346,33 +290,24 @@ class EditorClass(object):
             self.text.mark_set("matchStart", start)
             self.text.mark_set("matchEnd", start)
             self.text.mark_set("searchLimit", end)
-
             count = tk.IntVar()
             while True:
                 index = self.text.search('".*"', "matchEnd", "searchLimit", count=count, regexp=regexp)
                 if index == "": break
-                #arr = index.split('.')
-                #index = arr[0] + '.' + str(int(arr[1]) + 1)
-                #count_temp = str(int(count.get()) - 2)
-                if count.get() == 0: break # degenerate pattern which matches zero-length strings
+                if count.get() == 0: break
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
-
             start = self.text.index(start)
             end = self.text.index(end)
             self.text.mark_set("matchStart", start)
             self.text.mark_set("matchEnd", start)
             self.text.mark_set("searchLimit", end)
-
             count = tk.IntVar()
             while True:
                 index = self.text.search("'.*'", "matchEnd", "searchLimit", count=count, regexp=regexp)
                 if index == "": break
-                #arr = index.split('.')
-                #index = arr[0] + '.' + str(int(arr[1]) + 1)
-                #count_temp = str(int(count.get()) - 2)
-                if count.get() == 0: break # degenerate pattern which matches zero-length strings
+                if count.get() == 0: break
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
@@ -383,13 +318,11 @@ class EditorClass(object):
         self.text.mark_set("matchStart", start)
         self.text.mark_set("matchEnd", start)
         self.text.mark_set("searchLimit", end)
-
         count = tk.IntVar()
         while True:
-            index = self.text.search(pattern, "matchEnd","searchLimit",
-                                count=count, regexp=regexp)
+            index = self.text.search(pattern, "matchEnd", "searchLimit", count=count, regexp=regexp)
             if index == "": break
-            if count.get() == 0: break # degenerate pattern which matches zero-length strings
+            if count.get() == 0: break
             self.text.mark_set("matchStart", index)
             self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
             self.text.tag_remove(tag, "matchStart", "matchEnd")
@@ -490,10 +423,10 @@ class App:
         return tree, tn
 
     def on_double_click(self, event):
-            item = self.tree.selection()[0]
-            path, found = self.find_path('', self.tree_array, item)
-            if found:
-                self.open_file(path)
+        item = self.tree.selection()[0]
+        path, found = self.find_path('', self.tree_array, item)
+        if found:
+            self.open_file(path)
 
     def close_tab(self):
         index = self.n.tabs().index(self.n.select())
@@ -562,7 +495,7 @@ class App:
                     text = self.eds[index].text.get("1.0",END)
                     self.eds[index].text.delete("1.0",END)
                     text = text.replace(self.find_string, r_string)
-                    self.eds[index].text.insert(END, text)
+                    self.eds[index].text.insert(END, text[:-1])
                     index = index + 1
 
     def tree_rename(self):
