@@ -58,10 +58,14 @@ class EditorClass(object):
         self.text.bind('<4>', self.syntax_coloring)
         self.text.bind('<5>', self.syntax_coloring)
         self.text.bind('<Tab>', self.tab)
-        self.text.bind('<Enter>', self.enter)
+        self.text.bind('<Return>', self.enter)
 
     def enter(self, event):
-        print('Pressed enter')
+        start = float(int(float(self.text.index(INSERT))))
+        s = self.text.get(str(start), str(int(start))+'.1000')
+        indent = re.match(r"\s*", s).group()
+        self.text.insert(INSERT, '\n' + indent)
+        return 'break'
 
     def tab(self, event):
         self.text.insert(INSERT, " " * 4)
@@ -466,8 +470,6 @@ class App:
         return False
 
     def list_files(self, path, tree, parent, full_path):
-        print(full_path + '/' + path)
-        print(os.listdir(full_path+'/'+path))
         if path == '.':
             tree.insert('', 3, full_path + '/' + path, text=path, tags = ('directory',))
         else:
@@ -482,7 +484,6 @@ class App:
                 tree, n2 = self.list_files(d, tree, path, full_path + '/' + path)
             tn.nodes.append(n2)
         for f in files:
-                print(full_path)
                 if full_path != '.':
                     tree.insert(full_path, 3, full_path + '/' + f, text=f, tags = ('file',))
                     tn.nodes.append(Tree_Node(f))
