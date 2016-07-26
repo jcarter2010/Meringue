@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/env python
 
 from Tkinter import *
 import Tkinter as tk
@@ -133,6 +133,7 @@ class EditorClass(object):
         self.text.mark_set("matchEnd", start)
         self.text.mark_set("searchLimit", end)
         count = tk.IntVar()
+        counter = 0
         while True:
             index = self.text.search(pattern, "matchEnd", "searchLimit", count=count, regexp=regexp)
             if index == "": break
@@ -140,6 +141,9 @@ class EditorClass(object):
             self.text.mark_set("matchStart", index)
             self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
             self.text.tag_add(tag, "matchStart", "matchEnd")
+            if counter == 0:
+            	self.text.see(index)
+            counter = counter + 1
 
     def highlight_keywords(self, event):
         if self.fname.endswith('.py'):
@@ -648,6 +652,7 @@ class App:
         self.tree_array = []
         self.start(1, 9999)
         self.make_directory_menu(self.root)
+        self.jump_counter = 0
         mainloop()
 
 if __name__ == '__main__':
