@@ -5,8 +5,8 @@ def find():
 
     global entryWidget
 
-    print('!!FIND!!' + entryWidget.get())
-    sys.exit()
+    print('!!FIND_ONLY!! !!FIND!!' + entryWidget.get())
+    #sys.exit()
 
 def replace():
 
@@ -14,10 +14,10 @@ def replace():
     global entryWidget2
 
     print('!!FIND!!' + entryWidget.get() + '!!REPLACE!!' + entryWidget2.get())
-    sys.exit()
+    #sys.exit()
 
 def end():
-    print('!!DO NOT RENAME!!')
+    print('!!END!!')
     sys.exit()
 
 root = Tk()
@@ -46,13 +46,13 @@ entryWidget2.pack()
 
 textFrame.pack()
 
-button = Button(root, text="Find", command=find)
+button = Button(root, text="Find Next", command=find)
 button.pack()
 
 button2 = Button(root, text="Replace", command=replace)
 button2.pack()
 
-button3 = Button(root, text="Cancel", command=end)
+button3 = Button(root, text="Done", command=end)
 button3.pack()
 
 root.mainloop()

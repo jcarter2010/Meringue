@@ -10,10 +10,71 @@ from subprocess import Popen
 from subprocess import PIPE
 from tkMessageBox import *
 import keyword
+from multiprocessing import Process
 import tkFileDialog
 import tkMessageBox
-#from pygments.lexers import PythonLexer
 
+class find_and_replace_dialog:
+
+    def find(self):
+        self.parent_obj.find(self.entryWidget.get())
+
+    def find_one(self):
+        self.parent_obj.find_one(self.entryWidget.get())
+
+    def replace(self):
+        self.parent_obj.replace(self.entryWidget.get(), self.entryWidget2.get())
+
+    def replace_all(self):
+        self.parent_obj.replace_all(self.entryWidget.get(), self.entryWidget2.get())
+
+    def end(self):
+        self.parent_obj.reset_counters()
+        self.find_string = '!!END!!'
+        self.top.destroy()
+
+    def __init__(self, parent, parent_obj):
+
+        top = self.top = Toplevel(parent)
+
+        self.textFrame = Frame(top)
+
+        self.entryLabel = Label(self.textFrame)
+        self.entryLabel["text"] = "Find:"
+        self.entryLabel.pack()
+
+        self.entryWidget = Entry(self.textFrame)
+        self.entryWidget["width"] = 50
+        self.entryWidget.pack()
+
+        self.entryLabel2 = Label(self.textFrame)
+        self.entryLabel2["text"] = "Replace:"
+        self.entryLabel2.pack()
+
+        self.entryWidget2 = Entry(self.textFrame)
+        self.entryWidget2["width"] = 50
+        self.entryWidget2.pack()
+
+        self.textFrame.pack()
+
+        self.button = Button(top, text="Find All", command=self.find)
+        self.button.pack()
+
+        self.button1 = Button(top, text="Find Next", command=self.find_one)
+        self.button1.pack()
+
+        self.button2 = Button(top, text="Replace", command=self.replace)
+        self.button2.pack()
+
+        self.button3 = Button(top, text="Replace All", command=self.replace_all)
+        self.button3.pack()
+
+        self.button4 = Button(top, text="Done", command=self.end)
+        self.button4.pack()
+
+        self.parent_obj = parent_obj
+
+        #self.root.mainloop()
 
 class EditorClass(object):
 
@@ -64,6 +125,7 @@ class EditorClass(object):
         self.text.bind('<Return>', self.enter)
         self.text.bind('<Escape>', self.remove_highlight)
         self.text.bind('<Control-q>', self.highlight_variable)
+        self.text.bind('<MouseWheel>', self.syntax_coloring)
 
     def enter(self, event):
         start = float(int(float(self.text.index(INSERT))))
@@ -117,7 +179,21 @@ class EditorClass(object):
             cls.UPDATE_PERIOD,
             cls.updateAllLineNumbers)
 
+    def remove_all_tags(self, event):
+        self.text.tag_remove('string', '1.0', END)
+        self.text.tag_remove('boolean', '1.0', END)
+        self.text.tag_remove('operator', '1.0', END)
+        self.text.tag_remove('number', '1.0', END)
+        #self.text.tag_remove('highlight', '1.0', END)
+        self.text.tag_remove('function', '1.0', END)
+        self.text.tag_remove('keyword', '1.0', END)
+        self.text.tag_remove('function_name', '1.0', END)
+
     def syntax_coloring(self, event):
+        self.remove_all_tags(event)
+        self.highlight_numbers(event)
+        self.highlight_keywords
+        self.remove_all_tags(event)
         self.highlight_numbers(event)
         self.highlight_keywords(event)
         self.highlight_function_names(event)
@@ -127,6 +203,7 @@ class EditorClass(object):
         self.highlight_strings(event)
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end", regexp=False):
+        self.remove_highlight(None)
         start = self.text.index(start)
         end = self.text.index(end)
         self.text.mark_set("matchStart", start)
@@ -144,6 +221,28 @@ class EditorClass(object):
             if counter == 0:
             	self.text.see(index)
             counter = counter + 1
+        self.syntax_coloring(None)
+
+    def highlight_one(self, pattern, tag, c, start="1.0", end="end", regexp=False):
+        self.remove_highlight(None)
+        start = self.text.index(start)
+        end = self.text.index(end)
+        self.text.mark_set("matchStart", start)
+        self.text.mark_set("matchEnd", start)
+        self.text.mark_set("searchLimit", end)
+        count = tk.IntVar()
+        counter = 0
+        while True:
+            index = self.text.search(pattern, "matchEnd", "searchLimit", count=count, regexp=regexp)
+            if index == "": break
+            if count.get() == 0: break
+            self.text.mark_set("matchStart", index)
+            self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
+            if counter == c:
+                self.text.tag_add(tag, "matchStart", "matchEnd")
+            	self.text.see(index)
+            counter = counter + 1
+        self.syntax_coloring(None)
 
     def highlight_keywords(self, event):
         if self.fname.endswith('.py'):
@@ -165,6 +264,7 @@ class EditorClass(object):
                     self.text.mark_set("matchStart", index)
                     self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                     self.text.tag_add(tag, "matchStart", "matchEnd")
+                    self.text.see(index)
 
     def highlight_function_names(self, event):
         if self.fname.endswith('.py'):
@@ -321,22 +421,7 @@ class EditorClass(object):
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
 
-    def remove_highlight(self, pattern, tag, start="1.0", end="end", regexp=False):
-        '''
-        start = self.text.index(start)
-        end = self.text.index(end)
-        self.text.mark_set("matchStart", start)
-        self.text.mark_set("matchEnd", start)
-        self.text.mark_set("searchLimit", end)
-        count = tk.IntVar()
-        while True:
-            index = self.text.search(pattern, "matchEnd", "searchLimit", count=count, regexp=regexp)
-            if index == "": break
-            if count.get() == 0: break
-            self.text.mark_set("matchStart", index)
-            self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-            self.text.tag_remove(tag, "matchStart", "matchEnd")
-        '''
+    def remove_highlight(self, event):
         self.text.tag_remove('highlight', '1.0', END)
 
     def highlight_variable(self, event):
@@ -501,30 +586,48 @@ class App:
             self.tree = self.list_files('.', self.tree, "", '.')
             self.tree.item(os.getcwd(), open=True)
 
+    def find_text_dialog(self):
+        temp = find_and_replace_dialog(self.root, self)
+        self.root.wait_window(temp.top)
+        #while temp.find_string != '!!END!!':
+        #    if temp.find_string != '':
+        #        print(temp.find_string)
+
+    def find(self, f):
+        index = self.n.tabs().index(self.n.select())
+        ed = self.eds[index]
+        ed.highlight_pattern(f, "highlight")
+
+    def find_one(self, f):
+        index = self.n.tabs().index(self.n.select())
+        ed = self.eds[index]
+        text = ed.text.get("1.0",END)
+        count = text.count(f)
+        if self.find_counter >= count:
+            self.find_counter = 0
+        ed.highlight_one(f, "highlight", self.find_counter)
+        self.find_counter = self.find_counter + 1
+
+    def replace(self, f, r):
+        index = self.n.tabs().index(self.n.select())
+        text = self.eds[index].text.get("1.0",END)
+        self.eds[index].text.delete("1.0",END)
+        text = text.replace(f, r, 1)
+        self.eds[index].text.insert(END, text[:-1])
+
+    def replace_all(self, f, r):
+        index = self.n.tabs().index(self.n.select())
+        text = self.eds[index].text.get("1.0",END)
+        self.eds[index].text.delete("1.0",END)
+        text = text.replace(f, r)
+        self.eds[index].text.insert(END, text[:-1])
+
+    def reset_counters(self):
+        self.find_counter = 0
+
     def find_type(self, event):
         path = self.n.tab(self.n.select())['text']
-        args = ['python2', self.merengue_path + '/' + 'find_and_replace.py']
-        p = Popen(args, stdin=PIPE, stdout=PIPE, shell=False)
-        p.wait()
-        out = p.stdout.read().replace('\n', '')
-        f_index = out.index('!!FIND!!')
-        if f_index != -1:
-            self.find_string = out[8:]
-            r_index = out.find('!!REPLACE!!')
-            if r_index == -1:
-                for ed in self.eds:
-                    ed.highlight_pattern(out[8:], "highlight")
-            else:
-                self.find_string = self.find_string[:self.find_string.find('!!REPLACE!!')]
-                r_string = out[out.find('!!REPLACE!!') + 11:]
-                index = 0
-                for ed in self.eds:
-                    print(self.find_string + '|' + r_string)
-                    text = self.eds[index].text.get("1.0",END)
-                    self.eds[index].text.delete("1.0",END)
-                    text = text.replace(self.find_string, r_string)
-                    self.eds[index].text.insert(END, text[:-1])
-                    index = index + 1
+        self.find_text_dialog()
 
     def tree_rename(self):
         item = self.tree.selection()[0]
@@ -581,7 +684,7 @@ class App:
 
     def end_find(self, event):
         for ed in self.eds:
-            ed.remove_highlight(self.find_string, "highlight")
+            ed.remove_highlight(None)
 
     def start(self, noOfEditors, noOfLines):
         self.pane = PanedWindow(self.n, orient=HORIZONTAL, opaqueresize=True)
@@ -643,16 +746,21 @@ class App:
         self.merengue_path = self.merengue_path[:self.merengue_path.rfind('/')]
     	os.chdir(os.path.join(os.path.expanduser('~'), 'Documents'))
         self.root = Tk()
+        img = PhotoImage(file=self.merengue_path + '/' + 'icon.png')
+        self.root.tk.call('wm', 'iconphoto', self.root._w, img)
+        #self.root.iconbitmap(self.merengue_path + '/' + 'merengue_icon.ico')
         self.eds = []
         self.n = ttk.Notebook(self.root)
         self.menubar = Menu(self.root)
         self.tab_names = []
         self.find_string = ''
+        self.find_counter = 0
         self.selected_file_dir = ''
         self.tree_array = []
         self.start(1, 9999)
         self.make_directory_menu(self.root)
         self.jump_counter = 0
+        self.find_counter = 0
         mainloop()
 
 if __name__ == '__main__':
