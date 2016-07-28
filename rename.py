@@ -1,10 +1,14 @@
-from Tkinter import *
-import Tkinter as tk
+try:
+    from Tkinter import *
+    import Tkinter as tk
+except:
+    from tkinter import *
+    import tkinter as tk
 
 def displayText():
 
     global entryWidget
-     
+
     print(entryWidget.get())
     sys.exit()
 
@@ -16,7 +20,7 @@ root = Tk()
 
 root.title("Rename Tab")
 root["padx"] = 40
-root["pady"] = 20   
+root["pady"] = 20
 
 textFrame = Frame(root)
 
@@ -39,5 +43,3 @@ button2 = Button(root, text="Cancel", command=end)
 button2.pack()
 
 root.mainloop()
-
-
