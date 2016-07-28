@@ -1,5 +1,9 @@
-from Tkinter import *
-import Tkinter as tk
+try:
+    from Tkinter import *
+    import Tkinter as tk
+except:
+    from tkinter import *
+    import tkinter as tk
 
 def find():
 
