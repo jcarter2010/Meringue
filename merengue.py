@@ -823,7 +823,7 @@ class App:
         self.root.title("Merengue")
         self.root.bind('<Control-s>', self.save_type)
         self.root.bind('<Control-f>', self.find_type)
-        self.root.bind('<Control-Shift-p>', self.git_commands)
+        #self.root.bind('<Control-Shift-p>', self.git_commands)
         self.root.bind('<Escape>', self.end_find)
         #self.root.bind("<Configure>", self.configure)
         self.root['bg'] = 'black'
