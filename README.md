@@ -13,4 +13,4 @@ The first time you run it, it will ask you for the default directory to open wit
 
 After this, every time open Merengue it will open up to that directory.  I'm still working on the ability to change the directory (at the moment Python is being a butt) so if you want to change it just go into the config.ini file and delete everythin after 'folder=' which will cause it to prompt you for the folder on startup again.
 
-[ctrl]+[f] is find and repalce, and [ctrl]-[f] is vraiable highlighing.  Select whichever variable you want by click and drag (or double click) and then press the key combo and it will highlight all instances of the variable in your current tab that is open.
+[ctrl]+[F] is find and repalce, and [ctrl]-[Q] is vraiable highlighing.  Select whichever variable you want by click and drag (or double click) and then press the key combo and it will highlight all instances of the variable in your current tab that is open.

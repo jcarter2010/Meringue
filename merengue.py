@@ -485,7 +485,7 @@ class EditorClass(object):
     def remove_highlight(self, start, end, event):
         self.text.tag_remove('highlight', '1.0', END)
 
-    def highlight_variable(self, start, end, event):
+    def highlight_variable(self, event):
         pattern = self.text.get(tk.SEL_FIRST, tk.SEL_LAST)
         tag = "highlight"
         start = self.text.index('1.0')
@@ -595,9 +595,9 @@ class App:
 
     def on_double_click(self, event):
         item = self.tree.selection()[0]
-        self.folder = item
-        self.lines[11] = self.lines[11][:self.lines[11].find('=')+1]+self.folder
-        self.write_config()
+        #self.folder = item
+        #self.lines[11] = self.lines[11][:self.lines[11].find('=')+1]+self.folder
+        #self.write_config()
         self.open_file(item)
 
 
