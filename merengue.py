@@ -127,15 +127,15 @@ class EditorClass(object):
         self.vScrollbar.config(command=self.text.yview)
         if self.__class__.updateId is None:
             self.updateAllLineNumbers()
-        self.text.bind('<Key>', self.syntax_coloring)
-        self.text.bind('<4>', self.syntax_coloring)
-        self.text.bind('<5>', self.syntax_coloring)
+        self.text.bind('<Key>', self.syntax_coloring_after_type)
+        #self.text.bind('<4>', self.syntax_coloring)
+        #self.text.bind('<5>', self.syntax_coloring)
         self.text.bind('<Tab>', self.tab)
         self.text.bind('<Return>', self.enter)
         self.text.bind('<Escape>', self.remove_highlight)
         self.text.bind('<Control-q>', self.highlight_variable)
-        self.text.bind('<MouseWheel>', self.syntax_coloring)
-        self.text.bind('<1>', self.syntax_coloring)
+        #self.text.bind('<MouseWheel>', self.syntax_coloring)
+        #self.text.bind('<1>', self.syntax_coloring)
 
     def enter(self, event):
         start = float(int(float(self.text.index(INSERT))))
@@ -189,28 +189,48 @@ class EditorClass(object):
             cls.UPDATE_PERIOD,
             cls.updateAllLineNumbers)
 
-    def remove_all_tags(self, event):
-        self.text.tag_remove('string', '1.0', END)
-        self.text.tag_remove('boolean', '1.0', END)
-        self.text.tag_remove('operator', '1.0', END)
-        self.text.tag_remove('number', '1.0', END)
+    def remove_all_tags(self, start, end, event):
+        self.text.tag_remove('string', start, end)
+        self.text.tag_remove('boolean', start, end)
+        self.text.tag_remove('operator', start, end)
+        self.text.tag_remove('number', start, end)
         #self.text.tag_remove('highlight', '1.0', END)
-        self.text.tag_remove('function', '1.0', END)
-        self.text.tag_remove('keyword', '1.0', END)
-        self.text.tag_remove('function_name', '1.0', END)
+        self.text.tag_remove('function', start, end)
+        self.text.tag_remove('keyword', start, end)
+        self.text.tag_remove('function_name', start, end)
 
     def syntax_coloring(self, event):
-        self.remove_all_tags(event)
-        self.highlight_numbers(event)
-        self.highlight_keywords
-        self.remove_all_tags(event)
-        self.highlight_numbers(event)
-        self.highlight_keywords(event)
-        self.highlight_function_names(event)
-        self.highlight_functions(event)
-        self.highlight_True_False(event)
-        self.highlight_operators(event)
-        self.highlight_strings(event)
+        start = '1.0'
+        end = END
+        self.remove_all_tags(start, end, event)
+        self.highlight_numbers(start, end, event)
+        self.highlight_keywords(start, end, event)
+        #self.remove_all_tags(event)
+        self.highlight_numbers(start, end, event)
+        self.highlight_keywords(start, end, event)
+        self.highlight_function_names(start, end, event)
+        self.highlight_functions(start, end, event)
+        self.highlight_True_False(start, end, event)
+        self.highlight_operators(start, end, event)
+        self.highlight_strings(start, end, event)
+        self.highlight_comments(start, end, event)
+        self.highlight_multiline_comments(start, end, event)
+
+    def syntax_coloring_after_type(self, event):
+        start=self.text.index('@0,0')
+        end=self.text.index('@0,%d' % self.text.winfo_height())
+        self.remove_all_tags(start, end, event)
+        self.highlight_numbers(start, end, event)
+        self.highlight_keywords(start, end, event)
+        self.highlight_numbers(start, end, event)
+        self.highlight_keywords(start, end, event)
+        self.highlight_function_names(start, end, event)
+        self.highlight_functions(start, end, event)
+        self.highlight_True_False(start, end, event)
+        self.highlight_operators(start, end, event)
+        self.highlight_strings(start, end, event)
+        self.highlight_comments(start, end, event)
+        self.highlight_multiline_comments(start, end, event)
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end", regexp=False):
         self.remove_highlight(None)
@@ -254,11 +274,9 @@ class EditorClass(object):
             counter = counter + 1
         self.syntax_coloring(None)
 
-    def highlight_keywords(self, event):
+    def highlight_keywords(self, start, end, event):
         if self.fname.endswith('.py'):
             tag = 'keyword'
-            start=self.text.index('@0,0')
-            end=self.text.index('@0,%d' % self.text.winfo_height())
             regexp=True
             for pattern in keyword.kwlist:
                 start = self.text.index(start)
@@ -276,11 +294,9 @@ class EditorClass(object):
                     self.text.tag_add(tag, "matchStart", "matchEnd")
                     self.text.see(index)
 
-    def highlight_function_names(self, event):
+    def highlight_function_names(self, start, end, event):
         if self.fname.endswith('.py'):
             tag = 'function_name'
-            start=self.text.index('@0,0')
-            end=self.text.index('@0,%d' % self.text.winfo_height())
             regexp=True
             start = self.text.index(start)
             end = self.text.index(end)
@@ -299,11 +315,9 @@ class EditorClass(object):
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count_temp))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
 
-    def highlight_functions(self, event):
+    def highlight_functions(self, start, end, event):
         if self.fname.endswith('.py'):
             tag = 'function'
-            start=self.text.index('@0,0')
-            end=self.text.index('@0,%d' % self.text.winfo_height())
             regexp=True
             start = self.text.index(start)
             end = self.text.index(end)
@@ -322,11 +336,9 @@ class EditorClass(object):
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count_temp))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
 
-    def highlight_numbers(self, event):
+    def highlight_numbers(self, start, end, event):
         if self.fname.endswith('.py'):
             tag = 'number'
-            start=self.text.index('@0,0')
-            end=self.text.index('@0,%d' % self.text.winfo_height())
             regexp=True
             start = self.text.index(start)
             end = self.text.index(end)
@@ -342,11 +354,9 @@ class EditorClass(object):
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
 
-    def highlight_operators(self, event):
+    def highlight_operators(self, start, end, event):
         if self.fname.endswith('.py'):
             tag = 'operator'
-            start=self.text.index('@0,0')
-            end=self.text.index('@0,%d' % self.text.winfo_height())
             regexp=True
             start = self.text.index(start)
             end = self.text.index(end)
@@ -362,11 +372,58 @@ class EditorClass(object):
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
 
-    def highlight_True_False(self, event):
+    def highlight_comments(self, start, end, event):
+        if self.fname.endswith('.py'):
+            tag = 'comment'
+            regexp=True
+            start = self.text.index(start)
+            end = self.text.index(end)
+            self.text.mark_set("matchStart", start)
+            self.text.mark_set("matchEnd", start)
+            self.text.mark_set("searchLimit", end)
+            count = tk.IntVar()
+            while True:
+                index = self.text.search('[^\'\"]#.*\n', "matchEnd", "searchLimit", count=count, regexp=regexp)
+                if index == "": break
+                if count.get() == 0: break
+                self.text.mark_set("matchStart", index)
+                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
+                self.text.tag_add(tag, "matchStart", "matchEnd")
+
+    def highlight_multiline_comments(self, start, end, event):
+        if self.fname.endswith('.py'):
+            tag = 'comment'
+            regexp=True
+            start = self.text.index(start)
+            end = self.text.index(end)
+            self.text.mark_set("matchStart", start)
+            self.text.mark_set("matchEnd", start)
+            self.text.mark_set("searchLimit", end)
+            count = tk.IntVar()
+            while True:
+                index = self.text.search('\"\"\".*\"\"\"', "matchEnd", "searchLimit", count=count, regexp=regexp)
+                if index == "": break
+                if count.get() == 0: break
+                self.text.mark_set("matchStart", index)
+                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
+                self.text.tag_remove("matchStart", "matchEnd")
+                self.text.tag_add(tag, "matchStart", "matchEnd")
+            self.text.mark_set("matchStart", start)
+            self.text.mark_set("matchEnd", start)
+            self.text.mark_set("searchLimit", end)
+            count = tk.IntVar()
+            while True:
+                index = self.text.search("\'\'\'(.|\n)*\'\'\'", "matchEnd", "searchLimit", count=count, regexp=regexp)
+                if index == "": break
+                if count.get() == 0: break
+                self.text.mark_set("matchStart", index)
+                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
+                self.text.tag_remove("matchStart", "matchEnd")
+                self.text.tag_add(tag, "matchStart", "matchEnd")
+
+    def highlight_True_False(self, start, end, event):
         if self.fname.endswith('.py'):
             tag = 'boolean'
-            start=self.text.index('@0,0')
-            end=self.text.index('@0,%d' % self.text.winfo_height())
             regexp=True
             start = self.text.index(start)
             end = self.text.index(end)
@@ -382,8 +439,6 @@ class EditorClass(object):
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
-            start = self.text.index(start)
-            end = self.text.index(end)
             self.text.mark_set("matchStart", start)
             self.text.mark_set("matchEnd", start)
             self.text.mark_set("searchLimit", end)
@@ -398,11 +453,9 @@ class EditorClass(object):
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
 
-    def highlight_strings(self, event):
+    def highlight_strings(self, start, end, event):
         if self.fname.endswith('.py'):
             tag = 'string'
-            start=self.text.index('@0,0')
-            end=self.text.index('@0,%d' % self.text.winfo_height())
             regexp=True
             start = self.text.index(start)
             end = self.text.index(end)
@@ -417,8 +470,6 @@ class EditorClass(object):
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
-            start = self.text.index(start)
-            end = self.text.index(end)
             self.text.mark_set("matchStart", start)
             self.text.mark_set("matchEnd", start)
             self.text.mark_set("searchLimit", end)
@@ -431,10 +482,10 @@ class EditorClass(object):
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
 
-    def remove_highlight(self, event):
+    def remove_highlight(self, start, end, event):
         self.text.tag_remove('highlight', '1.0', END)
 
-    def highlight_variable(self, event):
+    def highlight_variable(self, start, end, event):
         pattern = self.text.get(tk.SEL_FIRST, tk.SEL_LAST)
         tag = "highlight"
         start = self.text.index('1.0')
@@ -469,7 +520,9 @@ class App:
                 pane.add(ed.frame)
                 self.n.add(pane, text=path)
                 self.n.pack(fill='both', expand=1)
-                self.n.place(x = 200, y = 0, width=10000, height=10000)
+                w = self.root.winfo_width()
+                h = self.root.winfo_height()
+                #self.n.place(x=200, y=0, width=(w-200), height=h)
                 self.tab_names.append(path)
                 ed.text.config(insertbackground='white')
                 with open(path, 'r') as f_in:
@@ -477,16 +530,18 @@ class App:
                     lines = text.split('\n')
                     for line in lines:
                         ed.text.insert(END, line+'\n')
-                ed.text.tag_configure("highlight", background="blue", foreground='orange')
-                ed.text.tag_configure("keyword", foreground='red')
-                ed.text.tag_configure("function_name", foreground='yellow')
-                ed.text.tag_configure("function", foreground='orange')
-                ed.text.tag_configure("boolean", foreground='green')
-                ed.text.tag_configure("string", foreground='magenta')
-                ed.text.tag_configure("number", foreground='cyan')
-                ed.text.tag_configure("operator", foreground='blue')
-                ed.text.tag_configure('normal', foreground='white')
-                ed.text.event_generate("<Key>", when='tail')
+                ed.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
+                ed.text.tag_configure("keyword", foreground=self.highlight_keyword)
+                ed.text.tag_configure("function_name", foreground=self.highlight_function_name)
+                ed.text.tag_configure("function", foreground=self.highlight_function)
+                ed.text.tag_configure("boolean", foreground=self.highlight_boolean)
+                ed.text.tag_configure("string", foreground=self.highlight_string)
+                ed.text.tag_configure("number", foreground=self.highlight_number)
+                ed.text.tag_configure("operator", foreground=self.highlight_operator)
+                ed.text.tag_configure('normal', foreground=self.highlight_normal)
+                ed.text.tag_configure('comment', foreground=self.highlight_comment)
+                #ed.text.event_generate("<Key>", when='tail')
+                ed.syntax_coloring(None)
                 #ed.color()
                 self.eds.append(ed)
             self.n.select(self.tab_names.index(path))
@@ -531,6 +586,9 @@ class App:
 
     def on_double_click(self, event):
         item = self.tree.selection()[0]
+        self.folder = item
+        self.lines[11] = self.lines[11][:self.lines[11].find('=')+1]+self.folder
+        self.write_config()
         self.open_file(item)
 
 
@@ -593,11 +651,15 @@ class App:
     def open_folder_click(self):
         val = self.close_all_tabs()
         if val:
-            folder = tkFileDialog.askdirectory()
+            folder = askdirectory()
             os.chdir(folder)
             self.tree.delete(*self.tree.get_children())
             self.tree = self.list_files('.', self.tree, "", '.')
             self.tree.item(os.getcwd(), open=True)
+            self.folder = folder
+            self.lines[11] = self.lines[11][:self.lines[11].find('=')+1]+self.folder
+            self.write_config()
+            print(self.folder)
 
     def find_text_dialog(self):
         temp = find_and_replace_dialog(self.root, self)
@@ -697,41 +759,43 @@ class App:
             ed.remove_highlight(None)
 
     def start(self, noOfEditors, noOfLines):
+        self.read_config()
         self.pane = PanedWindow(self.n, orient=HORIZONTAL, opaqueresize=True)
         ed = EditorClass(self.root, 'untitled')
         ed.text.config(insertbackground='white')
-        ed.text.tag_configure("highlight", background="blue", foreground='orange')
-        ed.text.tag_configure("keyword", foreground='red')
-        ed.text.tag_configure("function_name", foreground='yellow')
-        ed.text.tag_configure("function", foreground='orange')
-        ed.text.tag_configure("boolean", foreground='green')
-        ed.text.tag_configure("string", foreground='magenta')
-        ed.text.tag_configure("number", foreground='cyan')
-        ed.text.tag_configure("operator", foreground='blue')
-        ed.text.tag_configure('normal', foreground='white')
+        ed.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
+        ed.text.tag_configure("keyword", foreground=self.highlight_keyword)
+        ed.text.tag_configure("function_name", foreground=self.highlight_function_name)
+        ed.text.tag_configure("function", foreground=self.highlight_function)
+        ed.text.tag_configure("boolean", foreground=self.highlight_boolean)
+        ed.text.tag_configure("string", foreground=self.highlight_string)
+        ed.text.tag_configure("number", foreground=self.highlight_number)
+        ed.text.tag_configure("operator", foreground=self.highlight_operator)
+        ed.text.tag_configure('normal', foreground=self.highlight_normal)
+        ed.text.tag_configure('comment', foreground=self.highlight_comment)
         self.pane.add(ed.frame)
         self.eds.append(ed)
-        self.tree = ttk.Treeview(self.root)
-        self.tree["columns"]=("Files_and_Folders")
+        self.tree_frame = Frame(self.root, width=200)
+        self.tree = ttk.Treeview(self.tree_frame)
+        #self.tree["columns"]=("Files_and_Folders")
         self.tree = self.list_files('.', self.tree, "", '.')
         self.tree.item(os.getcwd(), open=True)
         self.tree.tag_configure('directory', background='black', foreground='magenta')
         self.tree.tag_configure('file', background='black', foreground='lime')
         ttk.Style().configure("Treeview", fieldbackground="#000000")
-        self.treeScroll = ttk.Scrollbar(self.tree, orient=HORIZONTAL)
+        self.treeScroll = ttk.Scrollbar(self.tree_frame, orient=HORIZONTAL)
         self.treeScroll.configure(command=self.tree.xview)
         self.treeScroll.pack(side=TOP, fill=X)
         self.tree.configure(xscrollcommand=self.treeScroll.set)
         self.tree.bind("<3>", self.on_right_click)
         self.tree.bind("<Double-1>", self.on_double_click)
-        self.tree.pack(side=LEFT, fill=X, expand=1)
-        self.tree.place(x = 0, y = 0, width=200, height=10000)
-        self.pane.pack(fill='both', expand=1)
+        self.tree.pack(side=LEFT, fill=BOTH)
+        self.tree_frame.pack(side=LEFT, fill=BOTH)
         self.pane.configure(background='black')
+        self.pane.pack(fill='both', expand=1)
         self.n.add(self.pane, text='untitled')
         self.n.bind("<Double-1>", self.tab_rename)
-        self.n.pack(fill='both', expand=1)
-        self.n.place(x = 200, y = 0, width=10000, height=10000)
+        self.n.pack(side=LEFT, fill='both', expand=True)
         self.tab_names.append('untitled')
 
         filemenu = Menu(self.menubar, tearoff=0)
@@ -751,15 +815,50 @@ class App:
         self.root.bind('<Control-s>', self.save_type)
         self.root.bind('<Control-f>', self.find_type)
         self.root.bind('<Escape>', self.end_find)
+        #self.root.bind("<Configure>", self.configure)
         self.root['bg'] = 'black'
         self.root.geometry('{}x{}'.format(600, 400))
         self.root.config(menu=self.menubar)
         #self.root.attributes("-zoomed", True)
 
+    #def configure(self, event):
+    #    print(event.width)
+    #    self.n.place(x = 200, y = 0)
+
+    def read_config(self):
+        with open('config.ini', 'r') as f_in:
+            self.lines = f_in.read().split('\n')
+            self.highlight_foreground = self.lines[0].split('=')[1]
+            self.highlight_background = self.lines[1].split('=')[1]
+            self.highlight_keyword = self.lines[2].split('=')[1]
+            self.highlight_function_name = self.lines[3].split('=')[1]
+            self.highlight_function = self.lines[4].split('=')[1]
+            self.highlight_boolean = self.lines[5].split('=')[1]
+            self.highlight_string = self.lines[6].split('=')[1]
+            self.highlight_number = self.lines[7].split('=')[1]
+            self.highlight_operator = self.lines[8].split('=')[1]
+            self.highlight_normal = self.lines[9].split('=')[1]
+            self.highlight_comment = self.lines[10].split('=')[1]
+            self.folder = self.lines[11].split('=')[1]
+        if not self.folder:
+            self.folder = askdirectory()
+            self.lines[11] = self.lines[11][:self.lines[11].find('=')+1]+self.folder
+        self.write_config()
+        print(self.folder)
+        os.chdir(self.folder)
+
     def make_directory_menu(self, w):
         self.directory_menu = Menu(self.root, tearoff=0)
         self.directory_menu.add_command(label="Delete", command=self.delete_file)
         self.directory_menu.add_command(label="Rename", command=self.tree_rename)
+
+    def write_config(self):
+        print('writing')
+        with open('config.ini', 'w') as f_out:
+            for line in self.lines:
+                print(line)
+                f_out.write(line + '\n')
+            f_out.flush()
 
     def __init__(self):
         self.merengue_path = os.path.realpath(__file__)
@@ -777,17 +876,27 @@ class App:
         self.find_counter = 0
         self.selected_file_dir = ''
         self.tree_array = []
-        lines = []
-        with open('config.ini', 'r') as f_in:
-            lines = f_in.read().split('\n')
-            self.folder = lines[0].split('=')[1]
-            if not self.folder:
-                self.folder = askdirectory()
-                lines[0] = 'folder='+self.folder
-        with open('config.ini', 'w') as f_out:
-            for line in lines:
-                f_out.write(line + '\n')
-        os.chdir(self.folder)
+        #lines = []
+        #with open('config.ini', 'r') as f_in:
+        #    lines = f_in.read().split('\n')
+        #    self.folder = lines[0].split('=')[1]
+        #    if not self.folder:
+        #        self.folder = askdirectory()
+        #        lines[0] = 'folder='+self.folder
+        #with open('config.ini', 'w') as f_out:
+        #    for line in lines:
+        #        f_out.write(line + '\n')
+        self.folder = ''
+        self.highligh_foreground = ''
+        self.highlight_background = ''
+        self.highlight_keyword = ''
+        self.highlight_function_name = ''
+        self.highlight_function = ''
+        self.highlight_boolean = ''
+        self.highlight_string = ''
+        self.highlight_number = ''
+        self.highlight_operator = ''
+        self.highlight_normal = ''
         self.start(1, 9999)
         self.make_directory_menu(self.root)
         self.jump_counter = 0
