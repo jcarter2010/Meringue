@@ -1,18 +1,27 @@
 #!/usr/bin/env python
 
-from Tkinter import *
-import Tkinter as tk
-import ttk
+try:
+    from Tkinter import *
+    import Tkinter as tk
+    import ttk
+    import tkFileDialog
+    import tkMessageBox
+    import tkFileDialog
+except:
+    from tkinter import *
+    import tkinter as tk
+    import tkinter.ttk as ttk
+    import tkinter.messagebox as tkMessageBox
+    from tkinter.filedialog import askdirectory
 import os
 from os import listdir
 from os.path import isfile, join
 from subprocess import Popen
 from subprocess import PIPE
-from tkMessageBox import *
+#from tkMessageBox import *
 import keyword
 from multiprocessing import Process
-import tkFileDialog
-import tkMessageBox
+
 
 class find_and_replace_dialog:
 
@@ -126,6 +135,7 @@ class EditorClass(object):
         self.text.bind('<Escape>', self.remove_highlight)
         self.text.bind('<Control-q>', self.highlight_variable)
         self.text.bind('<MouseWheel>', self.syntax_coloring)
+        self.text.bind('<1>', self.syntax_coloring)
 
     def enter(self, event):
         start = float(int(float(self.text.index(INSERT))))
@@ -240,7 +250,7 @@ class EditorClass(object):
             self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
             if counter == c:
                 self.text.tag_add(tag, "matchStart", "matchEnd")
-            	self.text.see(index)
+                self.text.see(index)
             counter = counter + 1
         self.syntax_coloring(None)
 
@@ -459,6 +469,7 @@ class App:
                 pane.add(ed.frame)
                 self.n.add(pane, text=path)
                 self.n.pack(fill='both', expand=1)
+                self.n.place(x = 200, y = 0, width=10000, height=10000)
                 self.tab_names.append(path)
                 ed.text.config(insertbackground='white')
                 with open(path, 'r') as f_in:
@@ -475,6 +486,8 @@ class App:
                 ed.text.tag_configure("number", foreground='cyan')
                 ed.text.tag_configure("operator", foreground='blue')
                 ed.text.tag_configure('normal', foreground='white')
+                ed.text.event_generate("<Key>", when='tail')
+                #ed.color()
                 self.eds.append(ed)
             self.n.select(self.tab_names.index(path))
 
@@ -508,11 +521,11 @@ class App:
         for f in self.files:
             if counter != 0:
                 if(isfile(f)):
-                    tree.insert(f[:f.rfind('/')], 3, f, text=f[f.rfind('/') + 1:], tags = ('file',))
+                    tree.insert(f[:f.rfind('\\')], 0, f, text=f[f.rfind('\\') + 1:], tags = ('file',))
                 else:
-                    tree.insert(f[:f.rfind('/')], 3, f, text=f[f.rfind('/') + 1:], tags = ('directory',))
+                    tree.insert(f[:f.rfind('\\')], 0, f, text=f[f.rfind('\\') + 1:], tags = ('directory',))
             else:
-                tree.insert('', 3, f, text=f[f.rfind('/') + 1:], tags = ('directory',))
+                tree.insert('', 3, f, text=f[f.rfind('\\') + 1:], tags = ('directory',))
             counter = counter + 1
         return tree
 
@@ -573,7 +586,7 @@ class App:
         sys.exit()
 
     def keyPressed(self, event):
-        print "--"
+        print("--")
         if event.keysym == 's':
             self.save_click
 
@@ -589,9 +602,6 @@ class App:
     def find_text_dialog(self):
         temp = find_and_replace_dialog(self.root, self)
         self.root.wait_window(temp.top)
-        #while temp.find_string != '!!END!!':
-        #    if temp.find_string != '':
-        #        print(temp.find_string)
 
     def find(self, f):
         index = self.n.tabs().index(self.n.select())
@@ -642,7 +652,7 @@ class App:
                 print(i)
                 try:
                     if i != -1:
-                        os.rename(path, path[:path.rfind('/')]+'/'+out)
+                        os.rename(path, path[:path.rfind('\\')]+'\\'+out)
                     else:
                         os.rename(path, out)
                 except:
@@ -702,18 +712,26 @@ class App:
         self.pane.add(ed.frame)
         self.eds.append(ed)
         self.tree = ttk.Treeview(self.root)
+        self.tree["columns"]=("Files_and_Folders")
         self.tree = self.list_files('.', self.tree, "", '.')
         self.tree.item(os.getcwd(), open=True)
         self.tree.tag_configure('directory', background='black', foreground='magenta')
         self.tree.tag_configure('file', background='black', foreground='lime')
-        ttk.Style().configure("Treeview", fieldbackground="black")
+        ttk.Style().configure("Treeview", fieldbackground="#000000")
+        self.treeScroll = ttk.Scrollbar(self.tree, orient=HORIZONTAL)
+        self.treeScroll.configure(command=self.tree.xview)
+        self.treeScroll.pack(side=TOP, fill=X)
+        self.tree.configure(xscrollcommand=self.treeScroll.set)
         self.tree.bind("<3>", self.on_right_click)
         self.tree.bind("<Double-1>", self.on_double_click)
-        self.tree.pack(side=LEFT, fill=BOTH)
+        self.tree.pack(side=LEFT, fill=X, expand=1)
+        self.tree.place(x = 0, y = 0, width=200, height=10000)
         self.pane.pack(fill='both', expand=1)
+        self.pane.configure(background='black')
         self.n.add(self.pane, text='untitled')
         self.n.bind("<Double-1>", self.tab_rename)
         self.n.pack(fill='both', expand=1)
+        self.n.place(x = 200, y = 0, width=10000, height=10000)
         self.tab_names.append('untitled')
 
         filemenu = Menu(self.menubar, tearoff=0)
@@ -733,8 +751,10 @@ class App:
         self.root.bind('<Control-s>', self.save_type)
         self.root.bind('<Control-f>', self.find_type)
         self.root.bind('<Escape>', self.end_find)
+        self.root['bg'] = 'black'
+        self.root.geometry('{}x{}'.format(600, 400))
         self.root.config(menu=self.menubar)
-        self.root.attributes("-zoomed", True)
+        #self.root.attributes("-zoomed", True)
 
     def make_directory_menu(self, w):
         self.directory_menu = Menu(self.root, tearoff=0)
@@ -743,10 +763,10 @@ class App:
 
     def __init__(self):
         self.merengue_path = os.path.realpath(__file__)
-        self.merengue_path = self.merengue_path[:self.merengue_path.rfind('/')]
-    	os.chdir(os.path.join(os.path.expanduser('~'), 'Documents'))
+        self.merengue_path = self.merengue_path[:-11]
+        #os.chdir(os.path.join(os.path.expanduser('~'), 'Documents'))
         self.root = Tk()
-        img = PhotoImage(file=self.merengue_path + '/' + 'icon.png')
+        img = PhotoImage(file=self.merengue_path + 'icon.gif')
         self.root.tk.call('wm', 'iconphoto', self.root._w, img)
         #self.root.iconbitmap(self.merengue_path + '/' + 'merengue_icon.ico')
         self.eds = []
@@ -757,10 +777,21 @@ class App:
         self.find_counter = 0
         self.selected_file_dir = ''
         self.tree_array = []
+        lines = []
+        with open('config.ini', 'r') as f_in:
+            lines = f_in.read().split('\n')
+            self.folder = lines[0].split('=')[1]
+            if not self.folder:
+                self.folder = askdirectory()
+                lines[0] = 'folder='+self.folder
+        with open('config.ini', 'w') as f_out:
+            for line in lines:
+                f_out.write(line + '\n')
+        os.chdir(self.folder)
         self.start(1, 9999)
         self.make_directory_menu(self.root)
         self.jump_counter = 0
-        self.find_counter = 0
+        self. find_counter = 0
         mainloop()
 
 if __name__ == '__main__':
