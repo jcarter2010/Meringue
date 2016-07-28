@@ -575,12 +575,21 @@ class App:
         counter = 0
         for f in self.files:
             if counter != 0:
-                if(isfile(f)):
-                    tree.insert(f[:f.rfind('\\')], 0, f, text=f[f.rfind('\\') + 1:], tags = ('file',))
+                if os.name == 'posix':
+                    if(isfile(f)):
+                        tree.insert(f[:f.rfind('/')], 0, f, text=f[f.rfind('/') + 1:], tags = ('file',))
+                    else:
+                        tree.insert(f[:f.rfind('/')], 0, f, text=f[f.rfind('/') + 1:], tags = ('directory',))
                 else:
-                    tree.insert(f[:f.rfind('\\')], 0, f, text=f[f.rfind('\\') + 1:], tags = ('directory',))
+                    if(isfile(f)):
+                        tree.insert(f[:f.rfind('\\')], 0, f, text=f[f.rfind('\\') + 1:], tags = ('file',))
+                    else:
+                        tree.insert(f[:f.rfind('\\')], 0, f, text=f[f.rfind('\\') + 1:], tags = ('directory',))
             else:
-                tree.insert('', 3, f, text=f[f.rfind('\\') + 1:], tags = ('directory',))
+                if os.name == 'posix':
+                    tree.insert('', 3, f, text=f[f.rfind('/') + 1:], tags = ('directory',))
+                else:
+                    tree.insert('', 3, f, text=f[f.rfind('\\') + 1:], tags = ('directory',))
             counter = counter + 1
         return tree
 
