@@ -6,7 +6,7 @@ try:
     import ttk
     import tkFileDialog
     import tkMessageBox
-    import tkFileDialog
+    from tkFileDialog import askdirectory
 except:
     from tkinter import *
     import tkinter as tk
