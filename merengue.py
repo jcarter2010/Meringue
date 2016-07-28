@@ -835,7 +835,7 @@ class App:
     #    self.n.place(x = 200, y = 0)
 
     def read_config(self):
-        with open('config.ini', 'r') as f_in:
+        with open(self.merengue_path+'config.ini', 'r') as f_in:
             self.lines = f_in.read().split('\n')
             self.highlight_foreground = self.lines[0].split('=')[1]
             self.highlight_background = self.lines[1].split('=')[1]
@@ -863,7 +863,7 @@ class App:
 
     def write_config(self):
         print('writing')
-        with open('config.ini', 'w') as f_out:
+        with open(self.merengue_path+'config.ini', 'w') as f_out:
             for line in self.lines:
                 print(line)
                 f_out.write(line + '\n')
