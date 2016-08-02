@@ -629,7 +629,7 @@ class App:
         self.make_directory_menu(self.root)
         self.jump_counter = 0
         self.find_counter = 0
-        self.recursive_delete('./local')
+        self.recursive_delete(self.merengue_path+'/local')
         self.sftp_stem = ''
         mainloop()
 
