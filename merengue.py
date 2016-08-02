@@ -28,6 +28,7 @@ from find_and_replace_dialog import find_and_replace_dialog
 from new_dialog import new_dialog
 from new_folder_dialog import new_folder_dialog
 from open_file_dialog import open_file_dialog
+from change_color import change_color
 
 class App:
 
@@ -45,6 +46,8 @@ class App:
                 #self.n.place(x=200, y=0, width=(w-200), height=h)
                 self.tab_names.append(path)
                 ed.text.config(insertbackground='white')
+                ed.text.config(background=self.background)
+                ed.text.config(foreground=self.foreground)
                 with open(path, 'r') as f_in:
                     text = f_in.read()
                     lines = text.split('\n')
@@ -58,13 +61,40 @@ class App:
                 ed.text.tag_configure("string", foreground=self.highlight_string)
                 ed.text.tag_configure("number", foreground=self.highlight_number)
                 ed.text.tag_configure("operator", foreground=self.highlight_operator)
-                ed.text.tag_configure('normal', foreground=self.highlight_normal)
+                #ed.text.tag_configure('normal', foreground=self.highlight_normal)
                 ed.text.tag_configure('comment', foreground=self.highlight_comment)
+                ed.lnText.config(foreground=self.line_num_color)
+                ed.lnText.config(background=self.line_num_background_color)
                 #ed.text.event_generate("<Key>", when='tail')
                 ed.syntax_coloring(None)
                 #ed.color()
                 self.eds.append(ed)
             self.n.select(self.tab_names.index(path))
+
+    def change_ed_colors(self):
+        for ed in self.eds:
+            ed.text.config(insertbackground='white')
+            ed.text.config(background=self.background)
+            ed.text.config(foreground=self.foreground)
+            ed.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
+            ed.text.tag_configure("keyword", foreground=self.highlight_keyword)
+            ed.text.tag_configure("function_name", foreground=self.highlight_function_name)
+            ed.text.tag_configure("function", foreground=self.highlight_function)
+            ed.text.tag_configure("boolean", foreground=self.highlight_boolean)
+            ed.text.tag_configure("string", foreground=self.highlight_string)
+            ed.text.tag_configure("number", foreground=self.highlight_number)
+            ed.text.tag_configure("operator", foreground=self.highlight_operator)
+            ed.lnText.config(foreground=self.line_num_color)
+            ed.lnText.config(background=self.line_num_background_color)
+            #ed.text.tag_configure('normal', foreground=self.highlight_normal)
+            ed.text.tag_configure('comment', foreground=self.highlight_comment)
+        self.tree.tag_configure('directory', background=self.background, foreground=self.dir_color)
+        self.tree.tag_configure('file', background=self.background, foreground=self.file_color)
+        self.menubar.config(background=self.file_bar_color)
+        #self.pane.configure(background=self.pane_color)
+        self.root.configure(background=self.background)
+        self.menubar.config(background=self.file_bar_color, foreground=self.file_bar_text_color)
+        ttk.Style().configure("TNotebook", background=self.notebook_background)
 
     def copy_click(self):
         index = self.n.tabs().index(self.n.select())
@@ -361,10 +391,35 @@ class App:
         dialog = access_ssh(self.root, self)
 
     def start(self, noOfEditors, noOfLines):
+        '''
+        scroll_style = ttk.Style()
+
+        scroll_style.element_create("My.Scrollbar.trough", "from", "default")
+        scroll_style.element_create("My.Scrollbar.bg", "from", "default")
+        scroll_style.element_create("My.Scrollbar.activebackground", "from", "default")
+
+        # Redefine the horizontal scrollbar layout to use the custom trough.
+        # This one is appropriate for the 'vista' theme.
+        scroll_style.layout("My.TScrollbar",
+            [('My.Scrollbar.trough', {'children':
+                [('Horizontal.Scrollbar.leftarrow', {'side': 'left', 'sticky': ''}),
+                 ('Horizontal.Scrollbar.rightarrow', {'side': 'right', 'sticky': ''}),
+                 ('Horizontal.Scrollbar.thumb', {'unit': '1', 'children':
+                     [('Horizontal.Scrollbar.grip', {'sticky': ''})],
+                'sticky': 'nswe'})],
+            'sticky': 'we'})])
+        # Copy original style configuration and add our new custom configuration option.
+        scroll_style.configure("My.TScrollbar", *scroll_style.configure("Horizontal.TScrollbar"))
+        scroll_style.configure("My.TScrollbar", troughcolor="black")
+        '''
+        #s.configure('Tab_Style', background='cyan')
         self.read_config()
         self.pane = PanedWindow(self.n, orient=HORIZONTAL, opaqueresize=True)
         ed = EditorClass(self.root, 'untitled')
         ed.text.config(insertbackground='white')
+        ed.text.config(background=self.background)
+        ed.text.config(foreground=self.foreground)
+        #ed.vScrollbar.config(style="My.TScrollbar")
         ed.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
         ed.text.tag_configure("keyword", foreground=self.highlight_keyword)
         ed.text.tag_configure("function_name", foreground=self.highlight_function_name)
@@ -373,8 +428,11 @@ class App:
         ed.text.tag_configure("string", foreground=self.highlight_string)
         ed.text.tag_configure("number", foreground=self.highlight_number)
         ed.text.tag_configure("operator", foreground=self.highlight_operator)
-        ed.text.tag_configure('normal', foreground=self.highlight_normal)
+        #ed.text.tag_configure('normal', foreground=self.highlight_normal)
         ed.text.tag_configure('comment', foreground=self.highlight_comment)
+        ed.lnText.config(foreground=self.line_num_color)
+        ed.lnText.config(background=self.line_num_background_color)
+
         self.pane.add(ed.frame)
         self.eds.append(ed)
         self.tree_frame = Frame(self.root, width=200)
@@ -382,9 +440,9 @@ class App:
         #self.tree["columns"]=("Files_and_Folders")
         self.tree = self.list_files('.', self.tree, "", '.')
         self.tree.item(os.getcwd(), open=True)
-        self.tree.tag_configure('directory', background='black', foreground='magenta')
-        self.tree.tag_configure('file', background='black', foreground='lime')
-        ttk.Style().configure("Treeview", fieldbackground="#000000")
+        self.tree.tag_configure('directory', background=self.background, foreground=self.dir_color)
+        self.tree.tag_configure('file', background=self.background, foreground=self.file_color)
+        ttk.Style().configure("Treeview", fieldbackground=self.background)
         self.treeScroll = ttk.Scrollbar(self.tree_frame, orient=HORIZONTAL)
         self.treeScroll.configure(command=self.tree.xview)
         self.treeScroll.pack(side=TOP, fill=X)
@@ -393,11 +451,13 @@ class App:
         self.tree.bind("<Double-1>", self.on_double_click)
         self.tree.pack(side=LEFT, fill=BOTH)
         self.tree_frame.pack(side=LEFT, fill=BOTH)
-        self.pane.configure(background='black')
+        #self.pane.configure(background=self.pane_color)
         self.pane.pack(fill='both', expand=1)
         self.n.add(self.pane, text='untitled')
         self.n.bind("<Double-1>", self.tab_rename)
         self.n.pack(side=LEFT, fill='both', expand=True)
+        ttk.Style().configure("TNotebook", background=self.notebook_background)
+        #ttk.Style().configure("TPanedwindow", background=self.pane_color, foreground=self.notebook_foreground)
         self.tab_names.append('untitled')
 
         filemenu = Menu(self.menubar, tearoff=0)
@@ -408,12 +468,16 @@ class App:
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.exit_click)
         self.menubar.add_cascade(label="File", menu=filemenu)
+        optionsmenu = Menu(self.menubar, tearoff=0)
+        optionsmenu.add_command(label="Change Colors", command=self.color_config)
+        self.menubar.add_cascade(label="Options", menu=optionsmenu)
         helpmenu = Menu(self.menubar, tearoff=0)
         helpmenu.add_command(label="About")
         self.menubar.add_cascade(label="Help", menu=helpmenu)
         self.menubar.add_command(label="Close Tab", command=self.close_tab)
+        self.menubar.config(background=self.file_bar_color, foreground=self.file_bar_text_color)
 
-        self.root.configure(background='black')
+        self.root.configure(background=self.background)
         self.root.title("Merengue")
         self.root.bind('<Control-s>', self.save_type)
         self.root.bind('<Control-f>', self.find_type)
@@ -438,12 +502,21 @@ class App:
             self.highlight_string = self.lines[6].split('=')[1]
             self.highlight_number = self.lines[7].split('=')[1]
             self.highlight_operator = self.lines[8].split('=')[1]
-            self.highlight_normal = self.lines[9].split('=')[1]
-            self.highlight_comment = self.lines[10].split('=')[1]
-            self.folder = self.lines[11].split('=')[1]
+            #self.highlight_normal = self.lines[9].split('=')[1]
+            self.highlight_comment = self.lines[9].split('=')[1]
+            self.foreground = self.lines[10].split('=')[1]
+            self.background = self.lines[11].split('=')[1]
+            self.file_color = self.lines[12].split('=')[1]
+            self.dir_color = self.lines[13].split('=')[1]
+            self.line_num_color = self.lines[14].split('=')[1]
+            self.line_num_background_color = self.lines[15].split('=')[1]
+            self.file_bar_color = self.lines[16].split('=')[1]
+            self.file_bar_text_color = self.lines[17].split('=')[1]
+            self.notebook_background = self.lines[18].split('=')[1]
+            self.folder = self.lines[19].split('=')[1]
         if not self.folder:
             self.folder = askdirectory()
-            self.lines[11] = self.lines[11][:self.lines[11].find('=')+1]+self.folder
+            self.lines[19] = self.lines[19][:self.lines[19].find('=')+1]+self.folder
         self.write_config()
         os.chdir(self.folder)
 
@@ -494,6 +567,8 @@ class App:
         else:
             tkMessageBox.showwarning("File Creation", "Please select the parent folder for the new file and then try creating it again")
 
+    def color_config(self):
+        cc = change_color(self.root, self)
 
     def make_directory_menu(self, w):
         self.directory_menu = Menu(self.root, tearoff=0)
@@ -544,7 +619,9 @@ class App:
         self.highlight_string = ''
         self.highlight_number = ''
         self.highlight_operator = ''
-        self.highlight_normal = ''
+        #self.highlight_normal = ''
+        self.foreground = ''
+        self.background = ''
         self.start(1, 9999)
         self.make_directory_menu(self.root)
         self.jump_counter = 0

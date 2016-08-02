@@ -71,7 +71,7 @@ class access_ssh:
 
         ssh.close()
 
-        self.top.destroy()
+        #self.top.destroy()
 
     def cancel(self):
         self.top.destroy()

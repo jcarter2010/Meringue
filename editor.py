@@ -56,7 +56,7 @@ class EditorClass(object):
                 padx = 4,
                 undo=True,
                 background = 'black',
-                foreground = 'white',
+                foreground = 'blue',
                 wrap = NONE
         )
         self.text.pack(side=LEFT, fill=BOTH, expand=1)

@@ -29,8 +29,8 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
- 
+
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -42,54 +42,63 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
- 
+
 /* RGB_Controller.java requires no other files. */
 public class Color_Picker extends JPanel
-                              implements ChangeListener {
- 
+                              implements ChangeListener{
+
     public static JColorChooser tcc;
     public static JLabel banner;
- 
+
     public Color_Picker() {
         super(new BorderLayout());
- 
+
         //Set up the banner at the top of the window
-        banner = new JLabel("Please Select a Color",
+        //banner = new JLabel("Please Select a Color",
                             JLabel.CENTER);
         //banner.setForeground(Color.yellow);
         //banner.setBackground(Color.blue);
-        banner.setOpaque(true);
-        banner.setFont(new Font("SansSerif", Font.BOLD, 24));
-        banner.setPreferredSize(new Dimension(100, 65));
- 
-        JPanel bannerPanel = new JPanel(new BorderLayout());
-        bannerPanel.add(banner, BorderLayout.CENTER);
-        bannerPanel.setBorder(BorderFactory.createTitledBorder("Banner"));
- 
+        //banner.setOpaque(true);
+        //banner.setFont(new Font("SansSerif", Font.BOLD, 24));
+        //banner.setPreferredSize(new Dimension(100, 65));
+
+        JButton selectButton = new JButton("Select Color");
+        selectButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SelectButtonClick();
+            }
+        });
+
+        //JPanel bannerPanel = new JPanel(new BorderLayout());
+        //bannerPanel.add(banner, BorderLayout.CENTER);
+        //bannerPanel.setBorder(BorderFactory.createTitledBorder("Banner"));
+
         //Set up color chooser for setting text color
         tcc = new JColorChooser(banner.getForeground());
         tcc.getSelectionModel().addChangeListener(this);
         tcc.setBorder(BorderFactory.createTitledBorder(
-                                             "Choose Light Color"));
- 
-        add(bannerPanel, BorderLayout.CENTER);
-        add(tcc, BorderLayout.PAGE_END);
+                                             "Choose Element Color"));
+
+
+        //add(bannerPanel, BorderLayout.CENTER);
+        add(tcc, BorderLayout.CENTER);
+        add(selectButton, BorderLayout.PAGE_END);
     }
- 
+
+    public void SelectButtonClick(){
+      Color newColor = tcc.getColor();
+      //banner.setForeground(newColor);
+      System.out.println(Integer.toString(newColor.getRed()));
+      System.out.println(Integer.toString(newColor.getGreen()));
+      System.out.println(Integer.toString(newColor.getBlue()));
+      System.exit(0);
+    }
+
     public void stateChanged(ChangeEvent e) {
-        Color newColor = tcc.getColor();
-        banner.setForeground(newColor);
-        save();
-	String[] params = {"python","change_color.py",Integer.toString(newColor.getRed()),Integer.toString(newColor.getGreen()),Integer.toString(newColor.getBlue())};
-	try{
-		Runtime.getRuntime().exec(params);
-		Thread.sleep(1000);
-    	}
-	catch(Exception ex){
-		ex.printStackTrace();
-	}
+
     }
- 
+
     /**
      * Create the GUI and show it.  For thread safety,
      * this method should be invoked from the
@@ -99,60 +108,24 @@ public class Color_Picker extends JPanel
         //Create and set up the window.
         JFrame frame = new JFrame("Color Chooser");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
- 
+
         //Create and set up the content pane.
         JComponent newContentPane = new Color_Picker();
         newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
- 
+
         //Display the window.
         frame.pack();
         frame.setVisible(true);
     }
- 
+
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
-        load();
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 createAndShowGUI();
             }
         });
-    }
-    
-    public static void save(){
-    	try{
-    	    BufferedWriter writer = new BufferedWriter(new FileWriter(new File("color.txt")));
-    	    writer.write(Integer.toString(tcc.getColor().getRed()));
-	    writer.newLine();
-	    writer.write(Integer.toString(tcc.getColor().getGreen()));
-	    writer.newLine();
-	    writer.write(Integer.toString(tcc.getColor().getBlue()));
-    	    writer.close();
-    	}
-    	catch(Exception e){
-    	    e.printStackTrace();
-    	}
-    }
-
-    public static void load(){
-    	try{
-    	    BufferedReader reader = new BufferedReader(new FileReader(new File("color.txt")));
-    	    String line = null;
-    	    String[] vals = {"0", "0", "0"};
-    	    int counter = 0;
-    	    while((line = reader.readLine()) != null){
-    	        vals[counter] = line;
-    	     	counter++;
-    	    }
-    	    reader.close();
-    	    String[] params = {"python","Color_Picker.py",vals[0],vals[1],vals[2]};
-    	    Runtime.getRuntime().exec(params);
-	    Thread.sleep(1000);
-    	}
-    	catch(Exception e){
-    	    e.printStackTrace();
-    	}
     }
 }
