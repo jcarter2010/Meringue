@@ -28,7 +28,6 @@ from find_and_replace_dialog import find_and_replace_dialog
 from new_dialog import new_dialog
 from new_folder_dialog import new_folder_dialog
 from open_file_dialog import open_file_dialog
-from change_color import change_color
 
 class App:
 
@@ -46,8 +45,6 @@ class App:
                 #self.n.place(x=200, y=0, width=(w-200), height=h)
                 self.tab_names.append(path)
                 ed.text.config(insertbackground='white')
-                ed.text.config(background=self.background)
-                ed.text.config(foreground=self.foreground)
                 with open(path, 'r') as f_in:
                     text = f_in.read()
                     lines = text.split('\n')
@@ -61,40 +58,13 @@ class App:
                 ed.text.tag_configure("string", foreground=self.highlight_string)
                 ed.text.tag_configure("number", foreground=self.highlight_number)
                 ed.text.tag_configure("operator", foreground=self.highlight_operator)
-                #ed.text.tag_configure('normal', foreground=self.highlight_normal)
+                ed.text.tag_configure('normal', foreground=self.highlight_normal)
                 ed.text.tag_configure('comment', foreground=self.highlight_comment)
-                ed.lnText.config(foreground=self.line_num_color)
-                ed.lnText.config(background=self.line_num_background_color)
                 #ed.text.event_generate("<Key>", when='tail')
                 ed.syntax_coloring(None)
                 #ed.color()
                 self.eds.append(ed)
             self.n.select(self.tab_names.index(path))
-
-    def change_ed_colors(self):
-        for ed in self.eds:
-            ed.text.config(insertbackground='white')
-            ed.text.config(background=self.background)
-            ed.text.config(foreground=self.foreground)
-            ed.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
-            ed.text.tag_configure("keyword", foreground=self.highlight_keyword)
-            ed.text.tag_configure("function_name", foreground=self.highlight_function_name)
-            ed.text.tag_configure("function", foreground=self.highlight_function)
-            ed.text.tag_configure("boolean", foreground=self.highlight_boolean)
-            ed.text.tag_configure("string", foreground=self.highlight_string)
-            ed.text.tag_configure("number", foreground=self.highlight_number)
-            ed.text.tag_configure("operator", foreground=self.highlight_operator)
-            ed.lnText.config(foreground=self.line_num_color)
-            ed.lnText.config(background=self.line_num_background_color)
-            #ed.text.tag_configure('normal', foreground=self.highlight_normal)
-            ed.text.tag_configure('comment', foreground=self.highlight_comment)
-        self.tree.tag_configure('directory', background=self.background, foreground=self.dir_color)
-        self.tree.tag_configure('file', background=self.background, foreground=self.file_color)
-        self.menubar.config(background=self.file_bar_color)
-        #self.pane.configure(background=self.pane_color)
-        self.root.configure(background=self.background)
-        self.menubar.config(background=self.file_bar_color, foreground=self.file_bar_text_color)
-        ttk.Style().configure("TNotebook", background=self.notebook_background)
 
     def copy_click(self):
         index = self.n.tabs().index(self.n.select())
@@ -230,7 +200,7 @@ class App:
             self.tree = self.list_files('.', self.tree, "", '.')
             self.tree.item(os.getcwd(), open=True)
             self.folder = folder
-            self.lines[19] = self.lines[19][:self.lines[19].find('=')+1]+self.folder
+            self.lines[11] = self.lines[11][:self.lines[11].find('=')+1]+self.folder
             self.write_config()
             self.editing_pi = False
 
@@ -312,30 +282,28 @@ class App:
                         print('not a directory')
 
     def delete(self):
-        if tkMessageBox.askyesno("Delete", "Delte this file or folder?"):
-            item = self.tree.selection()[0]
-            try:
-                os.remove(item)
-                if self.editing_pi:
-                    transport = paramiko.Transport((self.ip, 22))
-                    transport.connect(username=self.username, password=self.password)
+        item = self.tree.selection()[0]
+        try:
+            os.remove(item)
+            if self.editing_pi:
+                transport = paramiko.Transport((self.ip, 22))
+                transport.connect(username=self.username, password=self.password)
 
-                    sftp = paramiko.SFTPClient.from_transport(transport)
-                    try:
-                        sftp.remove(item[item.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):])
-                    except:
-                        print('not a file')
-            except:
-                print('Not a file')
-            try:
-                #os.rmdir(item)
-                self.delete_file(item)
-            except:
-                print('Not a directory')
-            self.tree.delete(*self.tree.get_children())
-            self.tree = self.list_files('.', self.tree, "", '.')
-            self.tree.item(os.getcwd(), open=True)
-
+                sftp = paramiko.SFTPClient.from_transport(transport)
+                try:
+                    sftp.remove(item[item.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):])
+                except:
+                    print('not a file')
+        except:
+            print('Not a file')
+        try:
+            #os.rmdir(item)
+            self.delete_file(item)
+        except:
+            print('Not a directory')
+        self.tree.delete(*self.tree.get_children())
+        self.tree = self.list_files('.', self.tree, "", '.')
+        self.tree.item(os.getcwd(), open=True)
     def delete_file(self, path):
         dirs = [f for f in listdir(path) if not isfile(join(path, f))]
         files = [f for f in listdir(path) if isfile(join(path, f))]
@@ -359,6 +327,7 @@ class App:
 
             sftp = paramiko.SFTPClient.from_transport(transport)
             try:
+                pass
                 sftp.rmdir(path[path.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):]+'/'+d)
             except:
                 print('not a directory')
@@ -391,39 +360,11 @@ class App:
     def ssh(self, event=None):
         dialog = access_ssh(self.root, self)
 
-    def open_terminal(self):
-        os.system('gnome-terminal')
-
     def start(self, noOfEditors, noOfLines):
-        '''
-        scroll_style = ttk.Style()
-
-        scroll_style.element_create("My.Scrollbar.trough", "from", "default")
-        scroll_style.element_create("My.Scrollbar.bg", "from", "default")
-        scroll_style.element_create("My.Scrollbar.activebackground", "from", "default")
-
-        # Redefine the horizontal scrollbar layout to use the custom trough.
-        # This one is appropriate for the 'vista' theme.
-        scroll_style.layout("My.TScrollbar",
-            [('My.Scrollbar.trough', {'children':
-                [('Horizontal.Scrollbar.leftarrow', {'side': 'left', 'sticky': ''}),
-                 ('Horizontal.Scrollbar.rightarrow', {'side': 'right', 'sticky': ''}),
-                 ('Horizontal.Scrollbar.thumb', {'unit': '1', 'children':
-                     [('Horizontal.Scrollbar.grip', {'sticky': ''})],
-                'sticky': 'nswe'})],
-            'sticky': 'we'})])
-        # Copy original style configuration and add our new custom configuration option.
-        scroll_style.configure("My.TScrollbar", *scroll_style.configure("Horizontal.TScrollbar"))
-        scroll_style.configure("My.TScrollbar", troughcolor="black")
-        '''
-        #s.configure('Tab_Style', background='cyan')
         self.read_config()
         self.pane = PanedWindow(self.n, orient=HORIZONTAL, opaqueresize=True)
         ed = EditorClass(self.root, 'untitled')
         ed.text.config(insertbackground='white')
-        ed.text.config(background=self.background)
-        ed.text.config(foreground=self.foreground)
-        #ed.vScrollbar.config(style="My.TScrollbar")
         ed.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
         ed.text.tag_configure("keyword", foreground=self.highlight_keyword)
         ed.text.tag_configure("function_name", foreground=self.highlight_function_name)
@@ -432,11 +373,8 @@ class App:
         ed.text.tag_configure("string", foreground=self.highlight_string)
         ed.text.tag_configure("number", foreground=self.highlight_number)
         ed.text.tag_configure("operator", foreground=self.highlight_operator)
-        #ed.text.tag_configure('normal', foreground=self.highlight_normal)
+        ed.text.tag_configure('normal', foreground=self.highlight_normal)
         ed.text.tag_configure('comment', foreground=self.highlight_comment)
-        ed.lnText.config(foreground=self.line_num_color)
-        ed.lnText.config(background=self.line_num_background_color)
-
         self.pane.add(ed.frame)
         self.eds.append(ed)
         self.tree_frame = Frame(self.root, width=200)
@@ -444,9 +382,9 @@ class App:
         #self.tree["columns"]=("Files_and_Folders")
         self.tree = self.list_files('.', self.tree, "", '.')
         self.tree.item(os.getcwd(), open=True)
-        self.tree.tag_configure('directory', background=self.background, foreground=self.dir_color)
-        self.tree.tag_configure('file', background=self.background, foreground=self.file_color)
-        ttk.Style().configure("Treeview", fieldbackground=self.background)
+        self.tree.tag_configure('directory', background='black', foreground='magenta')
+        self.tree.tag_configure('file', background='black', foreground='lime')
+        ttk.Style().configure("Treeview", fieldbackground="#000000")
         self.treeScroll = ttk.Scrollbar(self.tree_frame, orient=HORIZONTAL)
         self.treeScroll.configure(command=self.tree.xview)
         self.treeScroll.pack(side=TOP, fill=X)
@@ -455,13 +393,11 @@ class App:
         self.tree.bind("<Double-1>", self.on_double_click)
         self.tree.pack(side=LEFT, fill=BOTH)
         self.tree_frame.pack(side=LEFT, fill=BOTH)
-        #self.pane.configure(background=self.pane_color)
+        self.pane.configure(background='black')
         self.pane.pack(fill='both', expand=1)
         self.n.add(self.pane, text='untitled')
         self.n.bind("<Double-1>", self.tab_rename)
         self.n.pack(side=LEFT, fill='both', expand=True)
-        ttk.Style().configure("TNotebook", background=self.notebook_background)
-        #ttk.Style().configure("TPanedwindow", background=self.pane_color, foreground=self.notebook_foreground)
         self.tab_names.append('untitled')
 
         filemenu = Menu(self.menubar, tearoff=0)
@@ -472,16 +408,12 @@ class App:
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.exit_click)
         self.menubar.add_cascade(label="File", menu=filemenu)
-        optionsmenu = Menu(self.menubar, tearoff=0)
-        optionsmenu.add_command(label="Change Colors", command=self.color_config)
-        self.menubar.add_cascade(label="Options", menu=optionsmenu)
         helpmenu = Menu(self.menubar, tearoff=0)
         helpmenu.add_command(label="About")
         self.menubar.add_cascade(label="Help", menu=helpmenu)
         self.menubar.add_command(label="Close Tab", command=self.close_tab)
-        self.menubar.add_command(label="Open Terminal", command=self.open_terminal)
-        self.menubar.config(background=self.file_bar_color, foreground=self.file_bar_text_color)
-        self.root.configure(background=self.background)
+
+        self.root.configure(background='black')
         self.root.title("Merengue")
         self.root.bind('<Control-s>', self.save_type)
         self.root.bind('<Control-f>', self.find_type)
@@ -493,80 +425,6 @@ class App:
         self.root['bg'] = 'black'
         self.root.geometry('{}x{}'.format(600, 400))
         self.root.config(menu=self.menubar)
-
-    def copy_file(self):
-        if len(self.tree.selection()) > 0:
-            item = self.tree.selection()[0]
-            self.copy_path = item
-
-    def paste_file(self):
-        if self.copy_path != '':
-            if len(self.tree.selection()) > 0:
-                item = self.tree.selection()[0]
-                dirs = [item+'/'+f for f in listdir(item) if not isfile(join(item, f))]
-                files = [item+'/'+f for f in listdir(item) if isfile(join(item, f))]
-                if not isfile(item):
-                    f_name = self.copy_path[self.copy_path.rfind('/')+1:]
-
-                    write_path = item+'/'+f_name
-                    if isfile(self.copy_path):
-                        counter = 1
-                        temp_write_path = write_path
-                        while temp_write_path in files:
-                            temp_write_path = write_path+'.'+str(counter)
-                            counter = counter + 1
-                        write_path = temp_write_path
-                        with open(write_path, 'w') as f_out:
-                            with open(self.copy_path, 'r') as f_in:
-                                text = f_in.read()
-                                f_out.write(text)
-                    else:
-                        counter = 1
-                        temp_write_path = write_path
-                        while temp_write_path in dirs:
-                            temp_write_path = write_path+'.'+str(counter)
-                            counter = counter + 1
-                        write_path = temp_write_path
-                        self.recursive_paste(write_path)
-                copy_path = ''
-                if self.editing_pi:
-                    transport = paramiko.Transport((self.ip, 22))
-                    transport.connect(username=self.username, password=self.password)
-
-                    sftp = paramiko.SFTPClient.from_transport(transport)
-                    try:
-                        sftp.put(write_path, write_path[write_path.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):])
-                    except:
-                        print('not a file')
-                        self.recursive_paste_sftp(write_path, sftp)
-
-
-            self.tree.delete(*self.tree.get_children())
-            self.tree = self.list_files('.', self.tree, "", '.')
-            self.tree.item(os.getcwd(), open=True)
-
-    def recursive_paste(self, path):
-        os.mkdir(path)
-        dirs = [f for f in listdir(self.copy_path) if not isfile(join(self.copy_path, f))]
-        files = [f for f in listdir(self.copy_path) if isfile(join(self.copy_path, f))]
-        for f in files:
-            with open(path+'/'+f, 'w') as f_out:
-                with open(self.copy_path+'/'+f, 'r') as f_in:
-                    text = f_in.read()
-                    f_out.write(text)
-        for d in dirs:
-            self.recursive_paste(path+'/'+d)
-
-    def recursive_paste_sftp(self, path, sftp):
-        sftp.mkdir(path[path.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):])
-        dirs = [path+'/'+f for f in listdir(path) if not isfile(join(path, f))]
-        files = [path+'/'+f for f in listdir(path) if isfile(join(path, f))]
-        print(dirs)
-        print(files)
-        for f in files:
-            sftp.put(f, f[f.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):])
-        for d in dirs:
-            self.recursive_paste(d, sftp)
 
     def read_config(self):
         with open(self.merengue_path+'config.ini', 'r') as f_in:
@@ -580,21 +438,12 @@ class App:
             self.highlight_string = self.lines[6].split('=')[1]
             self.highlight_number = self.lines[7].split('=')[1]
             self.highlight_operator = self.lines[8].split('=')[1]
-            #self.highlight_normal = self.lines[9].split('=')[1]
-            self.highlight_comment = self.lines[9].split('=')[1]
-            self.foreground = self.lines[10].split('=')[1]
-            self.background = self.lines[11].split('=')[1]
-            self.file_color = self.lines[12].split('=')[1]
-            self.dir_color = self.lines[13].split('=')[1]
-            self.line_num_color = self.lines[14].split('=')[1]
-            self.line_num_background_color = self.lines[15].split('=')[1]
-            self.file_bar_color = self.lines[16].split('=')[1]
-            self.file_bar_text_color = self.lines[17].split('=')[1]
-            self.notebook_background = self.lines[18].split('=')[1]
-            self.folder = self.lines[19].split('=')[1]
+            self.highlight_normal = self.lines[9].split('=')[1]
+            self.highlight_comment = self.lines[10].split('=')[1]
+            self.folder = self.lines[11].split('=')[1]
         if not self.folder:
             self.folder = askdirectory()
-            self.lines[19] = self.lines[19][:self.lines[19].find('=')+1]+self.folder
+            self.lines[11] = self.lines[11][:self.lines[11].find('=')+1]+self.folder
         self.write_config()
         os.chdir(self.folder)
 
@@ -645,15 +494,11 @@ class App:
         else:
             tkMessageBox.showwarning("File Creation", "Please select the parent folder for the new file and then try creating it again")
 
-    def color_config(self):
-        cc = change_color(self.root, self)
 
     def make_directory_menu(self, w):
         self.directory_menu = Menu(self.root, tearoff=0)
         self.directory_menu.add_command(label="Delete", command=self.delete)
         self.directory_menu.add_command(label="Rename", command=self.tree_rename)
-        self.directory_menu.add_command(label="Copy", command=self.copy_file)
-        self.directory_menu.add_command(label="Paste", command=self.paste_file)
         self.directory_menu.add_command(label='New File', command=self.new_file)
         self.directory_menu.add_command(label='New Folder', command=self.new_folder)
         #self.directory.menu.add_command(label='Copy', command=self.copy_item)
@@ -680,7 +525,6 @@ class App:
         self.tab_names = []
         self.find_string = ''
         self.find_counter = 0
-        self.copy_path = ''
         self.selected_file_dir = ''
         self.tree_array = []
         self.remote_tree_array = []
@@ -700,14 +544,12 @@ class App:
         self.highlight_string = ''
         self.highlight_number = ''
         self.highlight_operator = ''
-        #self.highlight_normal = ''
-        self.foreground = ''
-        self.background = ''
+        self.highlight_normal = ''
         self.start(1, 9999)
         self.make_directory_menu(self.root)
         self.jump_counter = 0
         self.find_counter = 0
-        self.recursive_delete(self.merengue_path+'/local')
+        self.recursive_delete('./local')
         self.sftp_stem = ''
         mainloop()
 
