@@ -1,5 +1,7 @@
 # Merengue
-A Raspberry Pi/Linux/Windows (even though it looks pretty ugly on Windows)/Mac (maybe? I haven't tested it yet) Text Editor
+A Raspberry Pi/Linux Text Editor
+
+THIS WILL NOT WORK ON WINDOWS AND MIGHT NOT ON MAC I HAVEN'T TESTED THAT YET SO USE IT ON A LINUX MACHINE
 
 Keep in mind, this is still in its very early stages and very much a work in progress.  There will be a lot of bugs, just giving you fair warning.
 
@@ -24,4 +26,4 @@ Click the 'close tab' button to close the current open tab.
 
 The 'about' button doesn't work yet, but I'll be putting all of this information into there after I get all of the functionality working.
 
-If anyone has any suggestions as to what I should add, email me at jcarter2010@comcast.net 
+If anyone has any suggestions as to what I should add, email me at jcarter2010@comcast.net
