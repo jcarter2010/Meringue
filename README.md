@@ -16,7 +16,7 @@ You can change this folder by going to 'file > open folder'
 
 [ctrl]+[f] is find and replace, and [ctrl]-[q] is variable highlighting.  Select whichever variable you want by click and drag (or double click) and then press the key combo and it will highlight all instances of the variable in your current tab that is open. Also, [ctrl]-[h] is to connect to a remote linux machine (be careful, this will install the 'tree' command on the remote machine in order to pull the directory structure).
 
-You can also double click on the file (the green items) in the directory tree on the left hand side to open them. Furthermore, you can right click on them to pull up a menu of actions that you can take.
+You can also double click on the file (the green items) in the directory tree on the left hand side to open them. Furthermore, you can right click on them to pull up a menu of actions that you can take such as delete, rename, copy, paste, create a new file, and create a new folder.
 
 Double click on the tab in the file you are working on to change its name.
 
@@ -27,10 +27,3 @@ Click the 'close tab' button to close the current open tab.
 The 'about' button doesn't work yet, but I'll be putting all of this information into there after I get all of the functionality working.
 
 If anyone has any suggestions as to what I should add, email me at jcarter2010@comcast.net
-
-THINGS THAT ARE GOING TO BE ADDED SOON
------------------------------------------------
-Copying files
-Copyting folders
-Moving files
-Moving folders
