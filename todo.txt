@@ -1,0 +1,2 @@
+hash password storage with pin for security
+look into md5 to protect against copying
