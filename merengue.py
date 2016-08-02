@@ -164,17 +164,6 @@ class App:
         del(self.eds[index])
 
     def open_click(self):
-        #args = ['python2', 'open_file.py']
-        #p = Popen(args, stdin=PIPE, stdout=PIPE, shell=False)
-        #p.wait()
-        #out = p.stdout.read().replace('\n', '')
-        #if out.startswith('./') == False:
-        #    out ='./' + out
-        #if not out == '!!DO NOT OPEN!!':
-        #    try:
-        #        self.open_file(out)
-        #    except:
-        #        showerror("!!ERROR!!", "File does not exist")
         of = open_file_dialog(self.root, self, os.getcwd())
 
     def save_click(self):
@@ -208,10 +197,10 @@ class App:
             transport.connect(username=self.username, password=self.password)
 
             sftp = paramiko.SFTPClient.from_transport(transport)
-            #try:
-            sftp.put(path,path[path.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):])
-            #except:
-            #    print('Could not push for some reason')
+            try:
+                sftp.put(path,path[path.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):])
+            except:
+                print('Could not push for some reason')
 
     def exit_click(self):
         sys.exit()
@@ -328,7 +317,6 @@ class App:
             except:
                 print('Not a file')
             try:
-                #os.rmdir(item)
                 self.delete_file(item)
             except:
                 print('Not a directory')
@@ -596,8 +584,12 @@ class App:
             self.folder = askdirectory()
             self.lines[19] = self.lines[19][:self.lines[19].find('=')+1]+self.folder
         self.write_config()
-        os.chdir(self.folder)
-
+        try:
+            os.chdir(self.folder)
+        except:
+            self.folder = askdirectory()
+            self.lines[19] = self.lines[19][:self.lines[19].find('=')+1]+self.folder
+            self.write_config()
     def new_file(self):
         nd = new_dialog(self.root, self)
 
