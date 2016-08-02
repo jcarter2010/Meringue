@@ -230,7 +230,7 @@ class App:
             self.tree = self.list_files('.', self.tree, "", '.')
             self.tree.item(os.getcwd(), open=True)
             self.folder = folder
-            self.lines[11] = self.lines[11][:self.lines[11].find('=')+1]+self.folder
+            self.lines[19] = self.lines[19][:self.lines[19].find('=')+1]+self.folder
             self.write_config()
             self.editing_pi = False
 
@@ -390,6 +390,9 @@ class App:
     def ssh(self, event=None):
         dialog = access_ssh(self.root, self)
 
+    def open_terminal(self):
+        os.system('gnome-terminal')
+
     def start(self, noOfEditors, noOfLines):
         '''
         scroll_style = ttk.Style()
@@ -475,8 +478,8 @@ class App:
         helpmenu.add_command(label="About")
         self.menubar.add_cascade(label="Help", menu=helpmenu)
         self.menubar.add_command(label="Close Tab", command=self.close_tab)
+        self.menubar.add_command(label="Open Terminal", command=self.open_terminal)
         self.menubar.config(background=self.file_bar_color, foreground=self.file_bar_text_color)
-
         self.root.configure(background=self.background)
         self.root.title("Merengue")
         self.root.bind('<Control-s>', self.save_type)
