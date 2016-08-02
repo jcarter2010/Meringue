@@ -18,7 +18,7 @@ class change_color:
             string = str(self.var1.get())
             index = self.function_list.index(string)
 
-            args = ['java', 'Color_Picker']
+            args = ['java', '-cp', self.parent_obj.merengue_path, 'Color_Picker']
             p = Popen(args, stdin=PIPE, stdout=PIPE, shell=False)
             p.wait()
             out = p.stdout.read().split('\n')
