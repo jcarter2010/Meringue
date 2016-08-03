@@ -1,7 +1,7 @@
 # Merengue
 A Raspberry Pi/Linux Text Editor
 
-This works on Windows now! I have not tested the connecting to the Raspberry Pi for remote editing on the Windows machine however, I just know that you can edit local files with it.
+This works on Windows now! Well, at least Windows 10, that's all I've tested it on.  You can even connect to a Raspberry Pi and edit its files remotely.  It just looks incredibly ugly.  Linux looks much much better, so go with Linux.
 
 Keep in mind, this is still in its very early stages and very much a work in progress.  There will be a lot of bugs, just giving you fair warning.
 
