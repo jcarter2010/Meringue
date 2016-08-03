@@ -740,5 +740,9 @@ class App:
                 os.rmdir(path)
             except:
                 pass
-if __name__ == '__main__':
+
+def main():
     App()
+
+if __name__ == '__main__':
+    main()
