@@ -24,6 +24,7 @@ class access_ssh:
         username = self.entryWidget.get()
         host = self.entryWidget2.get()
         password = self.entryWidget3.get()
+        port = self.entryWidget4.get()
 
         self.remote_tree_array = []
         self.remote_tree_file_array = []
@@ -64,7 +65,7 @@ class access_ssh:
 
             self.parent_obj.remote_tree_array = self.parent_obj.remote_tree_array[:-1]
 
-            rfc = remote_file_chooser(self.top, self.parent_obj, username, host, password, ssh)
+            rfc = remote_file_chooser(self.top, self.parent_obj, username, host, password, ssh, port)
 
         except:
             tkMessageBox.showwarning("SSH Connect", "Something failed -- Please try again")
@@ -105,6 +106,14 @@ class access_ssh:
         self.entryWidget3 = Entry(self.textFrame)
         self.entryWidget3["width"] = 50
         self.entryWidget3.pack()
+
+        self.entryLabel4 = Label(self.textFrame)
+        self.entryLabel4["text"] = "Port:"
+        self.entryLabel4.pack()
+
+        self.entryWidget4 = Entry(self.textFrame)
+        self.entryWidget4["width"] = 50
+        self.entryWidget4.pack()
 
         self.entryWidget.focus_set()
 

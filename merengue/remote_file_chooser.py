@@ -31,7 +31,7 @@ class remote_file_chooser:
             os.chdir('../..')
 
         host = self.ip
-        port = 22
+        port = self.port
         password = self.password
         username = self.username
 
@@ -84,8 +84,7 @@ class remote_file_chooser:
                     sftp.chdir('..')
                     os.chdir('..')
 
-
-    def __init__(self, parent, parent_obj, username, ip, password, ssh):
+    def __init__(self, parent, parent_obj, username, ip, password, ssh, port):
 
         top = self.top = Toplevel(parent)
         self.parent_obj = parent_obj
@@ -112,3 +111,4 @@ class remote_file_chooser:
         self.ip = ip
         self.password = password
         self.ssh = ssh
+        self.port = port
