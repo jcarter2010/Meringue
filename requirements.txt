@@ -1,5 +1,9 @@
-sudo apt-get install tree
-sudo apt-get install python-pip
-sudo apt-get install build-essential libssl-dev libffi-dev python-dev
-sudo pip install paramiko
+Ubuntu:
+  sudo apt-get install python-pip
+  sudo apt-get install build-essential libssl-dev libffi-dev python-dev
+  sudo pip install paramiko
+
+windows:
+  pip install paramiko
+
 Some form of Java that allows you to use the 'java' command

@@ -55,7 +55,7 @@ public class Color_Picker extends JPanel
 
         //Set up the banner at the top of the window
         //banner = new JLabel("Please Select a Color",
-                            JLabel.CENTER);
+        //                    JLabel.CENTER);
         //banner.setForeground(Color.yellow);
         //banner.setBackground(Color.blue);
         //banner.setOpaque(true);
@@ -75,7 +75,7 @@ public class Color_Picker extends JPanel
         //bannerPanel.setBorder(BorderFactory.createTitledBorder("Banner"));
 
         //Set up color chooser for setting text color
-        tcc = new JColorChooser(banner.getForeground());
+        tcc = new JColorChooser();
         tcc.getSelectionModel().addChangeListener(this);
         tcc.setBorder(BorderFactory.createTitledBorder(
                                              "Choose Element Color"));

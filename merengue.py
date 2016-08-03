@@ -164,7 +164,7 @@ class App:
         del(self.eds[index])
 
     def open_click(self):
-        of = open_file_dialog(self.root, self, os.getcwd())
+        of = open_file_dialog(self.root, self, os.getcwd().replace('\\', '/'))
 
     def save_click(self):
         path = self.n.tab(self.n.select())['text']
@@ -173,7 +173,7 @@ class App:
             f_out.write(self.eds[index].text.get("1.0",END))
         self.tree.delete(*self.tree.get_children())
         self.tree = self.list_files('.', self.tree, "", '.')
-        self.tree.item(os.getcwd(), open=True)
+        self.tree.item(os.getcwd().replace('\\', '/'), open=True)
         if self.editing_pi:
             transport = paramiko.Transport((self.ip, 22))
             transport.connect(username=self.username, password=self.password)
@@ -213,7 +213,7 @@ class App:
     def open_folder_click(self):
         val = self.close_all_tabs()
         if val:
-            folder = askdirectory()
+            folder = askdirectory().replace('\\', '/')
             os.chdir(folder)
             self.tree.delete(*self.tree.get_children())
             self.tree = self.list_files('.', self.tree, "", '.')
@@ -273,7 +273,7 @@ class App:
             p.wait()
             out = p.stdout.read().replace('\n', '')
             if not out == '!!DO NOT RENAME!!':
-                i = path.rfind('/')
+                i = path.replace('\\', '/').rfind('/')
                 try:
                     if i != -1:
                         os.rename(path, path[:path.rfind('/')]+'/'+out)
@@ -283,7 +283,7 @@ class App:
                     print('file does not exist, not renaming anything but the tab')
                 self.tree.delete(*self.tree.get_children())
                 self.tree = self.list_files('.', self.tree, "", '.')
-                self.tree.item(os.getcwd(), open=True)
+                self.tree.item(os.getcwd().replace('\\', '/'), open=True)
                 if self.editing_pi:
                     new_name = path[:path.rfind('/')]+'/'+out
                     new_name = new_name[new_name.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):]
@@ -380,7 +380,10 @@ class App:
         dialog = access_ssh(self.root, self)
 
     def open_terminal(self):
-        os.system('gnome-terminal')
+        if os.name == 'posix':
+            os.system('gnome-terminal')
+        if os.name == 'nt':
+            os.system('start cmd')
 
     def start(self, noOfEditors, noOfLines):
         '''
@@ -427,22 +430,25 @@ class App:
 
         self.pane.add(ed.frame)
         self.eds.append(ed)
-        self.tree_frame = Frame(self.root, width=200)
+        ttk.Style().configure('TFrame', fieldbackground=self.background, background=self.background)
+        self.tree_frame = Frame(self.root, bg='grey', width=200, height=10000)
+        self.bg_frame = Frame(self.tree_frame, width=200, height=10000, bg=self.background)
         self.tree = ttk.Treeview(self.tree_frame)
         #self.tree["columns"]=("Files_and_Folders")
         self.tree = self.list_files('.', self.tree, "", '.')
         self.tree.item(os.getcwd(), open=True)
         self.tree.tag_configure('directory', background=self.background, foreground=self.dir_color)
         self.tree.tag_configure('file', background=self.background, foreground=self.file_color)
-        ttk.Style().configure("Treeview", fieldbackground=self.background)
+        ttk.Style().configure("Treeview", fieldbackground=self.background, background=self.background)
         self.treeScroll = ttk.Scrollbar(self.tree_frame, orient=HORIZONTAL)
         self.treeScroll.configure(command=self.tree.xview)
         self.treeScroll.pack(side=TOP, fill=X)
         self.tree.configure(xscrollcommand=self.treeScroll.set)
         self.tree.bind("<3>", self.on_right_click)
         self.tree.bind("<Double-1>", self.on_double_click)
-        self.tree.pack(side=LEFT, fill=BOTH)
-        self.tree_frame.pack(side=LEFT, fill=BOTH)
+        self.tree.pack(side=TOP)
+        self.bg_frame.pack(side=TOP, fill=Y)
+        self.tree_frame.pack(side=LEFT, fill=Y, expand=0)
         #self.pane.configure(background=self.pane_color)
         self.pane.pack(fill='both', expand=1)
         self.n.add(self.pane, text='untitled')
@@ -481,6 +487,10 @@ class App:
         self.root['bg'] = 'black'
         self.root.geometry('{}x{}'.format(600, 400))
         self.root.config(menu=self.menubar)
+        print(ttk.Style().theme_names())
+        if os.name == 'nt':
+            ttk.Style().theme_use('default')
+
 
     def copy_file(self):
         if len(self.tree.selection()) > 0:
@@ -699,11 +709,15 @@ class App:
         self.make_directory_menu(self.root)
         self.jump_counter = 0
         self.find_counter = 0
-        self.recursive_delete(self.merengue_path+'/local')
+        if os.name == 'posix':
+            self.recursive_delete(self.merengue_path+'/local')
+        else:
+            self.recursive_delete(self.merengue_path.replace('\\', '/')+'local')
         self.sftp_stem = ''
         mainloop()
 
     def recursive_delete(self, rootDir):
+        print(rootDir)
         for lists in os.listdir(rootDir):
             path = os.path.join(rootDir, lists)
             if os.path.isdir(path):
