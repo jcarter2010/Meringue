@@ -4,7 +4,7 @@ setup(
     name='merengue',
     entry_points={
         'qui_scripts': ['merengue = merengue.__main__:main']},
-    version='1.0.2',
+    version='1.0.3',
     author='John Carter',
     author_email='jcarter2010@comcast.net',
     packages=['merengue'],
