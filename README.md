@@ -1,7 +1,7 @@
 # Merengue
 A Raspberry Pi/Linux Text Editor
 
-THIS WILL NOT WORK ON WINDOWS AND MIGHT NOT ON MAC I HAVEN'T TESTED THAT YET SO USE IT ON A LINUX MACHINE
+This works on Windows now! I have not tested the connecting to the Raspberry Pi for remote editing on the Windows machine however, I just know that you can edit local files with it.
 
 Keep in mind, this is still in its very early stages and very much a work in progress.  There will be a lot of bugs, just giving you fair warning.
 

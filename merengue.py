@@ -430,7 +430,7 @@ class App:
 
         self.pane.add(ed.frame)
         self.eds.append(ed)
-        ttk.Style().configure('TFrame', fieldbackground=self.background, background=self.background)
+        #ttk.Style().configure('TFrame', fieldbackground=self.background, background=self.background)
         self.tree_frame = Frame(self.root, bg='grey', width=200, height=10000)
         self.bg_frame = Frame(self.tree_frame, width=200, height=10000, bg=self.background)
         self.tree = ttk.Treeview(self.tree_frame)
@@ -709,15 +709,21 @@ class App:
         self.make_directory_menu(self.root)
         self.jump_counter = 0
         self.find_counter = 0
+        try:
+            if os.name == 'posix':
+                os.makedirs(self.merengue_path+'local')
+            else:
+                os.makedirs(self.merengue_path.replace('\\', '/')+'local')
+        except:
+            pass
         if os.name == 'posix':
-            self.recursive_delete(self.merengue_path+'/local')
+            self.recursive_delete(self.merengue_path+'local')
         else:
             self.recursive_delete(self.merengue_path.replace('\\', '/')+'local')
         self.sftp_stem = ''
         mainloop()
 
     def recursive_delete(self, rootDir):
-        print(rootDir)
         for lists in os.listdir(rootDir):
             path = os.path.join(rootDir, lists)
             if os.path.isdir(path):
@@ -730,7 +736,6 @@ class App:
             try:
                 os.rmdir(path)
             except:
-                print('cannot delete folder')
-
+                pass
 if __name__ == '__main__':
     App()
