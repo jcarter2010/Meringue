@@ -1,0 +1,3 @@
+[qui_scripts]
+merengue = merengue.__main__:main
+
