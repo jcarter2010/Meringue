@@ -175,7 +175,7 @@ class EditorClass(object):
         self.highlight_numbers(start, end, event)
         self.highlight_keywords(start, end, event)
         self.highlight_function_names(start, end, event)
-        self.highlight_functions(start, end, event)
+        self.highlight_functions_and_variables(start, end, event)
         self.highlight_True_False(start, end, event)
         self.highlight_operators(start, end, event)
         self.highlight_strings(start, end, event)
@@ -191,7 +191,7 @@ class EditorClass(object):
         self.highlight_numbers(start, end, event)
         self.highlight_keywords(start, end, event)
         self.highlight_function_names(start, end, event)
-        self.highlight_functions(start, end, event)
+        self.highlight_functions_and_variables(start, end, event)
         self.highlight_True_False(start, end, event)
         self.highlight_operators(start, end, event)
         self.highlight_strings(start, end, event)
@@ -287,7 +287,7 @@ class EditorClass(object):
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count_temp))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
-        if self.fname.endswith('.java'):
+        if self.fname.endswith('.java') or self.fname.endswith('.sh'):
             tag = 'function_name'
             regexp=True
             start = self.text.index(start)
@@ -307,8 +307,8 @@ class EditorClass(object):
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count_temp))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
 
-    def highlight_functions(self, start, end, event):
-        if self.fname.endswith('.py'):
+    def highlight_functions_and_variables(self, start, end, event):
+        if self.fname.endswith('.py') or self.fname.endswith('.java'):
             tag = 'function'
             regexp=True
             start = self.text.index(start)
@@ -318,11 +318,30 @@ class EditorClass(object):
             self.text.mark_set("searchLimit", end)
             count = tk.IntVar()
             while True:
-                index = self.text.search('\\..*\\(', "matchEnd", "searchLimit", count=count, regexp=regexp)
+                index = self.text.search('\\..*', "matchEnd", "searchLimit", count=count, regexp=regexp)
                 if index == "": break
                 arr = index.split('.')
                 index = arr[0] + '.' + str(int(arr[1]) + 1)
                 count_temp = str(int(count.get()) - 2)
+                if count.get() == 0: break
+                self.text.mark_set("matchStart", index)
+                self.text.mark_set("matchEnd", "%s+%sc" % (index, count_temp))
+                self.text.tag_add(tag, "matchStart", "matchEnd")
+        if self.fname.endswith('.sh'):
+            tag = 'function'
+            regexp=True
+            start = self.text.index(start)
+            end = self.text.index(end)
+            self.text.mark_set("matchStart", start)
+            self.text.mark_set("matchEnd", start)
+            self.text.mark_set("searchLimit", end)
+            count = tk.IntVar()
+            while True:
+                index = self.text.search('\\$\\S+', "matchEnd", "searchLimit", count=count, regexp=regexp)
+                if index == "": break
+                arr = index.split('.')
+                index = arr[0] + '.' + str(int(arr[1]))
+                count_temp = str(int(count.get()))
                 if count.get() == 0: break
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count_temp))
@@ -347,7 +366,7 @@ class EditorClass(object):
                 self.text.tag_add(tag, "matchStart", "matchEnd")
 
     def highlight_operators(self, start, end, event):
-        if self.fname.endswith('.py') or self.fname.endswith('.java'):
+        if self.fname.endswith('.py') or self.fname.endswith('.java') or self.fname.endswith('.sh'):
             tag = 'operator'
             regexp=True
             start = self.text.index(start)
@@ -365,7 +384,7 @@ class EditorClass(object):
                 self.text.tag_add(tag, "matchStart", "matchEnd")
 
     def highlight_comments(self, start, end, event):
-        if self.fname.endswith('.py'):
+        if self.fname.endswith('.py') or self.fname.endswith('.sh'):
             tag = 'comment'
             regexp=True
             start = self.text.index(start)
@@ -489,7 +508,7 @@ class EditorClass(object):
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
-        if self.fname.endswith('.java'):
+        if self.fname.endswith('.java') or self.fname.endswith('.sh'):
             tag = 'boolean'
             regexp=True
             start = self.text.index(start)
@@ -521,7 +540,7 @@ class EditorClass(object):
                 self.text.tag_add(tag, "matchStart", "matchEnd")
 
     def highlight_strings(self, start, end, event):
-        if self.fname.endswith('.py'):
+        if self.fname.endswith('.py') or self.fname.endswith('.sh'):
             tag = 'string'
             regexp=True
             start = self.text.index(start)
