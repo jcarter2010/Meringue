@@ -397,7 +397,7 @@ class EditorClass(object):
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
-                
+
     def highlight_multiline_comments(self, start, end, event):
         if self.fname.endswith('.py'):
             tag = 'comment'
@@ -548,6 +548,25 @@ class EditorClass(object):
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
                 self.text.tag_add(tag, "matchStart", "matchEnd")
+        if self.fname.endswith('.java'):
+            tag = 'string'
+            regexp=True
+            start = self.text.index(start)
+            end = self.text.index(end)
+            self.text.mark_set("matchStart", start)
+            self.text.mark_set("matchEnd", start)
+            self.text.mark_set("searchLimit", end)
+            count = tk.IntVar()
+            while True:
+                index = self.text.search(r'"(.*?)"', "matchEnd", "searchLimit", count=count, regexp=regexp)
+                if index == "": break
+                if count.get() == 0: break
+                self.text.mark_set("matchStart", index)
+                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
+                self.text.tag_add(tag, "matchStart", "matchEnd")
+            self.text.mark_set("matchStart", start)
+            self.text.mark_set("matchEnd", start)
+            self.text.mark_set("searchLimit", end)
 
     def remove_highlight(self, event):
         self.text.tag_remove('highlight', '1.0', END)
