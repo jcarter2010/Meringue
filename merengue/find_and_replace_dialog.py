@@ -1,3 +1,4 @@
+#import stuff
 try:
     from Tkinter import *
     import Tkinter as tk
@@ -18,24 +19,29 @@ from os import walk
 
 class find_and_replace_dialog:
 
+    #tell the parent to find all instances of the item the user typed in
     def find(self):
         self.parent_obj.find(self.entryWidget.get())
 
+    #tell the parent to find one instance of the item the user typed in
     def find_one(self):
         self.parent_obj.find_one(self.entryWidget.get())
 
+    #tell the parent to replace items
     def replace(self):
         self.parent_obj.replace(self.entryWidget.get(), self.entryWidget2.get())
 
+    #tell the parent to replace all instances of the items
     def replace_all(self):
         self.parent_obj.replace_all(self.entryWidget.get(), self.entryWidget2.get())
 
     def end(self):
         self.parent_obj.reset_counters()
-        self.find_string = '!!END!!'
         self.top.destroy()
 
     def __init__(self, parent, parent_obj):
+
+        #create all the gui -- see access_ssh.py and change_color.py for a explanation
 
         top = self.top = Toplevel(parent)
 
@@ -76,5 +82,3 @@ class find_and_replace_dialog:
         self.button4.pack()
 
         self.parent_obj = parent_obj
-
-        #self.root.mainloop()

@@ -1,3 +1,4 @@
+#import stuff
 try:
     from Tkinter import *
     import Tkinter as tk
@@ -19,6 +20,7 @@ from os import walk
 class new_folder_dialog:
 
     def find(self):
+        #tell the parent object to create a new folder
         self.parent_obj.new_folder_func(self.entryWidget.get())
         self.top.destroy()
 
@@ -26,6 +28,8 @@ class new_folder_dialog:
         self.top.destroy()
 
     def __init__(self, parent, parent_obj):
+
+        #creat the gui
 
         top = self.top = Toplevel(parent)
 

@@ -1,3 +1,4 @@
+#import everything, some of these are not needed I believe so I need to take care of taking those out
 try:
     from Tkinter import *
     import Tkinter as tk
@@ -21,18 +22,26 @@ from remote_file_chooser import remote_file_chooser
 class access_ssh:
 
     def connect(self):
+        #Get the parameters for ssh and sftp from the user dialog
         username = self.entryWidget.get()
         host = self.entryWidget2.get()
         password = self.entryWidget3.get()
         port = self.entryWidget4.get()
 
+        #We're going to store the directory tree here
+
         self.remote_tree_array = []
-        self.remote_tree_file_array = []
+
+        #Let's ssh into the remote machine
 
         try:
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh.connect(host, username=username, password=password)
+
+            #We need the 'tree' command on the remote machine so that we can pull the directory, hopefully this is already installed
+            #otherwise we need to install it, to do this though the user that they ssh'd into must have root privledges without
+            #a password at the moment
 
             print('Installing tree')
 
@@ -47,6 +56,8 @@ class access_ssh:
             for line in stderr.read().splitlines():
                 print('%s$: %s' % (host, line + "\n"))
 
+            #Run the tree command and then capture the directory output
+
             print('Running and capturing directories')
 
             tkMessageBox.showwarning("SSH Connect", "Pulling the directory structure -- please wait")
@@ -54,25 +65,29 @@ class access_ssh:
             stdin, stdout, stderr = ssh.exec_command('tree -f -i -l -d')
             stdin.close()
 
-            f_outfile = open(self.parent_obj.merengue_path+'temp.txt', 'w')
+            #Extract the name of all of the directories from the tree and store them
 
-            counter = 0
             for line in stdout.read().splitlines():
                 if ' -> ' in line:
                     self.parent_obj.remote_tree_array.append(line[:line.find(' -> ')])
                 else:
                     self.parent_obj.remote_tree_array.append(line)
 
+            #Elimiate the top directory as it is not needed
+
             self.parent_obj.remote_tree_array = self.parent_obj.remote_tree_array[:-1]
+
+            #Go to letting the user select the directory that they want
 
             rfc = remote_file_chooser(self.top, self.parent_obj, username, host, password, ssh, port)
 
         except:
+
+            #If something failed throw an error message
+
             tkMessageBox.showwarning("SSH Connect", "Something failed -- Please try again")
 
         ssh.close()
-
-        #self.top.destroy()
 
     def cancel(self):
         self.top.destroy()
@@ -82,6 +97,8 @@ class access_ssh:
         top = self.top = Toplevel(parent)
 
         self.textFrame = Frame(top)
+
+        #Labels and entry boxes to describe user input and capture it
 
         self.entryLabel = Label(self.textFrame)
         self.entryLabel["text"] = "Username:"
@@ -115,9 +132,13 @@ class access_ssh:
         self.entryWidget4["width"] = 50
         self.entryWidget4.pack()
 
+        #Set focus to the top box so they don't have to go over and click on it
+
         self.entryWidget.focus_set()
 
         self.textFrame.pack()
+
+        #Add the necessary buttons
 
         self.button = Button(top, text="Connect", command=self.connect)
         self.button.pack()

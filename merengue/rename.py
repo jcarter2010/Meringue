@@ -1,3 +1,5 @@
+#this needs to be compltely redone, it's a stupid way of doing things and so I'm going to change this entire thing
+
 try:
     from Tkinter import *
     import Tkinter as tk

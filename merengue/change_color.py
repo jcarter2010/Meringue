@@ -1,3 +1,5 @@
+#Import stuff
+
 import sys
 try:
     from Tkinter import *
@@ -9,24 +11,34 @@ except:
     import tkinter.ttk as ttk
 from subprocess import PIPE, Popen
 
-
-
 class change_color:
 
     def change(self):
         try:
+
+            #We want a dropdown box of all of the options, so get the selected item
+
             string = str(self.var1.get())
             index = self.function_list.index(string)
+
+            #Call the color picker java program to select a color
 
             args = ['java', '-cp', self.parent_obj.merengue_path, 'Color_Picker']
             p = Popen(args, stdin=PIPE, stdout=PIPE, shell=False)
             p.wait()
+
+            #capture the output from the java program
+
             out = p.stdout.read().split('\n')
-            print(out)
+
+            #the output is r\ng\nb so get those values
 
             r = out[0]
             g = out[1]
             b = out[2]
+
+            #Get all of the config values, set the color values for the parameter to be changed, rewrite the config to save them
+            #And change all of the colors for the items in the text editor then exit the dialog
 
             self.read_config()
             line = self.lines[index][:self.lines[index].find('=')]
@@ -41,12 +53,18 @@ class change_color:
             self.top.destroy()
 
     def write_config(self):
+
+        #Write all of the corresponding values to the config file to save them
+
         with open(self.parent_obj.merengue_path+'config.ini', 'w') as f_out:
             for line in self.lines:
                 f_out.write(line + '\n')
             f_out.flush()
 
     def read_config(self):
+
+        #read all of the values from the congfig file
+
         with open(self.parent_obj.merengue_path+'config.ini', 'r') as f_in:
             self.lines = f_in.read().split('\n')
             self.highlight_foreground = self.lines[0].split('=')[1]
@@ -72,8 +90,6 @@ class change_color:
             self.folder = self.lines[19].split('=')[1]
 
     def end(self):
-        #self.parent_obj.reset_counters()
-        #self.find_string = '!!END!!'
         self.top.destroy()
 
     def __init__(self, parent, parent_obj):
@@ -82,14 +98,13 @@ class change_color:
 
         self.parent_obj = parent_obj
 
+        #all of the possible color values to change
+
         self.function_list = ['highlight_foreground','highlight_background','highlight_keyword','highlight_function_name','highlight_function','highlight_boolean','highlight_string','highlight_number','highlight_operator','highlight_comment','foreground','background','file_color','dir_color','line_num_color','line_num_background_color','file_bar_color','file_bar_text_color','notebook_background']
 
-        #index = self.parent_obj.n.tabs().index(self.parent_obj.n.select())
-        #ed = self.parent_obj.eds[index]
-
-        #ed.return_function_names(self)
-
         self.textFrame = Frame(top)
+
+        #Create out dropdown box for the user to select a variable to change
 
         lst1 = self.function_list
         self.var1 = StringVar()
@@ -98,6 +113,8 @@ class change_color:
         self.dropdown.pack()
 
         self.textFrame.pack()
+
+        #Add the necessary buttons
 
         self.button = Button(top, text="Select Color", command=self.change)
         self.button.pack()

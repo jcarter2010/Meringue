@@ -9,9 +9,9 @@ except:
 
 class open_file_dialog:
 
-    def displayText(self):
+    def open_file(self):
 
-        #global entryWidget
+        #attempt to get the parent to open a file, if it fails tell the user
 
         try:
             print(self.entryWidget.get())
@@ -21,15 +21,12 @@ class open_file_dialog:
 
         self.top.destroy()
 
-        #print(entryWidget.get())
-        #sys.exit()
-
     def end(self):
-        #print('!!DO NOT OPEN!!')
-        #sys.exit()
         self.top.destroy()
 
     def __init__(self, parent, parent_obj, parent_path):
+
+        #create the gui
 
         self.top = Toplevel(parent)
 
@@ -47,14 +44,13 @@ class open_file_dialog:
 
         self.entryWidget = Entry(self.textFrame)
         self.entryWidget["width"] = 50
-        #self.entryWidget['text'] = "test"
         self.entryWidget.insert(0, parent_path + '/')
         self.entryWidget.pack(side=LEFT)
         self.entryWidget.focus_set()
 
         self.textFrame.pack()
 
-        self.button = Button(self.top, text="Open", command=self.displayText)
+        self.button = Button(self.top, text="Open", command=self.open_file)
         self.button.pack()
 
         self.button2 = Button(self.top, text="Cancel", command=self.end)

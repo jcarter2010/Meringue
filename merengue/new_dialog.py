@@ -1,3 +1,4 @@
+#import everthing
 try:
     from Tkinter import *
     import Tkinter as tk
@@ -19,6 +20,7 @@ from os import walk
 class new_dialog:
 
     def find(self):
+        #tell the parent to create a new file
         self.parent_obj.new_file_func(self.entryWidget.get())
         self.top.destroy()
 
@@ -26,6 +28,8 @@ class new_dialog:
         self.top.destroy()
 
     def __init__(self, parent, parent_obj):
+
+        #create the gui
 
         top = self.top = Toplevel(parent)
 
@@ -43,6 +47,7 @@ class new_dialog:
         self.entryLabel = Label(self.textFrame)
         self.entryLabel["text"] = "Name:"
         self.entryLabel.pack()
+        
         self.entryWidget = Entry(self.textFrame)
         self.entryWidget["width"] = 50
         self.entryWidget.pack()
