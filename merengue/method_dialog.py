@@ -1,3 +1,6 @@
+#Ignore all this, it doen't work right now and I need to fix it later.  The idea is to give the user a dropdown box of all of the functions
+#that they have defined in their file so that they can easily jump from one to another and to the places where they are used within the program.
+
 try:
     from Tkinter import *
     import Tkinter as tk
