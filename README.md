@@ -1,4 +1,4 @@
-it a# Merengue
+Merengue
 A Raspberry Pi/Linux Text Editor (Now with Python and Java syntax coloring!)
 
 This works on Windows now! Well, at least Windows 10, that's all I've tested it on.  You can even connect to a Raspberry Pi and edit its files remotely.  It just looks incredibly ugly.  Linux looks much much better, so go with Linux.
