@@ -51,11 +51,11 @@ class SSH_Terminal:
                 #for dat in data:
                 #    print(dat)
                 #print('\x1b[0m\x1b[01;34manaconda3\x1b[0m')
-                print(strdata, end = "")
+                print(strdata)
 
                 #self.print_output(strdata)
                 if(strdata.endswith("$ ")):
-                    print("\n$ ", end = "")
+                    print("\n$ ")
 
     def print_output(self, text):
         first_format = ''
@@ -80,7 +80,7 @@ terminal_connection = SSH_Terminal(sys.argv[2], sys.argv[3], sys.argv[4], sys.ar
 terminal_connection.openShell()
 terminal_connection.sendShell('cd {}'.format(sys.argv[1]))
 while True:
-    command = input('$ ')
+    command = raw_input('$ ')
     if command.startswith(" "):
         command = command[1:]
     terminal_connection.sendShell(command)

@@ -28,6 +28,12 @@ class access_ssh:
         password = self.entryWidget3.get()
         port = self.entryWidget4.get()
 
+        self.parent_obj.username = username
+        self.parent_obj.ip = host
+        self.parent_obj.password = password
+        self.parent_obj.port = port
+
+        '''
         #We're going to store the directory tree here
 
         self.remote_tree_array = []
@@ -43,18 +49,18 @@ class access_ssh:
             #otherwise we need to install it, to do this though the user that they ssh'd into must have root privledges without
             #a password at the moment
 
-            print('Installing tree')
+            #print('Installing tree')
 
-            tkMessageBox.showwarning("SSH Connect", "Intalling 'tree' command onto the system -- this might take a while")
+            #tkMessageBox.showwarning("SSH Connect", "Intalling 'tree' command onto the system -- this might take a while")
 
-            stdin, stdout, stderr = ssh.exec_command('sudo apt-get -y install tree')
-            stdin.close()
+            #stdin, stdout, stderr = ssh.exec_command('sudo apt-get -y install tree')
+            #stdin.close()
 
-            for line in stdout.read().splitlines():
-                print('%s$: %s' % (host, line))
+            #for line in stdout.read().splitlines():
+            #    print('%s$: %s' % (host, line))
 
-            for line in stderr.read().splitlines():
-                print('%s$: %s' % (host, line + "\n"))
+            #for line in stderr.read().splitlines():
+            #    print('%s$: %s' % (host, line + "\n"))
 
             #Run the tree command and then capture the directory output
 
@@ -79,7 +85,7 @@ class access_ssh:
 
             #Go to letting the user select the directory that they want
 
-            rfc = remote_file_chooser(self.top, self.parent_obj, username, host, password, ssh, port)
+            rfc = remote_file_chooser(self.top, self.parent_obj, username, host, password, ssh, int(port))
 
         except:
 
@@ -88,6 +94,8 @@ class access_ssh:
             tkMessageBox.showwarning("SSH Connect", "Something failed -- Please try again")
 
         ssh.close()
+        '''
+        self.top.destroy()
 
     def cancel(self):
         self.top.destroy()

@@ -25,6 +25,7 @@ from access_ssh import access_ssh
 from method_dialog import method_dialog
 from editor import EditorClass
 from find_and_replace_dialog import find_and_replace_dialog
+from remote_file_chooser import remote_file_chooser
 from new_dialog import new_dialog
 from new_folder_dialog import new_folder_dialog
 from open_file_dialog import open_file_dialog
@@ -476,7 +477,15 @@ class App:
         helpmenu.add_command(label="About")
         self.menubar.add_cascade(label="Help", menu=helpmenu)
         self.menubar.add_command(label="Close Tab", command=self.close_tab)
-        self.menubar.add_command(label="Open Terminal", command=self.open_terminal)
+        terminalmenu = Menu(self.menubar, tearoff=0)
+        terminalmenu.add_command(label="Local Terminal", command=self.open_terminal)
+        terminalmenu.add_command(label="Remote Terminal", command=self.open_remote_terminal)
+        self.menubar.add_cascade(label="Open Terminal", menu=terminalmenu)
+        remotemenu = Menu(self.menubar, tearoff=0)
+        remotemenu.add_command(label='Edit Directory', command=self.remote_folder_choose)
+        remotemenu.add_command(label="Pull File", command=self.open_remote_terminal)
+        self.menubar.add_cascade(label="Remote Actions", menu=remotemenu)
+        #self.menubar.add_command(label="Open Terminal", command=self.open_terminal)
         self.menubar.config(background=self.file_bar_color, foreground=self.file_bar_text_color)
         self.root.configure(background=self.background)
         self.root.title("Merengue")
@@ -493,6 +502,94 @@ class App:
         print(ttk.Style().theme_names())
         if os.name == 'nt':
             ttk.Style().theme_use('default')
+
+    def remote_folder_choose(self):
+        #We're going to store the directory tree here
+
+        self.remote_tree_array = []
+
+        #Let's ssh into the remote machine
+
+        try:
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(self.ip, username=self.username, password=self.password, port=int(self.port))
+
+            #We need the 'tree' command on the remote machine so that we can pull the directory, hopefully this is already installed
+            #otherwise we need to install it, to do this though the user that they ssh'd into must have root privledges without
+            #a password at the moment
+
+            #print('Installing tree')
+
+            #tkMessageBox.showwarning("SSH Connect", "Intalling 'tree' command onto the system -- this might take a while")
+
+            #stdin, stdout, stderr = ssh.exec_command('sudo apt-get -y install tree')
+            #stdin.close()
+
+            #for line in stdout.read().splitlines():
+            #    print('%s$: %s' % (host, line))
+
+            #for line in stderr.read().splitlines():
+            #    print('%s$: %s' % (host, line + "\n"))
+
+            #Run the tree command and then capture the directory output
+
+            print('Running and capturing directories')
+
+            tkMessageBox.showwarning("SSH Connect", "Pulling the directory structure -- please wait")
+
+            stdin, stdout, stderr = ssh.exec_command('tree -f -i -l -d')
+            stdin.close()
+
+            #Extract the name of all of the directories from the tree and store them
+
+            for line in stdout.read().splitlines():
+                if ' -> ' in line:
+                    self.remote_tree_array.append(line[:line.find(' -> ')])
+                else:
+                    self.remote_tree_array.append(line)
+
+            #Elimiate the top directory as it is not needed
+
+            self.remote_tree_array = self.remote_tree_array[:-1]
+
+            #Go to letting the user select the directory that they want
+
+            rfc = remote_file_chooser(self, self, self.username, self.ip, self.password, ssh, int(self.port))
+
+        except:
+
+            #If something failed throw an error message
+
+            tkMessageBox.showwarning("SSH Connect", "Something failed -- Please try again")
+
+        ssh.close()
+    def open_remote_terminal(self):
+        self.current_directory = '.'
+        if sys.platform == "win32":
+            try:
+                os.system('start python paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+            except:
+            #    try:
+            #        os.system('start python2 paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+            #    except:
+                pass
+        if sys.platform == "darwin":
+            #try:
+            #    os.system('open python paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+            #except:
+            try:
+                os.system('open python2 paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+            except:
+                pass
+        if sys.platform == "linux" or sys.platform == "linux2":
+            #try:
+            #    os.system('xterm -hold -e python paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+            #except:
+            try:
+                os.system('xterm -e python2 paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+            except:
+                pass
 
 
     def copy_file(self):
@@ -694,6 +791,7 @@ class App:
         self.username = ''
         self.password = ''
         self.ip = ''
+        self.port = 22
         self.new_file_or_folder_name = ''
         self.folder = ''
         self.highligh_foreground = ''

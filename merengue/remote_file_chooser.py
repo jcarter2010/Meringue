@@ -48,9 +48,9 @@ class remote_file_chooser:
 
         #tell the parent what the parametrs are, this will be used later to store the values for easier access
 
-        self.parent_obj.username = username
-        self.parent_obj.password = password
-        self.parent_obj.ip = self.ip
+        #self.parent_obj.username = username
+        #self.parent_obj.password = password
+        #self.parent_obj.ip = self.ip
 
         #get the remote tree and change to the 'local' directory for tree creation
 
@@ -69,7 +69,7 @@ class remote_file_chooser:
 
         self.parent_obj.sftp_stem = dir_name[dir_name.find('./') + 2:]
 
-        transport = paramiko.Transport((host, port))
+        transport = paramiko.Transport((host, int(port)))
         transport.connect(username=username, password=password)
 
         sftp = paramiko.SFTPClient.from_transport(transport)

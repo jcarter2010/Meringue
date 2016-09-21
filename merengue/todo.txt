@@ -1,2 +1,6 @@
 hash password storage with pin for security
 look into md5 to protect against copying
+Select single file for remote editing
+Projects section so you don't have to keep finding the folder for starred projects
+Auto comment
+
