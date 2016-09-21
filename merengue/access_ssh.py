@@ -128,7 +128,7 @@ class access_ssh:
         self.entryLabel3["text"] = "Password:"
         self.entryLabel3.pack()
 
-        self.entryWidget3 = Entry(self.textFrame)
+        self.entryWidget3 = Entry(self.textFrame, show='*')
         self.entryWidget3["width"] = 50
         self.entryWidget3.pack()
 

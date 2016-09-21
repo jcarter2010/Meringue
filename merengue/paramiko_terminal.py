@@ -80,7 +80,10 @@ terminal_connection = SSH_Terminal(sys.argv[2], sys.argv[3], sys.argv[4], sys.ar
 terminal_connection.openShell()
 terminal_connection.sendShell('cd {}'.format(sys.argv[1]))
 while True:
-    command = raw_input('$ ')
+    try:
+        command = raw_input('$ ')
+    except:
+        command = input('$ ')
     if command.startswith(" "):
         command = command[1:]
     terminal_connection.sendShell(command)

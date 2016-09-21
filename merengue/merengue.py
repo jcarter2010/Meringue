@@ -30,6 +30,7 @@ from new_dialog import new_dialog
 from new_folder_dialog import new_folder_dialog
 from open_file_dialog import open_file_dialog
 from change_color import change_color
+from interface import Paramiko_Interface
 
 class App:
 
@@ -483,7 +484,7 @@ class App:
         remotemenu = Menu(self.menubar, tearoff=0)
         remotemenu.add_command(label='Connect to Remote', command=self.ssh)
         remotemenu.add_command(label='Edit Directory', command=self.remote_folder_choose)
-        remotemenu.add_command(label="Pull File", command=self.open_remote_terminal)
+        remotemenu.add_command(label="Open Explorer", command=self.paramiko_interface_open)
         self.menubar.add_cascade(label="Remote Actions", menu=remotemenu)
         #self.menubar.add_command(label="Open Terminal", command=self.open_terminal)
         self.menubar.config(background=self.file_bar_color, foreground=self.file_bar_text_color)
@@ -501,6 +502,9 @@ class App:
         self.root.config(menu=self.menubar)
         if os.name == 'nt':
             ttk.Style().theme_use('default')
+
+    def paramiko_interface_open(self):
+        Paramiko_Interface(self, self.username, self.password, self.ip, self.port)
 
     def remote_folder_choose(self):
         #We're going to store the directory tree here
@@ -550,7 +554,8 @@ class App:
         self.current_directory = '.'
         if sys.platform == "win32":
             try:
-                os.system('start python paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+                #os.system('start python paramiko_terminal.py "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+                os.system('start test.bat')
             except:
             #    try:
             #        os.system('start python2 paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
@@ -561,7 +566,7 @@ class App:
             #    os.system('open python paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             #except:
             try:
-                os.system('open python2 paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+                os.system('open python2 paramiko_terminal.py "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             except:
                 pass
         if sys.platform == "linux" or sys.platform == "linux2":
@@ -569,7 +574,7 @@ class App:
             #    os.system('xterm -hold -e python paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             #except:
             try:
-                os.system('xterm -e python2 paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+                os.system('xterm -e python2 paramiko_terminal.py "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             except:
                 pass
 
@@ -774,6 +779,7 @@ class App:
     def __init__(self):
         self.merengue_path = os.path.realpath(__file__)
         self.merengue_path = self.merengue_path[:-11]
+        print(self.merengue_path)
         #os.chdir(os.path.join(os.path.expanduser('~'), 'Documents'))
         self.root = Tk()
         img = PhotoImage(file=self.merengue_path + 'icon.gif')
