@@ -35,19 +35,19 @@ class new_dialog:
 
         self.parent_obj = parent_obj
 
-        self.function_list = []
+        #self.function_list = []
 
-        index = self.parent_obj.n.tabs().index(self.parent_obj.n.select())
-        ed = self.parent_obj.eds[index]
+        #index = self.parent_obj.n.tabs().index(self.parent_obj.n.select())
+        #ed = self.parent_obj.eds[index]
 
-        ed.return_function_names(self)
+        #ed.return_function_names(self)
 
         self.textFrame = Frame(top)
 
         self.entryLabel = Label(self.textFrame)
         self.entryLabel["text"] = "Name:"
         self.entryLabel.pack()
-        
+
         self.entryWidget = Entry(self.textFrame)
         self.entryWidget["width"] = 50
         self.entryWidget.pack()

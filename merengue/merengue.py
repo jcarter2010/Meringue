@@ -45,7 +45,7 @@ class App:
                 w = self.root.winfo_width()
                 h = self.root.winfo_height()
                 #self.n.place(x=200, y=0, width=(w-200), height=h)
-                self.names.append(path)
+                self.tab_names.append(path)
                 ed.text.config(insertbackground='white')
                 ed.text.config(background=self.background)
                 ed.text.config(foreground=self.foreground)
@@ -436,7 +436,7 @@ class App:
         ttk.Style().configure('TFrame', fieldbackground=self.background, background=self.background)
         self.tree_frame = Frame(self.root, bg=self.background, width=200, height=10000)
         #ttk.Style().configure('TFrame', fieldbackground=self.background, background=self.background)
-        self.tree_frame = Frame(self.root, bg=self.background, width=200, height=10000)
+        #self.tree_frame = Frame(self.root, bg=self.background, width=200, height=10000)
         self.bg_frame = Frame(self.tree_frame, width=200, height=10000, bg=self.background)
         self.tree = ttk.Treeview(self.tree_frame)
         #self.tree["columns"]=("Files_and_Folders")
@@ -460,7 +460,7 @@ class App:
         self.n.pack(side=LEFT, fill='both', expand=True)
         ttk.Style().configure("TNotebook", background=self.notebook_background)
         #ttk.Style().configure("TPanedwindow", background=self.pane_color, foreground=self.notebook_foreground)
-        self.tab_names.append('untitled')
+        #self.tab_names.append('untitled')
 
         filemenu = Menu(self.menubar, tearoff=0)
         filemenu.add_command(label="Open", command=self.open_click)
@@ -499,7 +499,6 @@ class App:
         self.root['bg'] = 'black'
         self.root.geometry('{}x{}'.format(600, 400))
         self.root.config(menu=self.menubar)
-        print(ttk.Style().theme_names())
         if os.name == 'nt':
             ttk.Style().theme_use('default')
 
@@ -653,25 +652,44 @@ class App:
         with open(self.merengue_path+'config.ini', 'r') as f_in:
             self.lines = f_in.read().split('\n')
             self.highlight_foreground = self.lines[0].split('=')[1]
+            self.highlight_foreground = self.highlight_foreground[:7]
             self.highlight_background = self.lines[1].split('=')[1]
+            self.highlight_background = self.highlight_background[:7]
             self.highlight_keyword = self.lines[2].split('=')[1]
+            self.highlight_keyword = self.highlight_keyword[:7]
             self.highlight_function_name = self.lines[3].split('=')[1]
+            self.highlight_function_name = self.highlight_function_name[:7]
             self.highlight_function = self.lines[4].split('=')[1]
+            self.highlight_function = self.highlight_function[:7]
             self.highlight_boolean = self.lines[5].split('=')[1]
+            self.highlight_boolean = self.highlight_boolean[:7]
             self.highlight_string = self.lines[6].split('=')[1]
+            self.highlight_string = self.highlight_string[:7]
             self.highlight_number = self.lines[7].split('=')[1]
+            self.highlight_number = self.highlight_number[:7]
             self.highlight_operator = self.lines[8].split('=')[1]
+            self.highlight_operator = self.highlight_operator[:7]
             #self.highlight_normal = self.lines[9].split('=')[1]
             self.highlight_comment = self.lines[9].split('=')[1]
+            self.highlight_comment = self.highlight_comment[:7]
             self.foreground = self.lines[10].split('=')[1]
+            self.foreground = self.foreground[:7]
             self.background = self.lines[11].split('=')[1]
+            self.background = self.background[:7]
             self.file_color = self.lines[12].split('=')[1]
+            self.file_color = self.file_color[:7]
             self.dir_color = self.lines[13].split('=')[1]
+            self.dir_color = self.dir_color[:7]
             self.line_num_color = self.lines[14].split('=')[1]
+            self.line_num_color = self.line_num_color[:7]
             self.line_num_background_color = self.lines[15].split('=')[1]
+            self.line_num_background_color = self.line_num_background_color[:7]
             self.file_bar_color = self.lines[16].split('=')[1]
+            self.file_bar_color = self.file_bar_color[:7]
             self.file_bar_text_color = self.lines[17].split('=')[1]
+            self.file_bar_text_color = self.file_bar_text_color[:7]
             self.notebook_background = self.lines[18].split('=')[1]
+            self.notebook_background = self.notebook_background[:7]
             self.folder = self.lines[19].split('=')[1]
         if not self.folder:
             self.folder = askdirectory()
