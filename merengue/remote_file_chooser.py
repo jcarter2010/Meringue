@@ -100,9 +100,9 @@ class remote_file_chooser:
 
             if files.startswith('.') == False:
                 try:
-                    print ' -> Attempting to download: "{}", and saving it {}'.format(files, files)
+                    print(' -> Attempting to download: "{}", and saving it {}'.format(files, files))
                     print(path + '/' + files)
-                    print ' --> remotepath stat: {}'.format(sftp.stat(files))
+                    print(' --> remotepath stat: {}'.format(sftp.stat(files)))
                     sftp.get(files, files)
                 except:
 

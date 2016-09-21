@@ -45,7 +45,7 @@ class App:
                 w = self.root.winfo_width()
                 h = self.root.winfo_height()
                 #self.n.place(x=200, y=0, width=(w-200), height=h)
-                self.tab_names.append(path)
+                self.names.append(path)
                 ed.text.config(insertbackground='white')
                 ed.text.config(background=self.background)
                 ed.text.config(foreground=self.foreground)
@@ -410,6 +410,7 @@ class App:
         '''
         #s.configure('Tab_Style', background='cyan')
         self.read_config()
+        '''
         self.pane = PanedWindow(self.n, orient=HORIZONTAL, opaqueresize=True)
         ed = EditorClass(self.root, 'untitled')
         ed.text.config(insertbackground='white')
@@ -431,7 +432,7 @@ class App:
 
         self.pane.add(ed.frame)
         self.eds.append(ed)
-
+        '''
         ttk.Style().configure('TFrame', fieldbackground=self.background, background=self.background)
         self.tree_frame = Frame(self.root, bg=self.background, width=200, height=10000)
         #ttk.Style().configure('TFrame', fieldbackground=self.background, background=self.background)
@@ -441,9 +442,10 @@ class App:
         #self.tree["columns"]=("Files_and_Folders")
         self.tree = self.list_files('.', self.tree, "", '.')
         self.tree.item(os.getcwd(), open=True)
-        self.tree.tag_configure('directory', background=self.background, foreground=self.dir_color)
-        self.tree.tag_configure('file', background=self.background, foreground=self.file_color)
-        ttk.Style().configure("Treeview", fieldbackground=self.background, background=self.background)
+        if os.name != 'nt':
+            self.tree.tag_configure('directory', background=self.background, foreground=self.dir_color)
+            self.tree.tag_configure('file', background=self.background, foreground=self.file_color)
+            ttk.Style().configure("Treeview", fieldbackground=self.background, background=self.background)
         self.treeScroll = ttk.Scrollbar(self.tree_frame, orient=HORIZONTAL)
         self.treeScroll.configure(command=self.tree.xview)
         self.treeScroll.pack(side=TOP, fill=X)
@@ -451,11 +453,9 @@ class App:
         self.tree.bind("<3>", self.on_right_click)
         self.tree.bind("<Double-1>", self.on_double_click)
         self.tree.pack(side=TOP, fill=Y, expand=1)
-        #self.bg_frame.pack(side=TOP, fill=Y)
         self.tree_frame.pack(side=LEFT, fill=Y, expand=0)
-        #self.pane.configure(background=self.pane_color)
-        self.pane.pack(fill='both', expand=1)
-        self.n.add(self.pane, text='untitled')
+        #self.pane.pack(fill='both', expand=1)
+        #self.n.add(self.pane, text='untitled')
         self.n.bind("<Double-1>", self.tab_rename)
         self.n.pack(side=LEFT, fill='both', expand=True)
         ttk.Style().configure("TNotebook", background=self.notebook_background)
@@ -466,7 +466,6 @@ class App:
         filemenu.add_command(label="Open", command=self.open_click)
         filemenu.add_command(label="Open Folder", command=self.open_folder_click)
         filemenu.add_command(label="Save", command=self.save_click)
-        filemenu.add_command(label='Connect to Remote', command=self.ssh)
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.exit_click)
         self.menubar.add_cascade(label="File", menu=filemenu)
@@ -482,6 +481,7 @@ class App:
         terminalmenu.add_command(label="Remote Terminal", command=self.open_remote_terminal)
         self.menubar.add_cascade(label="Open Terminal", menu=terminalmenu)
         remotemenu = Menu(self.menubar, tearoff=0)
+        remotemenu.add_command(label='Connect to Remote', command=self.ssh)
         remotemenu.add_command(label='Edit Directory', command=self.remote_folder_choose)
         remotemenu.add_command(label="Pull File", command=self.open_remote_terminal)
         self.menubar.add_cascade(label="Remote Actions", menu=remotemenu)
@@ -515,24 +515,7 @@ class App:
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh.connect(self.ip, username=self.username, password=self.password, port=int(self.port))
 
-            #We need the 'tree' command on the remote machine so that we can pull the directory, hopefully this is already installed
-            #otherwise we need to install it, to do this though the user that they ssh'd into must have root privledges without
-            #a password at the moment
-
-            #print('Installing tree')
-
-            #tkMessageBox.showwarning("SSH Connect", "Intalling 'tree' command onto the system -- this might take a while")
-
-            #stdin, stdout, stderr = ssh.exec_command('sudo apt-get -y install tree')
-            #stdin.close()
-
-            #for line in stdout.read().splitlines():
-            #    print('%s$: %s' % (host, line))
-
-            #for line in stderr.read().splitlines():
-            #    print('%s$: %s' % (host, line + "\n"))
-
-            #Run the tree command and then capture the directory output
+            #Capture the directory output
 
             print('Running and capturing directories')
 
@@ -700,6 +683,8 @@ class App:
             self.folder = askdirectory()
             self.lines[19] = self.lines[19][:self.lines[19].find('=')+1]+self.folder
             self.write_config()
+            os.chdir(self.folder)
+
     def new_file(self):
         nd = new_dialog(self.root, self)
 
