@@ -16,6 +16,8 @@ except:
 import time
 import paramiko
 import threading
+import ImageTk
+import Image
 
 class Paramiko_Interface:
     def __init__(self, parent_obj, username, password, server, port):
@@ -45,7 +47,7 @@ class Paramiko_Interface:
         self.files = []
         self.scroll_y = 30
         self.current_directory = '.'
-        self.top = Tkinter.Tk()
+        self.top = Tkinter.Toplevel()
         self.canvas = Canvas(self.top, width=800, height=600)
         self.canvas.pack()
         self.canvas.bind("<Button-1>", self.Click)
@@ -64,7 +66,7 @@ class Paramiko_Interface:
         #terminalmenu = Menu(self.menubar, tearoff=0)
         self.connection = SSH(self.server, self.username, self.password, self.port, self)
         self.connection.openShell()
-        time.sleep(1)
+        time.sleep(4)
         self.Open_Folder()
         self.top.config(menu=self.menubar)
         self.top.mainloop()
@@ -87,10 +89,10 @@ class Paramiko_Interface:
         if len(self.canvas.gettags('current')) > 0:
             index = int(self.canvas.gettags('current')[0])
             if index in self.folders:
-                self.connection.sendShell('cd ' + self.tot[index])
                 self.current_directory = self.current_directory + '/' + self.tot[index]
-                time.sleep(1)
-                self.connection.sendShell('ls --color=never')
+                self.connection.sendShell('cd ' + self.tot[index] + ' && ls --color=never')
+                #time.sleep(2)
+                #self.connection.sendShell()
             '''
             if index in self.files:
                 print(self.tot[index])
@@ -113,6 +115,7 @@ class Paramiko_Interface:
     def clone_dir(self, dir_name):
 
         #Warn the user that this might take a while
+        self.remote_tree_array = []
 
         tkMessageBox.showwarning("SSH Connect", "Cloning the chosen directory -- this can take a long time if there are a lot of files. Please wait")
 
@@ -230,10 +233,11 @@ class Paramiko_Interface:
             if index in self.folders:
                 '''
                 self.connection.sendShell('cd ' + self.tot[index])
-                self.current_directory = self.current_directory + '/' + self.tot[index]
+
                 time.sleep(0.5)
                 self.connection.sendShell('ls --color=never')
                 '''
+                self.current_directory = self.current_directory + '/' + self.tot[index]
                 self.clone_dir(self.current_directory)
             if index in self.files:
                 print(self.tot[index])
@@ -256,11 +260,10 @@ class Paramiko_Interface:
         if command == 'ls --color=never -d */':
             temp = output
             temp_command = command.replace(' ', '')
-            print(temp[0])
-            while temp_command.startswith(temp[0]):
-                temp_command = temp_command.replace(temp[0], '', 1)
-                del(temp[0])
-                print(temp_command)
+            if len(temp) > 0:
+                while temp_command.startswith(temp[0]):
+                    temp_command = temp_command.replace(temp[0], '', 1)
+                    del(temp[0])
             self.current_folders = ['..'] + temp
             for folder in self.current_folders:
                 if folder in self.all_files_and_folders:
@@ -270,15 +273,19 @@ class Paramiko_Interface:
         if command == 'ls --color=never':
             temp = output
             temp_command = command.replace(' ', '')
-            print(temp_command)
-            while temp_command.startswith(temp[0]):
-                temp_command = temp_command.replace(temp[0], '', 1)
-                del(temp[0])
-                print(temp_command)
-            self.all_files_and_folders = temp
-            self.connection.sendShell('ls --color=never -d */')
+            #print(temp_command)
+            if len(temp) > 0:
+                while temp_command.startswith(temp[0]):
+                    temp_command = temp_command.replace(temp[0], '', 1)
+                    del(temp[0])
+                    print(temp_command)
+                self.all_files_and_folders = temp
+                self.connection.sendShell('ls --color=never -d */')
+        #self.Draw()
 
     def Draw(self):
+        #folder_img = ImageTk.PhotoImage(Image.open('./resources/folder_image.png'))
+        #file_img = ImageTk.PhotoImage(Image.open('./resources/file_image.png'))
         self.canvas.delete('all')
         for widget in self.canvas.winfo_children():
             widget.destroy()
@@ -295,6 +302,8 @@ class Paramiko_Interface:
             self.canvas.create_rectangle(x + 5, y + 10, x + 65, y + 80, tags=str(index), fill="#D2B48C")
             self.canvas.create_rectangle(x + 5, y, x + 25, y + 10, tags=str(index), fill="#D2B48C")
             self.canvas.create_rectangle(x, y + 10, x + 5, y + 80, tags=str(index), fill="#8B4513")
+            #lab2 = Label(self.canvas, image = folder_img)
+            #lab2.place(x=x, y=y)
             self.items.append(f)
             self.folders.append(index)
             index = index + 1
@@ -308,6 +317,8 @@ class Paramiko_Interface:
             lab = Label(self.canvas, text=f)
             lab.place(x = x, y = y + 90)
             self.canvas.create_rectangle(x, y, x + 70, y + 80, tags=str(index), fill="white")
+            #lab2 = Label(self.canvas, image = file_img)
+            #lab2.place(x=x, y=y)
             self.items.append(f)
             self.files.append(index)
             index = index + 1

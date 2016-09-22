@@ -1,5 +1,6 @@
 import threading
 import paramiko
+import time
 
 class SSH:
     shell = None
@@ -31,7 +32,8 @@ class SSH:
 
     def sendShell(self, command):
         if(self.shell):
-            self.current_command = command
+            self.current_command = command[command.find('ls'):]
+            print(self.current_command)
             self.shell.send(command + "\n")
         else:
             print("Shell not opened.")
@@ -40,26 +42,51 @@ class SSH:
         global connection
         output = []
         should_return = False
+        temp_str = ''
         while True:
             while should_return == False:
                 if self.shell != None and self.shell.recv_ready():
                     alldata = self.shell.recv(1024)
                     while self.shell.recv_ready():
                         alldata += self.shell.recv(1024)
-                    strdata = str(alldata)[2:-1]
+                        time.sleep(0.5)
+                    strdata = str(alldata)
+                    #strdata = str(alldata)[2:-1]
                     #strdata = strdata[2:-1]
                     strdata = strdata.replace('\\r', '')
-                    strdata = strdata.replace('\\n', ' ')
+                    strdata = strdata.replace('\\n', '\n')
+                    strdata = strdata.replace('\r', '')
+                    temp_str = temp_str + strdata
+                    #strdata = strdata.replace('\n', ' ')
                     data = strdata.split(' ')
+                    #data = strdata.split(' ')
                     for dat in data:
                         if dat != '':
                             if dat.endswith("$"):
                                 should_return = True
                             else:
-                                dat = dat.replace('/', '')
-                                output.append(dat)
-                    print(output)
+                                pass
+                                #dat = dat.replace('/', '')
+                                #output.append(dat)
+                    #print(output)
                     if should_return:
+                        temp = temp_str.split('\n')
+                        print(temp)
+                        del(temp[0])
+                        del(temp[len(temp) - 1])
+                        if temp[0].startswith('ls: cannot access */'):
+                            output = []
+                        else:
+                            tot_string = ''
+                            for item in temp:
+                                tot_string = tot_string + ' ' + item
+                            print(tot_string)
+                            data = tot_string.split(' ')
+                            output = []
+                            for dat in data:
+                                if dat != '':
+                                    dat = dat.replace('/', '')
+                                    output.append(dat)
                         self.parent.Process_Output(self.current_command, output)
-                        output = []
                         should_return = False
+                        temp_str = ''

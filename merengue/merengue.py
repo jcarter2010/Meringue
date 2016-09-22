@@ -483,7 +483,7 @@ class App:
         self.menubar.add_cascade(label="Open Terminal", menu=terminalmenu)
         remotemenu = Menu(self.menubar, tearoff=0)
         remotemenu.add_command(label='Connect to Remote', command=self.ssh)
-        remotemenu.add_command(label='Edit Directory', command=self.remote_folder_choose)
+        #remotemenu.add_command(label='Edit Directory', command=self.remote_folder_choose)
         remotemenu.add_command(label="Open Explorer", command=self.paramiko_interface_open)
         self.menubar.add_cascade(label="Remote Actions", menu=remotemenu)
         #self.menubar.add_command(label="Open Terminal", command=self.open_terminal)

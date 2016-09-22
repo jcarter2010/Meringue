@@ -30,3 +30,8 @@ Click the 'close tab' button to close the current open tab.
 The 'about' button doesn't work yet, but I'll be putting all of this information into there after I get all of the functionality working.
 
 If anyone has any suggestions as to what I should add, email me at jcarter2010@comcast.net
+
+REQUIREMENTS:
+	Paramiko
+	ImageTk
+	
