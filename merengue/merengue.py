@@ -554,8 +554,8 @@ class App:
         self.current_directory = '.'
         if sys.platform == "win32":
             try:
-                #os.system('start python paramiko_terminal.py "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
-                os.system('start test.bat')
+                #os.system('start python ' + self.merengue_path + 'paramiko_terminal.py "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+                os.system('start python "' + self.merengue_path + 'paramiko_terminal.py" "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             except:
             #    try:
             #        os.system('start python2 paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
@@ -566,7 +566,7 @@ class App:
             #    os.system('open python paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             #except:
             try:
-                os.system('open python2 paramiko_terminal.py "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+                os.system('open python2 "' + self.merengue_path + 'paramiko_terminal.py" "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             except:
                 pass
         if sys.platform == "linux" or sys.platform == "linux2":
@@ -574,7 +574,7 @@ class App:
             #    os.system('xterm -hold -e python paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             #except:
             try:
-                os.system('xterm -e python2 paramiko_terminal.py "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+                os.system('xterm -e python2 "' + self.merengue_path + 'paramiko_terminal.py" "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             except:
                 pass
 
