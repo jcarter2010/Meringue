@@ -70,6 +70,8 @@ class EditorClass(object):
         #self.text.bind('<4>', self.syntax_coloring)
         #self.text.bind('<5>', self.syntax_coloring)
         self.text.bind('<Tab>', self.tab)
+        self.text.bind('<ISO_Left_Tab>', self.reverse_tab)
+        self.text.bind('<Shift-KeyPress-Tab>', self.reverse_tab)
         self.text.bind('<Return>', self.enter)
         self.text.bind('<Escape>', self.remove_highlight)
         self.text.bind('<Control-q>', self.highlight_variable)
@@ -85,8 +87,87 @@ class EditorClass(object):
         return 'break'
 
     def tab(self, event):
-        self.text.insert(INSERT, " " * 4)
+        try:
+            start=self.text.index('@0,0')
+            end=self.text.index('@0,%d' % self.text.winfo_height())
+            content = self.text.get(start, end)
+            l_c = content.split('\n')
+            t = self.text.selection_get()
+            l = t.split('\n')
+            start_line = int(str(self.find_selection()))
+            end_line = 0
+            start_index = int(start[:start.find('.')])
+            counter = start_index
+            #found_start = False
+            found_end = False
+            for line in l_c:
+                if l[len(l) - 1] in line and counter > start_line and found_end == False:
+                    end_line = counter
+                    found_end = True
+                counter = counter + 1
+            for i in range(start_line - start_index, end_line + 1 - start_index):
+                l_c[i] = '    ' + l_c[i]
+            l_fin = '\n'.join(l_c)
+            #l_fin = []
+            #for line in l:
+            #    l_fin = '    ' + l
+            self.text.delete(start, end)
+            self.text.insert(start, l_fin)
+            self.syntax_coloring_after_type(event)
+        except:
+            self.text.insert(INSERT, " " * 4)
         return 'break'
+
+    def reverse_tab(self, event):
+        try:
+            start=self.text.index('@0,0')
+            end=self.text.index('@0,%d' % self.text.winfo_height())
+            content = self.text.get(start, end)
+            l_c = content.split('\n')
+            t = self.text.selection_get()
+            l = t.split('\n')
+            start_line = int(str(self.find_selection()))
+            end_line = 0
+            start_index = int(start[:start.find('.')])
+            counter = start_index
+            found_end = False
+            for line in l_c:
+                if l[len(l) - 1] in line and counter > start_line and found_end == False:
+                    end_line = counter
+                    found_end = True
+                counter = counter + 1
+            for i in range(start_line - start_index, end_line + 1 - start_index):
+                if l_c[i].startswith('    '):
+                    l_c[i] = l_c[i].replace('    ', '', 1)
+            l_fin = '\n'.join(l_c)
+            self.text.delete(start, end)
+            self.text.insert(start, l_fin)
+            self.syntax_coloring_after_type(event)
+        except:
+            self.text.insert(INSERT, " " * 4)
+        return 'break'
+
+    def find_selection(self):
+        pattern = self.text.get(tk.SEL_FIRST, tk.SEL_LAST)
+        tag = "highlight"
+        start = tk.SEL_FIRST
+        end = tk.SEL_LAST
+        self.text.mark_set("matchStart", start)
+        self.text.mark_set("matchEnd", start)
+        self.text.mark_set("searchLimit", end)
+        count = tk.IntVar()
+        while True:
+            index = self.text.search(pattern, "matchEnd", "searchLimit", count=count, regexp=False)
+            if index == "": break
+            if count.get() == 0: break
+            self.text.mark_set("matchStart", index)
+            self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
+            #print(index)
+            #print(count.get())
+            return(index[:index.find('.')])
+        #    self.text.tag_add(tag, "matchStart", "matchEnd")
+        #print(start)
+
 
     def getLineNumbers(self):
         x = 0
@@ -161,6 +242,7 @@ class EditorClass(object):
         self.text.tag_remove('operator', start, end)
         self.text.tag_remove('number', start, end)
         #self.text.tag_remove('highlight', '1.0', END)
+        self.text.tag_remove('comment', start, end)
         self.text.tag_remove('function', start, end)
         self.text.tag_remove('keyword', start, end)
         self.text.tag_remove('function_name', start, end)
@@ -175,7 +257,7 @@ class EditorClass(object):
         self.highlight_numbers(start, end, event)
         self.highlight_keywords(start, end, event)
         self.highlight_function_names(start, end, event)
-        self.highlight_functions_and_variables(start, end, event)
+        #self.highlight_functions_and_variables(start, end, event)
         self.highlight_True_False(start, end, event)
         self.highlight_operators(start, end, event)
         self.highlight_strings(start, end, event)
@@ -191,7 +273,7 @@ class EditorClass(object):
         self.highlight_numbers(start, end, event)
         self.highlight_keywords(start, end, event)
         self.highlight_function_names(start, end, event)
-        self.highlight_functions_and_variables(start, end, event)
+        #self.highlight_functions_and_variables(start, end, event)
         self.highlight_True_False(start, end, event)
         self.highlight_operators(start, end, event)
         self.highlight_strings(start, end, event)
@@ -394,7 +476,7 @@ class EditorClass(object):
             self.text.mark_set("searchLimit", end)
             count = tk.IntVar()
             while True:
-                index = self.text.search('[^\'\"]#.*\n', "matchEnd", "searchLimit", count=count, regexp=regexp)
+                index = self.text.search('([ ]|^|[\'\"])#.*\n', "matchEnd", "searchLimit", count=count, regexp=regexp)
                 if index == "": break
                 if count.get() == 0: break
                 self.text.mark_set("matchStart", index)
@@ -428,7 +510,7 @@ class EditorClass(object):
             self.text.mark_set("searchLimit", end)
             count = tk.IntVar()
             while True:
-                index = self.text.search('\"\"\".*\"\"\"', "matchEnd", "searchLimit", count=count, regexp=regexp)
+                index = self.text.search('\"\"\"(.|\n)*\"\"\"', "matchEnd", "searchLimit", count=count, regexp=regexp)
                 if index == "": break
                 if count.get() == 0: break
                 self.text.mark_set("matchStart", index)
