@@ -51,6 +51,8 @@ class SSH:
                         alldata += self.shell.recv(1024)
                         time.sleep(0.5)
                     strdata = str(alldata)
+                    strdata = strdata.replace("b'", '')
+                    strdata = strdata.replace("'", '')
                     #strdata = str(alldata)[2:-1]
                     #strdata = strdata[2:-1]
                     strdata = strdata.replace('\\r', '')

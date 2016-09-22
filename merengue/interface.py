@@ -16,8 +16,14 @@ except:
 import time
 import paramiko
 import threading
-import ImageTk
-import Image
+'''
+try:
+    import ImageTk
+    import Image
+except:
+    from PIL import ImageTk as ImageTk
+    from PIL import Image as Image
+'''
 
 class Paramiko_Interface:
     def __init__(self, parent_obj, username, password, server, port):
@@ -284,8 +290,10 @@ class Paramiko_Interface:
         #self.Draw()
 
     def Draw(self):
-        #folder_img = ImageTk.PhotoImage(Image.open('./resources/folder_image.png'))
-        #file_img = ImageTk.PhotoImage(Image.open('./resources/file_image.png'))
+        #folder_img = ImageTk.PhotoImage(Image.open(self.parent_obj.merengue_path + 'resources/folder_image.png'))
+        #file_img = ImageTk.PhotoImage(Image.open(self.parent_obj.merengue_path + 'resources/file_image.png'))
+        self.labels = []
+        file_img = PhotoImage(self.parent_obj.merengue_path + 'resources/file_image.gif')
         self.canvas.delete('all')
         for widget in self.canvas.winfo_children():
             widget.destroy()
@@ -316,9 +324,11 @@ class Paramiko_Interface:
         for f in self.all_files_and_folders:
             lab = Label(self.canvas, text=f)
             lab.place(x = x, y = y + 90)
-            self.canvas.create_rectangle(x, y, x + 70, y + 80, tags=str(index), fill="white")
-            #lab2 = Label(self.canvas, image = file_img)
-            #lab2.place(x=x, y=y)
+            #self.canvas.create_rectangle(x, y, x + 70, y + 80, tags=str(index), fill="white")
+            lab2 = Label(self.canvas, image = file_img)
+            lab2.image = file_img
+            lab2.place(x=x, y=y)
+            labels.append(lab2)
             self.items.append(f)
             self.files.append(index)
             index = index + 1
