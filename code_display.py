@@ -22,30 +22,25 @@ import re
 from multiprocessing import Process
 import paramiko
 
-class DebugScrollbar(Scrollbar):
-    def set(self, *args):
-        print "SCROLLBAR SET", args
-        Scrollbar.set(self, *args)
-
-class EditorClass(object):
+class DisplayClass(object):
 
     UPDATE_PERIOD = 100 #ms
     editors = []
     updateId = None
     #keyword_python =
-    def __init__(self, master, filename, parent):
-        self.parent = parent
+    def __init__(self, master, filename):
         self.keywords_bash = ['if','then','else','elif','fi','case','esac','for','select','while','until','do','done','in','function','time','coproc']
         self.keywords_java = ['abstract','continue','for','new','switch','assert','default','goto','package','synchronized','boolean','do','if','private','this','break','double','implements','protected','throw','byte','else','import','public','throws','case','enum','instanceof','return','transient','catch','extends','int','short','try','char','final','interface','static','void','class','finally','long','strictfp','volatile','const','float','native','super','while','String','Integer','Double','Boolean']
         self.__class__.editors.append(self)
         self.fname = filename
-        self.lineNumbers = ''
+        #self.lineNumbers = ''
         # A frame to hold the three components of the widget.
         self.frame = Frame(master, bd=2, relief=SUNKEN)
         # The widgets vertical scrollbar
         self.vScrollbar = Scrollbar(self.frame, orient=VERTICAL)
         self.vScrollbar.pack(fill='y', side=RIGHT)
         # The Text widget holding the line numbers.
+        '''
         self.lnText = Text(self.frame,
                 width = 4,
                 padx = 4,
@@ -56,47 +51,46 @@ class EditorClass(object):
                 foreground = 'magenta',
                 state='disabled'
         )
-        self.lnText.pack(side=LEFT, fill='y')
+        '''
+        #self.lnText.pack(side=LEFT, fill='y')
         # The Main Text Widget
         self.text = Text(self.frame,
-                width=16,
+                width=150,
                 bd=0,
                 padx = 4,
                 undo=True,
-                background = 'black',
+                background = 'white',
                 foreground = 'blue',
-                wrap = NONE
+                wrap = NONE,
+                font = ("Helvetica",1),
+                #width = 200
         )
         self.text.pack(side=LEFT, fill=BOTH, expand=1)
         self.text.config(yscrollcommand=self.vScrollbar.set)
         self.vScrollbar.config(command=self.yview)
-        if self.__class__.updateId is None:
-            self.updateAllLineNumbers()
-        self.text.bind('<Key>', self.syntax_coloring_after_type)
-        self.text.bind('<4>', self.update_display)
-        self.text.bind('<5>', self.update_display)
-        self.text.bind('<Tab>', self.tab)
-        self.text.bind('<ISO_Left_Tab>', self.reverse_tab)
-        self.text.bind('<Shift-KeyPress-Tab>', self.reverse_tab)
-        self.text.bind('<Return>', self.enter)
-        self.text.bind('<Escape>', self.remove_highlight)
-        self.text.bind('<Control-q>', self.highlight_variable)
+        #if self.__class__.updateId is None:
+        #    self.updateAllLineNumbers()
+        #self.text.bind('<Key>', self.syntax_coloring_after_type)
+        #self.text.bind('<4>', self.syntax_coloring)
+        #self.text.bind('<5>', self.syntax_coloring)
+        #self.text.bind('<Tab>', self.tab)
+        #self.text.bind('<ISO_Left_Tab>', self.reverse_tab)
+        #self.text.bind('<Shift-KeyPress-Tab>', self.reverse_tab)
+        #self.text.bind('<Return>', self.enter)
+        #self.text.bind('<Escape>', self.remove_highlight)
+        #self.text.bind('<Control-q>', self.highlight_variable)
         #self.text.bind('<MouseWheel>', self.syntax_coloring)
         #self.text.bind('<1>', self.syntax_coloring)
 
-    def update_display(self, event):
-        start=self.text.index('@0,0')
-        end=self.text.index('@0,%d' % self.text.winfo_height())
-
-        self.parent.update_display(start, end)
 
     def yview(self, *args):
-        self.syntax_coloring(None)
+        #self.syntax_coloring(None)
         #self.parent.dis.text.tag_remove('current_selection', '1.0', END)
         self.text.yview(*args)
         start=self.text.index('@0,0')
         end=self.text.index('@0,%d' % self.text.winfo_height())
-        self.update_display(None)
+        syntax_coloring_after_type(None)
+        #self.update_display(None)
 
     def enter(self, event):
         start = float(int(float(self.text.index(INSERT))))
@@ -256,11 +250,38 @@ class EditorClass(object):
             cls.UPDATE_PERIOD,
             cls.updateAllLineNumbers)
 
+    def highlight_current(self, start, end):
+        #
+        #print(start)
+        #print(end)
+        start_float = float(start) - 20
+        if start_float < 1.0:
+            start_float = 1.0
+        remove_start = str(start_float)
+        end_float = float(end) + 20
+        if end_float > float(self.text.index('end')):
+            end_float = float(self.text.index('end'))
+        remove_end = str(end_float)
+        self.text.tag_remove('current_selection', remove_start, remove_end)
+        tag = "current_selection"
+        self.text.mark_set("matchStart", start)
+        self.text.mark_set("matchEnd", start)
+        self.text.mark_set("searchLimit", end)
+        count = tk.IntVar()
+        while True:
+            index = self.text.search('[.*|\s*]', "matchEnd", "searchLimit", count=count, regexp=True)
+            if index == "": break
+            if count.get() == 0: break
+            self.text.mark_set("matchStart", index)
+            self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
+            self.text.tag_add(tag, "matchStart", "matchEnd")
+
     def remove_all_tags(self, start, end, event):
         self.text.tag_remove('string', start, end)
         self.text.tag_remove('boolean', start, end)
         self.text.tag_remove('operator', start, end)
         self.text.tag_remove('number', start, end)
+        self.text.tag_remove('current_selection', start, end)
         #self.text.tag_remove('highlight', '1.0', END)
         self.text.tag_remove('comment', start, end)
         self.text.tag_remove('function', start, end)

@@ -24,6 +24,7 @@ import paramiko
 from access_ssh import access_ssh
 from method_dialog import method_dialog
 from editor import EditorClass
+from code_display import DisplayClass
 from find_and_replace_dialog import find_and_replace_dialog
 from remote_file_chooser import remote_file_chooser
 from new_dialog import new_dialog
@@ -35,17 +36,15 @@ from interface import Paramiko_Interface
 class App:
 
     def open_file(self, path):
-        print(path)
         if isfile(path):
             if not path in self.tab_names:
                 pane = PanedWindow(self.n, orient=HORIZONTAL, opaqueresize=True)
-                ed = EditorClass(self.root, path)
+                ed = EditorClass(self.root, path, self)
                 pane.add(ed.frame)
                 self.n.add(pane, text=path)
                 self.n.pack(fill='both', expand=1)
                 w = self.root.winfo_width()
                 h = self.root.winfo_height()
-                #self.n.place(x=200, y=0, width=(w-200), height=h)
                 self.tab_names.append(path)
                 ed.text.config(insertbackground='white')
                 ed.text.config(background=self.background)
@@ -69,9 +68,89 @@ class App:
                 ed.lnText.config(background=self.line_num_background_color)
                 #ed.text.event_generate("<Key>", when='tail')
                 ed.syntax_coloring(None)
-                #ed.color()
                 self.eds.append(ed)
+
+                #self.dis.place(x=100, y=0)
+                #self.dis.destroy()
+                self.set_display_text(path)
+                #ed.color()
+
             self.n.select(self.tab_names.index(path))
+
+    def update_display(self, start, end):
+        self.dis.highlight_current(start, end)
+
+    def reset_display_text(self):
+        self.n.tab(self.n.select())['text']
+        try:
+            self.pane.destroy()
+        except:
+            pass
+        self.pane = PanedWindow(self.display_frame, orient=HORIZONTAL, opaqueresize=True)
+        self.dis = DisplayClass(self.display_frame, path)
+        self.pane.add(self.dis.frame)
+        self.pane.pack(fill='both', expand=1)
+        self.dis.text.config(insertbackground='white')
+        self.dis.text.config(background=self.background)
+        self.dis.text.config(foreground=self.foreground)
+        with open(path, 'r') as f_in:
+            text = f_in.read()
+            lines = text.split('\n')
+            for line in lines:
+                self.dis.text.insert(END, line+'\n')
+        self.dis.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
+        self.dis.text.tag_configure("keyword", foreground=self.highlight_keyword)
+        self.dis.text.tag_configure("function_name", foreground=self.highlight_function_name)
+        self.dis.text.tag_configure("function", foreground=self.highlight_function)
+        self.dis.text.tag_configure("boolean", foreground=self.highlight_boolean)
+        self.dis.text.tag_configure("string", foreground=self.highlight_string)
+        self.dis.text.tag_configure("number", foreground=self.highlight_number)
+        self.dis.text.tag_configure("operator", foreground=self.highlight_operator)
+        #self.dis.text.tag_configure('normal', foreground=self.highlight_normal)
+        self.dis.text.tag_configure('comment', foreground=self.highlight_comment)
+        self.dis.text.tag_configure('current_selection', background='#555555')
+        #self.dis.lnText.config(foreground=self.line_num_color)
+        #self.dis.lnText.config(background=self.line_num_background_color)
+        #self.dis.text.event_generate("<Key>", when='tail')
+        self.dis.syntax_coloring(None)
+        self.dis.text.config(state=DISABLED)
+
+        #self.display_frame.add(self.dis)
+
+    def set_display_text(self, path):
+        try:
+            self.pane.destroy()
+        except:
+            pass
+        self.pane = PanedWindow(self.display_frame, orient=HORIZONTAL, opaqueresize=True)
+        self.dis = DisplayClass(self.display_frame, path)
+        self.pane.add(self.dis.frame)
+        self.pane.pack(fill='both', expand=1)
+        self.dis.text.config(insertbackground='white')
+        self.dis.text.config(background=self.background)
+        self.dis.text.config(foreground=self.foreground)
+        with open(path, 'r') as f_in:
+            text = f_in.read()
+            lines = text.split('\n')
+            for line in lines:
+                self.dis.text.insert(END, line+'\n')
+        self.dis.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
+        self.dis.text.tag_configure("keyword", foreground=self.highlight_keyword)
+        self.dis.text.tag_configure("function_name", foreground=self.highlight_function_name)
+        self.dis.text.tag_configure("function", foreground=self.highlight_function)
+        self.dis.text.tag_configure("boolean", foreground=self.highlight_boolean)
+        self.dis.text.tag_configure("string", foreground=self.highlight_string)
+        self.dis.text.tag_configure("number", foreground=self.highlight_number)
+        self.dis.text.tag_configure("operator", foreground=self.highlight_operator)
+        #self.dis.text.tag_configure('normal', foreground=self.highlight_normal)
+        self.dis.text.tag_configure('comment', foreground=self.highlight_comment)
+        self.dis.text.tag_configure('current_selection', background='#555555')
+        #self.dis.lnText.config(foreground=self.line_num_color)
+        #self.dis.lnText.config(background=self.line_num_background_color)
+        #self.dis.text.event_generate("<Key>", when='tail')
+        self.dis.syntax_coloring(None)
+        self.dis.text.config(state=DISABLED)
+
 
     def change_ed_colors(self):
         for ed in self.eds:
@@ -439,6 +518,7 @@ class App:
         #ttk.Style().configure('TFrame', fieldbackground=self.background, background=self.background)
         #self.tree_frame = Frame(self.root, bg=self.background, width=200, height=10000)
         self.bg_frame = Frame(self.tree_frame, width=200, height=10000, bg=self.background)
+        self.display_frame = Frame(self.root, width=150, height=10000, bg=self.background)
         self.tree = ttk.Treeview(self.tree_frame)
         #self.tree["columns"]=("Files_and_Folders")
         self.tree = self.list_files('.', self.tree, "", '.')
@@ -455,9 +535,11 @@ class App:
         self.tree.bind("<Double-1>", self.on_double_click)
         self.tree.pack(side=TOP, fill=Y, expand=1)
         self.tree_frame.pack(side=LEFT, fill=Y, expand=0)
+        self.display_frame.pack(side=RIGHT, fill=Y, expand=0)
         #self.pane.pack(fill='both', expand=1)
         #self.n.add(self.pane, text='untitled')
         self.n.bind("<Double-1>", self.tab_rename)
+        self.n.bind("<1>", self.reset_display_text)
         self.n.pack(side=LEFT, fill='both', expand=True)
         ttk.Style().configure("TNotebook", background=self.notebook_background)
         #ttk.Style().configure("TPanedwindow", background=self.pane_color, foreground=self.notebook_foreground)
