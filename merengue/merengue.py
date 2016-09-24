@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 try:
     from Tkinter import *
     import Tkinter as tk
@@ -736,7 +738,8 @@ class App:
             self.recursive_paste(d, sftp)
 
     def read_config(self):
-        with open(self.merengue_path+'config.ini', 'r') as f_in:
+        #with open('/usr/share/merengue_data/config.ini', 'r') as f_in:
+        with open(self.merengue_path + 'data/config.ini', 'r') as f_in:
             self.lines = f_in.read().split('\n')
             self.highlight_foreground = self.lines[0].split('=')[1]
             self.highlight_foreground = self.highlight_foreground[:7]
@@ -853,19 +856,20 @@ class App:
 
     def write_config(self):
         print('writing')
-        with open(self.merengue_path+'config.ini', 'w') as f_out:
+        with open(self.merengue_path + 'data/config.ini', 'w') as f_out:
+        #with open('/usr/share/merengue_data/config.ini', 'w') as f_out:
             for line in self.lines:
                 f_out.write(line + '\n')
             f_out.flush()
 
     def __init__(self):
         self.merengue_path = os.path.realpath(__file__)
-        self.merengue_path = self.merengue_path[:-11]
+        self.merengue_path = self.merengue_path[:self.merengue_path.rfind('/') + 1]
         print(self.merengue_path)
         #os.chdir(os.path.join(os.path.expanduser('~'), 'Documents'))
         self.root = Tk()
-        img = PhotoImage(file=self.merengue_path + 'icon.gif')
-        self.root.tk.call('wm', 'iconphoto', self.root._w, img)
+        #img = PhotoImage(file=self.merengue_path + 'icon.gif')
+        #self.root.tk.call('wm', 'iconphoto', self.root._w, img)
         #self.root.iconbitmap(self.merengue_path + '/' + 'merengue_icon.ico')
         self.eds = []
         self.n = ttk.Notebook(self.root)

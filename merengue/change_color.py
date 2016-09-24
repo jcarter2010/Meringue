@@ -1,4 +1,5 @@
 #Import stuff
+#I really should comment this better
 
 import sys
 try:
@@ -123,5 +124,7 @@ class change_color:
         self.button4.pack()
 
         self.parent_obj = parent_obj
+
+
 
 
