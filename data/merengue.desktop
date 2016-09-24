@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Name[en_US]=Merengue
+GenericName=Merengue Text Editor
+Exec=merengue.py
+Terminal=false
+Icon[en_US]=/usr/share/icons/icon.gif
+Type=Application
+Categories=Application
+Comment[en_US]=Merengue text editor

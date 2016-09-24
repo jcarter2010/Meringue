@@ -13,6 +13,7 @@ except:
     import tkinter.ttk as ttk
     import tkinter.messagebox as tkMessageBox
     from tkinter.filedialog import askdirectory
+from pkg_resources import resource_stream
 import os
 from os import listdir
 from os.path import isfile, join
@@ -34,6 +35,7 @@ from new_folder_dialog import new_folder_dialog
 from open_file_dialog import open_file_dialog
 from change_color import change_color
 from interface import Paramiko_Interface
+from create_config import create_config
 
 class App:
 
@@ -491,7 +493,11 @@ class App:
         scroll_style.configure("My.TScrollbar", troughcolor="black")
         '''
         #s.configure('Tab_Style', background='cyan')
-        self.read_config()
+        try:
+            self.read_config()
+        except:
+            create_config()
+            self.read_config()
         '''
         self.pane = PanedWindow(self.n, orient=HORIZONTAL, opaqueresize=True)
         ed = EditorClass(self.root, 'untitled')
@@ -738,8 +744,7 @@ class App:
             self.recursive_paste(d, sftp)
 
     def read_config(self):
-        #with open('/usr/share/merengue_data/config.ini', 'r') as f_in:
-        with open(self.merengue_path + 'data/config.ini', 'r') as f_in:
+        with open(os.environ['HOME'] + '/merengue/merengue_config.ini', 'r') as f_in:
             self.lines = f_in.read().split('\n')
             self.highlight_foreground = self.lines[0].split('=')[1]
             self.highlight_foreground = self.highlight_foreground[:7]
@@ -856,8 +861,7 @@ class App:
 
     def write_config(self):
         print('writing')
-        with open(self.merengue_path + 'data/config.ini', 'w') as f_out:
-        #with open('/usr/share/merengue_data/config.ini', 'w') as f_out:
+        with open(os.environ['HOME'] + '/merengue/merengue_config.ini', 'w') as f_out:
             for line in self.lines:
                 f_out.write(line + '\n')
             f_out.flush()

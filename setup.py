@@ -1,13 +1,16 @@
 from setuptools import setup
+import os
 
 setup(
-    name='merengue',
-    install_requires=['paramiko'],
-    entry_points={
-        'qui_scripts': ['merengue = merengue.__main__:main']},
-    version='1.0.4',
-    author='John Carter',
-    author_email='jcarter2010@comcast.net',
+    name = "Merengue",
+    version = "1.0",
+    author = "John Carter",
+    author_email = "jcarter2010@comcast.net",
+    description = "Raspberry Pi/Linux text editor",
+    license = "BSD",
+    url = "https://github.com/JCarter2010/Merengue",
     packages=['merengue'],
-    package_dir={'merengue': 'merengue'},
-    description='Merengue text editor for Linux/Windows/Raspbian.')
+    package_data = {'merengue.data': ['*']},
+    entry_points={ 'gui_scripts': [ 'merengue=merengue.merengue:main' ] },
+    data_files=[ ('share/icons', ['data/icon.gif']), ('share/applications', ['data/merengue.desktop']) ],
+)
