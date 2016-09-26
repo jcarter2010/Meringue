@@ -265,7 +265,7 @@ class App:
 
             sftp = paramiko.SFTPClient.from_transport(transport)
             try:
-                sftp.put(path,path[path.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):])
+                sftp.put(path,path[path.find(self.meringue_path + '/local/') + len(self.meringue_path + '/local/'):])
             except:
                 print('Could not push for some reason')
 
@@ -283,7 +283,7 @@ class App:
 
             sftp = paramiko.SFTPClient.from_transport(transport)
             try:
-                sftp.put(path,path[path.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):])
+                sftp.put(path,path[path.find(self.meringue_path + '/local/') + len(self.meringue_path + '/local/'):])
             except:
                 print('Could not push for some reason')
 
@@ -353,7 +353,7 @@ class App:
         path = item
         found = True
         if found:
-            args = ['python2', self.merengue_path + '/' + 'rename.py', 'test']
+            args = ['python2', self.meringue_path + '/' + 'rename.py', 'test']
             p = Popen(args, stdin=PIPE, stdout=PIPE, shell=False)
             p.wait()
             out = p.stdout.read().replace('\n', '')
@@ -371,17 +371,17 @@ class App:
                 self.tree.item(os.getcwd().replace('\\', '/'), open=True)
                 if self.editing_pi:
                     new_name = path[:path.rfind('/')]+'/'+out
-                    new_name = new_name[new_name.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):]
+                    new_name = new_name[new_name.find(self.meringue_path + '/local/') + len(self.meringue_path + '/local/'):]
                     transport = paramiko.Transport((self.ip, 22))
                     transport.connect(username=self.username, password=self.password)
 
                     sftp = paramiko.SFTPClient.from_transport(transport)
                     try:
-                        sftp.rename(item[item.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):], new_name)
+                        sftp.rename(item[item.find(self.meringue_path + '/local/') + len(self.meringue_path + '/local/'):], new_name)
                     except:
                         print('not a file')
                     try:
-                        sftp.rmdir(item[item.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):], new_name)
+                        sftp.rmdir(item[item.find(self.meringue_path + '/local/') + len(self.meringue_path + '/local/'):], new_name)
                     except:
                         print('not a directory')
 
@@ -396,7 +396,7 @@ class App:
 
                     sftp = paramiko.SFTPClient.from_transport(transport)
                     try:
-                        sftp.remove(item[item.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):])
+                        sftp.remove(item[item.find(self.meringue_path + '/local/') + len(self.meringue_path + '/local/'):])
                     except:
                         print('not a file')
             except:
@@ -420,7 +420,7 @@ class App:
 
                 sftp = paramiko.SFTPClient.from_transport(transport)
                 try:
-                    sftp.remove(path[path.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):]+'/'+f)
+                    sftp.remove(path[path.find(self.meringue_path + '/local/') + len(self.meringue_path + '/local/'):]+'/'+f)
                 except:
                     print('not a file')
         for d in dirs:
@@ -432,7 +432,7 @@ class App:
 
             sftp = paramiko.SFTPClient.from_transport(transport)
             try:
-                sftp.rmdir(path[path.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):]+'/'+d)
+                sftp.rmdir(path[path.find(self.meringue_path + '/local/') + len(self.meringue_path + '/local/'):]+'/'+d)
             except:
                 print('not a directory')
 
@@ -447,7 +447,11 @@ class App:
 
     def tab_rename(self, event):
         path = self.n.tab(self.n.select())['text']
-        args = ['python2', self.merengue_path + '/' + 'rename.py', path[path.rfind('/')+1:]]
+        if os.name == 'nt':
+            print(self.meringue_path)
+            args = ['python', self.meringue_path + 'rename.py', path[path.rfind('\\')+1:]]
+        else:
+            args = ['python2', self.meringue_path + 'rename.py', path[path.rfind('/')+1:]]
         p = Popen(args, stdin=PIPE, stdout=PIPE, shell=False)
         p.wait()
         out = p.stdout.read().replace('\n', '')
@@ -496,7 +500,7 @@ class App:
         try:
             self.read_config()
         except:
-            create_config()
+            create_config(self.meringue_path)
             self.read_config()
         '''
         self.pane = PanedWindow(self.n, orient=HORIZONTAL, opaqueresize=True)
@@ -579,7 +583,7 @@ class App:
         #self.menubar.add_command(label="Open Terminal", command=self.open_terminal)
         self.menubar.config(background=self.file_bar_color, foreground=self.file_bar_text_color)
         self.root.configure(background=self.background)
-        self.root.title("Merengue")
+        self.root.title("meringue")
         self.root.bind('<Control-s>', self.save_type)
         self.root.bind('<Control-f>', self.find_type)
         #self.root.bind('<Control-Shift-p>', self.git_commands)
@@ -644,8 +648,8 @@ class App:
         self.current_directory = '.'
         if sys.platform == "win32":
             try:
-                #os.system('start python ' + self.merengue_path + 'paramiko_terminal.py "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
-                os.system('start python "' + self.merengue_path + 'paramiko_terminal.py" "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+                #os.system('start python ' + self.meringue_path + 'paramiko_terminal.py "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+                os.system('start python "' + self.meringue_path + 'paramiko_terminal.py" "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             except:
             #    try:
             #        os.system('start python2 paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
@@ -656,7 +660,7 @@ class App:
             #    os.system('open python paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             #except:
             try:
-                os.system('open python2 "' + self.merengue_path + 'paramiko_terminal.py" "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+                os.system('open python2 "' + self.meringue_path + 'paramiko_terminal.py" "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             except:
                 pass
         if sys.platform == "linux" or sys.platform == "linux2":
@@ -664,7 +668,7 @@ class App:
             #    os.system('xterm -hold -e python paramiko_terminal.py {} {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             #except:
             try:
-                os.system('xterm -e python2 "' + self.merengue_path + 'paramiko_terminal.py" "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
+                os.system('xterm -e python2 "' + self.meringue_path + 'paramiko_terminal.py" "{}" {} {} {} {}'.format(self.current_directory, self.ip, self.username, self.password, self.port))
             except:
                 pass
 
@@ -710,7 +714,7 @@ class App:
 
                     sftp = paramiko.SFTPClient.from_transport(transport)
                     try:
-                        sftp.put(write_path, write_path[write_path.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):])
+                        sftp.put(write_path, write_path[write_path.find(self.meringue_path + '/local/') + len(self.meringue_path + '/local/'):])
                     except:
                         print('not a file')
                         self.recursive_paste_sftp(write_path, sftp)
@@ -733,18 +737,18 @@ class App:
             self.recursive_paste(path+'/'+d)
 
     def recursive_paste_sftp(self, path, sftp):
-        sftp.mkdir(path[path.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):])
+        sftp.mkdir(path[path.find(self.meringue_path + '/local/') + len(self.meringue_path + '/local/'):])
         dirs = [path+'/'+f for f in listdir(path) if not isfile(join(path, f))]
         files = [path+'/'+f for f in listdir(path) if isfile(join(path, f))]
         print(dirs)
         print(files)
         for f in files:
-            sftp.put(f, f[f.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):])
+            sftp.put(f, f[f.find(self.meringue_path + '/local/') + len(self.meringue_path + '/local/'):])
         for d in dirs:
             self.recursive_paste(d, sftp)
 
     def read_config(self):
-        with open(os.environ['HOME'] + '/merengue/merengue_config.ini', 'r') as f_in:
+        with open(self.meringue_path + '/data/meringue_config.ini', 'r') as f_in:
             self.lines = f_in.read().split('\n')
             self.highlight_foreground = self.lines[0].split('=')[1]
             self.highlight_foreground = self.highlight_foreground[:7]
@@ -815,7 +819,7 @@ class App:
 
                 sftp = paramiko.SFTPClient.from_transport(transport)
                 try:
-                    sftp.put(item+'/'+name,item[item.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):]+'/'+name)
+                    sftp.put(item+'/'+name,item[item.find(self.meringue_path + '/local/') + len(self.meringue_path + '/local/'):]+'/'+name)
                 except:
                     print('Could not push for some reason')
         else:
@@ -839,7 +843,7 @@ class App:
 
                 sftp = paramiko.SFTPClient.from_transport(transport)
                 try:
-                    sftp.mkdir(item[item.find(self.merengue_path + '/local/') + len(self.merengue_path + '/local/'):]+'/'+name)
+                    sftp.mkdir(item[item.find(self.meringue_path + '/local/') + len(self.meringue_path + '/local/'):]+'/'+name)
                 except:
                     print('Could not push for some reason')
         else:
@@ -861,20 +865,24 @@ class App:
 
     def write_config(self):
         print('writing')
-        with open(os.environ['HOME'] + '/merengue/merengue_config.ini', 'w') as f_out:
+        with open(self.meringue_path + '/data/meringue_config.ini', 'w') as f_out:
             for line in self.lines:
                 f_out.write(line + '\n')
             f_out.flush()
 
     def __init__(self):
-        self.merengue_path = os.path.realpath(__file__)
-        self.merengue_path = self.merengue_path[:self.merengue_path.rfind('/') + 1]
-        print(self.merengue_path)
+        self.meringue_path = os.path.realpath(__file__)
+        if os.name == 'nt':
+            self.meringue_path = self.meringue_path[:self.meringue_path.rfind('\\') + 1]
+        else:
+            self.meringue_path = self.meringue_path[:self.meringue_path.rfind('/') + 1]
+        print(self.meringue_path)
+        sys.stdout.flush()
         #os.chdir(os.path.join(os.path.expanduser('~'), 'Documents'))
         self.root = Tk()
-        #img = PhotoImage(file=self.merengue_path + 'icon.gif')
+        #img = PhotoImage(file=self.meringue_path + 'icon.gif')
         #self.root.tk.call('wm', 'iconphoto', self.root._w, img)
-        #self.root.iconbitmap(self.merengue_path + '/' + 'merengue_icon.ico')
+        #self.root.iconbitmap(self.meringue_path + '/' + 'meringue_icon.ico')
         self.eds = []
         self.n = ttk.Notebook(self.root)
         self.menubar = Menu(self.root)
@@ -911,15 +919,15 @@ class App:
         self.find_counter = 0
         try:
             if os.name == 'posix':
-                os.makedirs(self.merengue_path+'local')
+                os.makedirs(self.meringue_path+'local')
             else:
-                os.makedirs(self.merengue_path.replace('\\', '/')+'local')
+                os.makedirs(self.meringue_path.replace('\\', '/')+'local')
         except:
             pass
         if os.name == 'posix':
-            self.recursive_delete(self.merengue_path+'local')
+            self.recursive_delete(self.meringue_path+'local')
         else:
-            self.recursive_delete(self.merengue_path.replace('\\', '/')+'local')
+            self.recursive_delete(self.meringue_path.replace('\\', '/')+'local')
         self.sftp_stem = ''
         mainloop()
 

@@ -22,11 +22,6 @@ import re
 from multiprocessing import Process
 import paramiko
 
-class DebugScrollbar(Scrollbar):
-    def set(self, *args):
-        print "SCROLLBAR SET", args
-        Scrollbar.set(self, *args)
-
 class EditorClass(object):
 
     UPDATE_PERIOD = 100 #ms
@@ -76,8 +71,10 @@ class EditorClass(object):
         self.text.bind('<4>', self.update_display)
         self.text.bind('<5>', self.update_display)
         self.text.bind('<Tab>', self.tab)
-        self.text.bind('<ISO_Left_Tab>', self.reverse_tab)
-        self.text.bind('<Shift-KeyPress-Tab>', self.reverse_tab)
+        try:
+            self.text.bind('<ISO_Left_Tab>', self.reverse_tab)
+        except:
+            self.text.bind('<Shift-KeyPress-Tab>', self.reverse_tab)
         self.text.bind('<Return>', self.enter)
         self.text.bind('<Escape>', self.remove_highlight)
         self.text.bind('<Control-q>', self.highlight_variable)

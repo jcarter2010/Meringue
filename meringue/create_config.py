@@ -1,12 +1,12 @@
 import os
 
 class create_config:
-    def __init__(self):
-        try:
-            os.makedirs(os.environ['HOME'] + '/merengue')
-        except:
-            pass
-        with open(os.environ['HOME'] + '/merengue/merengue_config.ini', 'w') as f_out:
+    def __init__(self, meringue_path):
+        #try:
+        #    os.makedirs(os.environ['HOME'] + '/merengue')
+        #except:
+        #    pass
+        with open(meringue_path + '/data/meringue_config.ini', 'w') as f_out:
             f_out.write('highlight_foreground=#FFFF00\n')
             f_out.write('highlight_background=#0000FF\n')
             f_out.write('highlight_keyword=#FF0000\n')
