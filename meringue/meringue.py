@@ -946,6 +946,9 @@ class App:
             except:
                 pass
 
+def __main__(self):
+    App()
+
 def main():
     App()
 

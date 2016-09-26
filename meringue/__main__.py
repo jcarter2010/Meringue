@@ -1,7 +1,7 @@
-from meringue import meringue
+from meringue import App as meringue
 
 def main():
-    meringue.main()
+    meringue()
 
 if __name__ == '__main__':
     main()
