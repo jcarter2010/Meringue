@@ -35,6 +35,7 @@ class EditorClass(object):
         self.__class__.editors.append(self)
         self.fname = filename
         self.lineNumbers = ''
+        self.words = []
         # A frame to hold the three components of the widget.
         self.frame = Frame(master, bd=2, relief=SUNKEN)
         # The widgets vertical scrollbar
@@ -78,8 +79,12 @@ class EditorClass(object):
         self.text.bind('<Return>', self.enter)
         self.text.bind('<Escape>', self.remove_highlight)
         self.text.bind('<Control-q>', self.highlight_variable)
+        #self.text.bind('<Space>', self.add_word)
         #self.text.bind('<MouseWheel>', self.syntax_coloring)
         #self.text.bind('<1>', self.syntax_coloring)
+
+    def add_word(self, event):
+        pass
 
     def update_display(self, event):
         start=self.text.index('@0,0')
@@ -105,8 +110,10 @@ class EditorClass(object):
 
     def tab(self, event):
         try:
-            start=self.text.index('@0,0')
-            end=self.text.index('@0,%d' % self.text.winfo_height())
+            start = '1.0'
+            end = END
+            #start=self.text.index('@0,0')
+            #end=self.text.index('@0,%d' % self.text.winfo_height())
             content = self.text.get(start, end)
             l_c = content.split('\n')
             t = self.text.selection_get()
@@ -137,8 +144,10 @@ class EditorClass(object):
 
     def reverse_tab(self, event):
         try:
-            start=self.text.index('@0,0')
-            end=self.text.index('@0,%d' % self.text.winfo_height())
+            start = '1.0'
+            end = END
+            #start=self.text.index('@0,0')
+            #end=self.text.index('@0,%d' % self.text.winfo_height())
             content = self.text.get(start, end)
             l_c = content.split('\n')
             t = self.text.selection_get()
