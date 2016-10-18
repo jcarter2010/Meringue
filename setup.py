@@ -1,16 +1,18 @@
 from setuptools import setup
+#import distutils
+import py2exe
 import os
 
 setup(
-    name = "Merengue",
+    name = "Meringue",
     version = "1.0",
     author = "John Carter",
     author_email = "jcarter2010@comcast.net",
-    description = "Raspberry Pi/Linux text editor",
+    description = "Raspberry Pi/Linux/Windows/OS X text editor",
     license = "BSD",
     url = "https://github.com/JCarter2010/Merengue",
-    packages=['merengue'],
-    package_data = {'merengue.data': ['*']},
-    entry_points={ 'gui_scripts': [ 'merengue=merengue.merengue:main' ] },
-    data_files=[ ('share/icons', ['data/icon.gif']), ('share/applications', ['data/merengue.desktop']) ],
+    packages=['meringue'],
+    package_data = {'meringue.data': ['*']},
+    entry_points={ 'gui_scripts': [ 'meringue=meringue.meringue:main' ] },
+    data_files=[ ('share/icons', ['data/icon.gif']), ('share/applications', ['data/meringue.desktop']) ],
 )

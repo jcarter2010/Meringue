@@ -1,2 +1,2 @@
 recursive-include data *
-recursive-include merengue/data *
+recursive-include meringue/data *
