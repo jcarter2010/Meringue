@@ -48,7 +48,7 @@ class App:
                 ed = EditorClass(self.root, path, self)
                 pane.add(ed.frame)
                 self.n.add(pane, text=path)
-                self.n.pack(fill='both', expand=1)
+                self.n.grid(row=0, column=1, rowspan=40, sticky=N+S+E+W)
                 w = self.root.winfo_width()
                 h = self.root.winfo_height()
                 self.tab_names.append(path)
@@ -78,13 +78,14 @@ class App:
 
                 #self.dis.place(x=100, y=0)
                 #self.dis.destroy()
-                self.set_display_text(path)
+                #self.set_display_text(path)
                 #ed.color()
 
             self.n.select(self.tab_names.index(path))
 
     def update_display(self, start, end):
-        self.dis.highlight_current(start, end)
+        #self.dis.highlight_current(start, end)
+        pass
 
     def reset_display_text(self):
         self.n.tab(self.n.select())['text']
@@ -95,7 +96,7 @@ class App:
         self.pane = PanedWindow(self.display_frame, orient=HORIZONTAL, opaqueresize=True)
         self.dis = DisplayClass(self.display_frame, path)
         self.pane.add(self.dis.frame)
-        self.pane.pack(fill='both', expand=1)
+        self.pane.grid(row=0, column=0, rowspan=40, columnspan=60, sticky=N+S+E+W)
         self.dis.text.config(insertbackground='white')
         self.dis.text.config(background=self.background)
         self.dis.text.config(foreground=self.foreground)
@@ -541,20 +542,20 @@ class App:
             self.tree.tag_configure('directory', background=self.background, foreground=self.dir_color)
             self.tree.tag_configure('file', background=self.background, foreground=self.file_color)
             ttk.Style().configure("Treeview", fieldbackground=self.background, background=self.background)
-        self.treeScroll = ttk.Scrollbar(self.tree_frame, orient=HORIZONTAL)
-        self.treeScroll.configure(command=self.tree.xview)
-        self.treeScroll.pack(side=TOP, fill=X)
+        self.treeScroll = ttk.Scrollbar(self.tree_frame, orient=VERTICAL)
+        self.treeScroll.configure(command=self.tree.yview)
+        self.treeScroll.grid(row=0, column=1, rowspan=40, sticky=N+S)
         self.tree.configure(xscrollcommand=self.treeScroll.set)
         self.tree.bind("<3>", self.on_right_click)
         self.tree.bind("<Double-1>", self.on_double_click)
-        self.tree.pack(side=TOP, fill=Y, expand=1)
-        self.tree_frame.pack(side=LEFT, fill=Y, expand=0)
+        self.tree.grid(row=0, column=0, rowspan=40, sticky=N+S)
+        self.tree_frame.grid(row=0, column=0, rowspan=40, sticky=N+S)
         #self.display_frame.pack(side=RIGHT, fill=Y, expand=0)
         #self.pane.pack(fill='both', expand=1)
         #self.n.add(self.pane, text='untitled')
         self.n.bind("<Double-1>", self.tab_rename)
         #self.n.bind("<1>", self.reset_display_text)
-        self.n.pack(side=LEFT, fill='both', expand=True)
+        self.n.grid(row=0, column=1, rowspan=40, columnspan=60, sticky=N+S+E+W)
         ttk.Style().configure("TNotebook", background=self.notebook_background)
         #ttk.Style().configure("TPanedwindow", background=self.pane_color, foreground=self.notebook_foreground)
         #self.tab_names.append('untitled')
@@ -603,6 +604,30 @@ class App:
         self.root.config(menu=self.menubar)
         if os.name == 'nt':
             ttk.Style().theme_use('default')
+
+        for x in range(60):
+            Grid.columnconfigure(self.n, x, weight=1)
+
+        for y in range(30):
+            Grid.rowconfigure(self.n, y, weight=1)
+
+        for x in range(60):
+            Grid.columnconfigure(self.tree, x, weight=1)
+
+        for y in range(30):
+            Grid.rowconfigure(self.tree, y, weight=1)
+
+        for x in range(60):
+            Grid.columnconfigure(self.tree_frame, x, weight=1)
+
+        for y in range(30):
+            Grid.rowconfigure(self.tree_frame, y, weight=1)
+
+        for x in range(60):
+            Grid.columnconfigure(self.root, x, weight=1)
+
+        for y in range(30):
+            Grid.rowconfigure(self.root, y, weight=1)
 
     def run_file_python_2(self):
         index = self.n.tabs().index(self.n.select())
