@@ -547,6 +547,7 @@ class App:
         self.treeScroll.grid(row=0, column=1, rowspan=40, sticky=N+S)
         self.tree.configure(xscrollcommand=self.treeScroll.set)
         self.tree.bind("<3>", self.on_right_click)
+        self.tree.bind("<2>", self.on_right_click)
         self.tree.bind("<Double-1>", self.on_double_click)
         self.tree.grid(row=0, column=0, rowspan=40, sticky=N+S)
         self.tree_frame.grid(row=0, column=0, rowspan=40, sticky=N+S)

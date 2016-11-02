@@ -8,7 +8,7 @@ Keep in mind, this is still in its very early stages and very much a work in pro
 
 In order to run this, download the repository as a .zip and put it wherever you want it.  After doing that just unzip it to the directory where you want to keep it, then open up a terminal window and type:
 
-  python2 merengue.py
+  python2 meringue.py
 
 don't use the setup.py script.  I am still testing that and it doesn't work whatsoever, so just ignore it.
 
@@ -34,4 +34,5 @@ If anyone has any suggestions as to what I should add, email me at jcarter2010@c
 REQUIREMENTS:
 	Paramiko
 	ImageTk
+	colorama
 	
