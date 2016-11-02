@@ -33,9 +33,4 @@ If anyone has any suggestions as to what I should add, email me at jcarter2010@c
 
 REQUIREMENTS:
 	Paramiko
-<<<<<<< HEAD
-	ImageTk
-	colorama
-=======
->>>>>>> 6c759ea444ac03721503402a56963e18e0856845
 	
