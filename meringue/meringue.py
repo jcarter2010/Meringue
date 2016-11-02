@@ -36,7 +36,8 @@ from open_file_dialog import open_file_dialog
 from change_color import change_color
 from interface import Paramiko_Interface
 from create_config import create_config
-from run_script import run_script
+from run_script import run_script_python_2
+from run_script import run_script_python_3
 
 class App:
 
@@ -582,7 +583,10 @@ class App:
         remotemenu.add_command(label="Open Explorer", command=self.paramiko_interface_open)
         self.menubar.add_cascade(label="Remote Actions", menu=remotemenu)
         #runmenu = Menu(self.menubar, tearoff=0)
-        self.menubar.add_command(label="Run File", command=self.run_file)
+        runmenu = Menu(self.menubar, tearoff=0)
+        runmenu.add_command(label='Python 2', command=self.run_file_python_2)
+        runmenu.add_command(label='Python 3', command=self.run_file_python_3)
+        self.menubar.add_cascade(label="Run File", menu=runmenu)
         #self.menubar.add_command(label="Open Terminal", command=self.open_terminal)
         self.menubar.config(background=self.file_bar_color, foreground=self.file_bar_text_color)
         self.root.configure(background=self.background)
@@ -600,10 +604,15 @@ class App:
         if os.name == 'nt':
             ttk.Style().theme_use('default')
 
-    def run_file(self):
+    def run_file_python_2(self):
         index = self.n.tabs().index(self.n.select())
         print(self.tab_names[index])
-        run_script(self.tab_names[index], self.root)
+        run_script_python_2(self.tab_names[index], self.root)
+
+    def run_file_python_3(self):
+        index = self.n.tabs().index(self.n.select())
+        print(self.tab_names[index])
+        run_script_python_3(self.tab_names[index], self.root)
 
     def paramiko_interface_open(self):
         Paramiko_Interface(self, self.username, self.password, self.ip, self.port)
