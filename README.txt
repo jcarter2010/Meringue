@@ -6,7 +6,7 @@ This works on Windows now! Well, at least Windows 10, that's all I've tested it 
 
 Keep in mind, this is still in its very early stages and very much a work in progress.  There will be a lot of bugs, just giving you fair warning.
 
-In order to run this, download the repository as a .zip and put it wherever you want it.  After doing that just unzip it to the directory where you want to keep it, then open up a terminal window and type:
+In order to run this, download the repository as a .zip and put it wherever you want it.  After doing that just unzip it to the directory where you want to keep it, then open up a terminal window within the 'meringue' directory and type:
 
   python2 meringue.py
 
@@ -33,6 +33,9 @@ If anyone has any suggestions as to what I should add, email me at jcarter2010@c
 
 REQUIREMENTS:
 	Paramiko
+<<<<<<< HEAD
 	ImageTk
 	colorama
+=======
+>>>>>>> 6c759ea444ac03721503402a56963e18e0856845
 	
