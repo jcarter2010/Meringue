@@ -11,53 +11,61 @@ except:
     import tkinter as tk
     import tkinter.ttk as ttk
 from subprocess import PIPE, Popen
+from tkColorChooser import askcolor
 
 class change_color:
 
     def change(self):
-        try:
+        #try:
 
-            #We want a dropdown box of all of the options, so get the selected item
+        #We want a dropdown box of all of the options, so get the selected item
 
-            string = str(self.var1.get())
-            index = self.function_list.index(string)
+        string = str(self.var1.get())
+        index = self.function_list.index(string)
 
-            #Call the color picker java program to select a color
+        color = askcolor()
+        out = color
 
-            args = ['java', '-cp', self.parent_obj.merengue_path, 'Color_Picker']
-            p = Popen(args, stdin=PIPE, stdout=PIPE, shell=False)
-            p.wait()
+        print(out)
 
-            #capture the output from the java program
+        #Call the color picker java program to select a color
 
-            out = p.stdout.read().split('\n')
+        #args = ['java', '-cp', self.parent_obj.meringue_path, 'Color_Picker']
+        #p = Popen(args, stdin=PIPE, stdout=PIPE, shell=False)
 
-            #the output is r\ng\nb so get those values
+        #p.wait()
 
-            r = out[0]
-            g = out[1]
-            b = out[2]
+        #capture the output from the java program
 
-            #Get all of the config values, set the color values for the parameter to be changed, rewrite the config to save them
-            #And change all of the colors for the items in the text editor then exit the dialog
+        #out = p.stdout.read().split('\n')
 
-            self.read_config()
-            line = self.lines[index][:self.lines[index].find('=')]
-            hex = '#%02x%02x%02x' % (int(r), int(g), int(b))
-            line = line + '=' + hex
-            self.lines[index] = line
-            self.write_config()
-            self.parent_obj.read_config()
-            self.parent_obj.change_ed_colors()
-            self.top.destroy()
-        except:
-            self.top.destroy()
+        #the output is r\ng\nb so get those values
+
+        #r = out[0]
+        #g = out[1]
+        #b = out[2]
+
+        #Get all of the config values, set the color values for the parameter to be changed, rewrite the config to save them
+        #And change all of the colors for the items in the text editor then exit the dialog
+
+        self.read_config()
+        line = self.lines[index][:self.lines[index].find('=')]
+        #hex = '#%02x%02x%02x' % (int(r), int(g), int(b))
+        hex_code = out[1]
+        line = line + '=' + hex_code
+        self.lines[index] = line
+        self.write_config()
+        self.parent_obj.read_config()
+        self.parent_obj.change_ed_colors()
+        self.top.destroy()
+        #except:
+        #    self.top.destroy()
 
     def write_config(self):
 
         #Write all of the corresponding values to the config file to save them
 
-        with open(self.parent_obj.merengue_path+'config.ini', 'w') as f_out:
+        with open(self.parent_obj.meringue_path+'data/meringue_config.ini', 'w') as f_out:
             for line in self.lines:
                 f_out.write(line + '\n')
             f_out.flush()
@@ -66,7 +74,7 @@ class change_color:
 
         #read all of the values from the congfig file
 
-        with open(self.parent_obj.merengue_path+'config.ini', 'r') as f_in:
+        with open(self.parent_obj.meringue_path+'data/meringue_config.ini', 'r') as f_in:
             self.lines = f_in.read().split('\n')
             self.highlight_foreground = self.lines[0].split('=')[1]
             self.highlight_background = self.lines[1].split('=')[1]
@@ -124,7 +132,3 @@ class change_color:
         self.button4.pack()
 
         self.parent_obj = parent_obj
-
-
-
-

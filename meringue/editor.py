@@ -315,17 +315,24 @@ class EditorClass(object):
         self.text.mark_set("searchLimit", end)
         count = tk.IntVar()
         counter = 0
+        first_index = None
+        first = True
         while True:
             index = self.text.search(pattern, "matchEnd", "searchLimit", count=count, regexp=regexp)
             if index == "": break
             if count.get() == 0: break
+            if first:
+                first_index = index
+                first = False
             self.text.mark_set("matchStart", index)
-            self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
+            self.counttext.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
             self.text.tag_add(tag, "matchStart", "matchEnd")
             if counter == 0:
             	self.text.see(index)
             counter = counter + 1
-        self.syntax_coloring(None)
+        if first_index != None:
+            self.syntax_coloring(None)
+            self.text.see(first_index)
 
     def highlight_one(self, pattern, tag, c, start="1.0", end="end", regexp=False):
         self.remove_highlight(None)
@@ -344,9 +351,9 @@ class EditorClass(object):
             self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
             if counter == c:
                 self.text.tag_add(tag, "matchStart", "matchEnd")
+                self.syntax_coloring(None)
                 self.text.see(index)
             counter = counter + 1
-        self.syntax_coloring(None)
 
     def highlight_keywords(self, start, end, event):
         if self.fname.endswith('.py') or self.fname.endswith('.sh') or self.fname.endswith('.java'):
