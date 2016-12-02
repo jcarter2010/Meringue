@@ -5,7 +5,7 @@
 
 ----------------
 
-A Raspberry Pi/Linux Text Editor (Now with Python and Java syntax coloring!)
+A Raspberry Pi Linux Windows and OS X text editor
 
 ----------------
 
