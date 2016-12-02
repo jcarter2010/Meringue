@@ -63,16 +63,16 @@ class App:
                     lines = text.split('\n')
                     for line in lines:
                         ed.text.insert(END, line+'\n')
-                ed.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
-                ed.text.tag_configure("keyword", foreground=self.highlight_keyword)
-                ed.text.tag_configure("function_name", foreground=self.highlight_function_name)
-                ed.text.tag_configure("function", foreground=self.highlight_function)
-                ed.text.tag_configure("boolean", foreground=self.highlight_boolean)
-                ed.text.tag_configure("string", foreground=self.highlight_string)
-                ed.text.tag_configure("number", foreground=self.highlight_number)
-                ed.text.tag_configure("operator", foreground=self.highlight_operator)
+                #ed.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
+                #ed.text.tag_configure("keyword", foreground=self.highlight_keyword)
+                #ed.text.tag_configure("function_name", foreground=self.highlight_function_name)
+                #ed.text.tag_configure("function", foreground=self.highlight_function)
+                #ed.text.tag_configure("boolean", foreground=self.highlight_boolean)
+                #ed.text.tag_configure("string", foreground=self.highlight_string)
+                #ed.text.tag_configure("number", foreground=self.highlight_number)
+                #ed.text.tag_configure("operator", foreground=self.highlight_operator)
                 #ed.text.tag_configure('normal', foreground=self.highlight_normal)
-                ed.text.tag_configure('comment', foreground=self.highlight_comment)
+                #ed.text.tag_configure('comment', foreground=self.highlight_comment)
                 ed.lnText.config(foreground=self.line_num_color)
                 ed.lnText.config(background=self.line_num_background_color)
                 #ed.text.event_generate("<Key>", when='tail')
@@ -882,55 +882,56 @@ class App:
     def read_config(self):
         with open(self.meringue_path + '/data/meringue_config.ini', 'r') as f_in:
             self.lines = f_in.read().split('\n')
-            self.highlight_foreground = self.lines[0].split('=')[1]
-            self.highlight_foreground = self.highlight_foreground[:7]
-            self.highlight_background = self.lines[1].split('=')[1]
-            self.highlight_background = self.highlight_background[:7]
-            self.highlight_keyword = self.lines[2].split('=')[1]
-            self.highlight_keyword = self.highlight_keyword[:7]
-            self.highlight_function_name = self.lines[3].split('=')[1]
-            self.highlight_function_name = self.highlight_function_name[:7]
-            self.highlight_function = self.lines[4].split('=')[1]
-            self.highlight_function = self.highlight_function[:7]
-            self.highlight_boolean = self.lines[5].split('=')[1]
-            self.highlight_boolean = self.highlight_boolean[:7]
-            self.highlight_string = self.lines[6].split('=')[1]
-            self.highlight_string = self.highlight_string[:7]
-            self.highlight_number = self.lines[7].split('=')[1]
-            self.highlight_number = self.highlight_number[:7]
-            self.highlight_operator = self.lines[8].split('=')[1]
-            self.highlight_operator = self.highlight_operator[:7]
-            #self.highlight_normal = self.lines[9].split('=')[1]
-            self.highlight_comment = self.lines[9].split('=')[1]
-            self.highlight_comment = self.highlight_comment[:7]
-            self.foreground = self.lines[10].split('=')[1]
+            self.foreground = self.lines[0].split('=')[1]
             self.foreground = self.foreground[:7]
-            self.background = self.lines[11].split('=')[1]
+            self.background = self.lines[1].split('=')[1]
             self.background = self.background[:7]
-            self.file_color = self.lines[12].split('=')[1]
+            self.file_color = self.lines[2].split('=')[1]
             self.file_color = self.file_color[:7]
-            self.dir_color = self.lines[13].split('=')[1]
+            self.dir_color = self.lines[3].split('=')[1]
             self.dir_color = self.dir_color[:7]
-            self.line_num_color = self.lines[14].split('=')[1]
+            self.line_num_color = self.lines[4].split('=')[1]
             self.line_num_color = self.line_num_color[:7]
-            self.line_num_background_color = self.lines[15].split('=')[1]
+            self.line_num_background_color = self.lines[5].split('=')[1]
             self.line_num_background_color = self.line_num_background_color[:7]
-            self.file_bar_color = self.lines[16].split('=')[1]
+            self.file_bar_color = self.lines[6].split('=')[1]
             self.file_bar_color = self.file_bar_color[:7]
-            self.file_bar_text_color = self.lines[17].split('=')[1]
+            self.file_bar_text_color = self.lines[7].split('=')[1]
             self.file_bar_text_color = self.file_bar_text_color[:7]
-            self.notebook_background = self.lines[18].split('=')[1]
+            self.notebook_background = self.lines[8].split('=')[1]
             self.notebook_background = self.notebook_background[:7]
-            self.folder = self.lines[19].split('=')[1]
+            self.highlight_foreground = self.lines[9].split('=')[1]
+            self.highlight_foreground = self.highlight_foreground[:7]
+            self.highlight_background = self.lines[10].split('=')[1]
+            self.highlight_background = self.highlight_background[:7]
+            self.token_keyword = self.lines[11].split('=')[1]
+            self.token_keyword = self.token_keyword[:7]
+            self.token_name = self.lines[12].split('=')[1]
+            self.token_name = self.token_name[:7]
+            self.token_literal = self.lines[13].split('=')[1]
+            self.token_literal = self.token_literal[:7]
+            self.token_string = self.lines[14].split('=')[1]
+            self.token_string = self.token_string[:7]
+            self.token_number = self.lines[15].split('=')[1]
+            self.token_number = self.token_number[:7]
+            self.token_operators = self.lines[16].split('=')[1]
+            self.token_operators = self.token_operators[:7]
+            self.token_punctuation = self.lines[17].split('=')[1]
+            self.token_punctuation = self.token_punctuation[:7]
+            self.token_comments = self.lines[18].split('=')[1]
+            self.token_comments = self.token_comments[:7]
+            self.token_generic = self.lines[19].split('=')[1]
+            self.token_generic = self.token_generic[:7]
+            self.folder = self.lines[20].split('=')[1]
         if not self.folder:
             self.folder = askdirectory()
-            self.lines[19] = self.lines[19][:self.lines[19].find('=')+1]+self.folder
+            self.lines[20] = self.lines[20][:self.lines[20].find('=')+1]+self.folder
         self.write_config()
         try:
             os.chdir(self.folder)
         except:
             self.folder = askdirectory()
-            self.lines[19] = self.lines[19][:self.lines[19].find('=')+1]+self.folder
+            self.lines[20] = self.lines[20][:self.lines[20].find('=')+1]+self.folder
             self.write_config()
             os.chdir(self.folder)
 

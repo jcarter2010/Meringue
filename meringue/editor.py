@@ -403,6 +403,7 @@ class EditorClass(object):
             thmethod creates the tags associated with each distinct style element of the
             source code 'dressing'
         """
+        '''
         bold_font = font.Font(self.text, self.text.cget("font"))
         bold_font.configure(weight=font.BOLD)
         italic_font = font.Font(self.text, self.text.cget("font"))
@@ -431,6 +432,89 @@ class EditorClass(object):
             self.tag_names.append(str(ttype))
 
             self.text.tag_configure(str(ttype), foreground=foreground, font=tag_font)
+        '''
+
+        style = get_style_by_name('default')
+
+        self.tag_names = []
+
+        for ttype, ndef in style:
+            self.tag_names.append(str(ttype))
+
+        self.text.tag_configure('Token.Keyword', foreground=self.parent.token_keyword)
+        self.text.tag_configure('Token.Keyword.Constant', foreground=self.parent.token_keyword)
+        self.text.tag_configure('Token.Keyword.Declaration', foreground=self.parent.token_keyword)
+        self.text.tag_configure('Token.Keyword.Namespace', foreground=self.parent.token_keyword)
+        self.text.tag_configure('Token.Keyword.Pseudo', foreground=self.parent.token_keyword)
+        self.text.tag_configure('Token.Keyword.Reserved', foreground=self.parent.token_keyword)
+        self.text.tag_configure('Token.Keyword.Type', foreground=self.parent.token_keyword)
+
+        self.text.tag_configure('Token.Name', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Attribute', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Builtin', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Builtin.Pseudo', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Class', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Constant', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Decorator', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Entity', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Exception', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Function', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Label', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Namespace', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Other', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Tag', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Variable', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Variable.Class', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Variable.Global', foreground=self.parent.token_name)
+        self.text.tag_configure('Token.Name.Variable.Instance', foreground=self.parent.token_name)
+
+        self.text.tag_configure('Token.Literal', foreground=self.parent.token_literal)
+        self.text.tag_configure('Token.Literal.Date', foreground=self.parent.token_literal)
+
+        self.text.tag_configure('Token.Literal.String', foreground=self.parent.token_string)
+        self.text.tag_configure('Token.Literal.String.Backtick', foreground=self.parent.token_string)
+        self.text.tag_configure('Token.Literal.String.Char', foreground=self.parent.token_string)
+        self.text.tag_configure('Token.Literal.String.Doc', foreground=self.parent.token_string)
+        self.text.tag_configure('Token.Literal.String.Double', foreground=self.parent.token_string)
+        self.text.tag_configure('Token.Literal.String.Escape', foreground=self.parent.token_string)
+        self.text.tag_configure('Token.Literal.String.Heredoc', foreground=self.parent.token_string)
+        self.text.tag_configure('Token.Literal.String.Interpol', foreground=self.parent.token_string)
+        self.text.tag_configure('Token.Literal.String.Other', foreground=self.parent.token_string)
+        self.text.tag_configure('Token.Literal.String.Regex', foreground=self.parent.token_string)
+        self.text.tag_configure('Token.Literal.String.Single', foreground=self.parent.token_string)
+        self.text.tag_configure('Token.Literal.String.Symbol', foreground=self.parent.token_string)
+
+        self.text.tag_configure('Token.Literal.Number', foreground=self.parent.token_number)
+        self.text.tag_configure('Token.Literal.Number.Bin', foreground=self.parent.token_number)
+        self.text.tag_configure('Token.Literal.Number.Float', foreground=self.parent.token_number)
+        self.text.tag_configure('Token.Literal.Number.Hex', foreground=self.parent.token_number)
+        self.text.tag_configure('Token.Literal.Number.Integer', foreground=self.parent.token_number)
+        self.text.tag_configure('Token.Literal.Number.Integer.Long', foreground=self.parent.token_number)
+        self.text.tag_configure('Token.Literal.Number.Oct', foreground=self.parent.token_number)
+
+        self.text.tag_configure('Token.Operator', foreground=self.parent.token_operators)
+        self.text.tag_configure('Token.Operator.Word', foreground=self.parent.token_operators)
+
+        self.text.tag_configure('Token.Punctuation', foreground=self.parent.token_punctuation)
+
+        self.text.tag_configure('Token.Comment', foreground=self.parent.token_comments)
+        self.text.tag_configure('Token.Comment.Hashbang', foreground=self.parent.token_comments)
+        self.text.tag_configure('Token.Comment.Multiline', foreground=self.parent.token_comments)
+        self.text.tag_configure('Token.Comment.Preproc', foreground=self.parent.token_comments)
+        self.text.tag_configure('Token.Comment.Single', foreground=self.parent.token_comments)
+        self.text.tag_configure('Token.Comment.Special', foreground=self.parent.token_comments)
+
+        self.text.tag_configure('Token.Generic', foreground=self.parent.token_generic)
+        self.text.tag_configure('Token.Generic.Deleted', foreground=self.parent.token_generic)
+        self.text.tag_configure('Token.Generic.Emph', foreground=self.parent.token_generic)
+        self.text.tag_configure('Token.Generic.Error', foreground=self.parent.token_generic)
+        self.text.tag_configure('Token.Generic.Heading', foreground=self.parent.token_generic)
+        self.text.tag_configure('Token.Generic.Inserted', foreground=self.parent.token_generic)
+        self.text.tag_configure('Token.Generic.Output', foreground=self.parent.token_generic)
+        self.text.tag_configure('Token.Generic.Prompt', foreground=self.parent.token_generic)
+        self.text.tag_configure('Token.Generic.Strong', foreground=self.parent.token_generic)
+        self.text.tag_configure('Token.Generic.Subheading', foreground=self.parent.token_generic)
+        self.text.tag_configure('Token.Generic.Traceback', foreground=self.parent.token_generic)
 
     def recolorize(self):
         if self.lexer != None:
