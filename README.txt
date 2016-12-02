@@ -5,7 +5,7 @@
 
 ----------------
 
-A Raspberry Pi Linux Windows and OS X text editor
+A Raspberry Pi text editor, also for Linux, Windows, and OS X
 
 ----------------
 
