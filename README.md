@@ -13,7 +13,7 @@ ABOUT
 
 ----------------
 
-  This works on Windows now! Well, at least Windows 10, that's all I've tested it on.  You can even connect to a Raspberry Pi and edit its files remotely.  It just looks incredibly ugly.  Linux looks much much better, so go with Linux.  Also, a few versions ago it kind of worked on OS X, so if you want to try running it on that go ahead and please tell me about any bugs and how it runs.
+  This works on Windows now! Well, at least Windows 10, that's all I've tested it on.  You can even connect to a Raspberry Pi and edit its files remotely.  It just looks incredibly ugly.  Linux looks much much better, so go with Linux.
 
   Keep in mind, this is still in its very early stages and very much a work in progress.  There will be a lot of bugs, just giving you fair warning.
 
@@ -36,12 +36,12 @@ Commands:
 
   + [ctrl]+[f] is find and replace
 
-  + [ctrl]-[q] is variable highlighting.
+  + [ctrl]-[q] is variable highlighting.  
     Select whichever variable you want by click and drag (or double click) and then press the key combo and it will highlight all instances of the variable in your current tab that is open.
 
   + [ctrl]-[h] is to connect to a remote Linux machine.
 
-  + [ctrl]-[r] is to refresh the syntax highlighting
+  + [ctrl]-[r] is to refresh the syntax highlighting  
     Current syntax highlighting supported:
       * Python
       * PlainText
@@ -58,12 +58,12 @@ Commands:
       * MySql
 
 
-  + Double click on the files in the directory tree on the left hand side to open them
+  + Double click on the files in the directory tree on the left hand side to open them  
     Right click on them to pull up a menu of actions that you can take such as delete, rename, copy, paste, create a new file, and create a new folder.
 
   + Double click on the tab in the file you are working on to change its name.
 
-  + Click 'edit > Change Editor Colors' it will give you a dropdown box with all of the color variables for the program.
+  + Click 'edit > Change Editor Colors' it will give you a dropdown box with all of the color variables for the program.  
     Select one and then hit 'select color' and it will give you a way to select a new color for the element in order to customize your text editing experience.
 
   + Right click on a tab to close it
