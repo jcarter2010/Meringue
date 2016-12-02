@@ -655,7 +655,7 @@ class App:
         self.root.bind('<Control-f>', self.find_type)
         #self.root.bind('<Control-Shift-p>', self.git_commands)
         self.root.bind('<Escape>', self.end_find)
-        self.root.bind('<Control-r>', self.function_dialog)
+        #self.root.bind('<Control-r>', self.function_dialog)
         self.root.bind('<Control-h>', self.ssh)
         self.root.bind('<Alt_R>', self.hide_show_menubar);
         self.root.bind('<Control-e>', self.hide_show_tree);

@@ -5,6 +5,7 @@ try:
     import tkFileDialog
     import tkMessageBox
     from tkFileDialog import askdirectory
+    import tkFont as font
 except:
     from tkinter import *
     import tkinter as tk
@@ -21,6 +22,20 @@ import keyword
 import re
 from multiprocessing import Process
 import paramiko
+from pygments.lexers.python import PythonLexer
+from pygments.lexers.special import TextLexer
+from pygments.lexers.html import HtmlLexer
+from pygments.lexers.html import XmlLexer
+from pygments.lexers.templates import HtmlPhpLexer
+from pygments.lexers.perl import Perl6Lexer
+from pygments.lexers.ruby import RubyLexer
+from pygments.lexers.configs import IniLexer
+from pygments.lexers.configs import ApacheConfLexer
+from pygments.lexers.shell import BashLexer
+from pygments.lexers.diff import DiffLexer
+from pygments.lexers.dotnet import CSharpLexer
+from pygments.lexers.sql import MySqlLexer
+from pygments.styles import get_style_by_name
 
 class EditorClass(object):
 
@@ -36,6 +51,7 @@ class EditorClass(object):
         self.keywords_java = ['abstract','continue','for','new','switch','assert','default','goto','package','synchronized','boolean','do','if','private','this','break','double','implements','protected','throw','byte','else','import','public','throws','case','enum','instanceof','return','transient','catch','extends','int','short','try','char','final','interface','static','void','class','finally','long','strictfp','volatile','const','float','native','super','while','String','Integer','Double','Boolean']
         self.__class__.editors.append(self)
         self.fname = filename
+        self.lexer = self.get_lexer(filename)
         self.lineNumbers = ''
         self.words = []
         # A frame to hold the three components of the widget.
@@ -73,7 +89,9 @@ class EditorClass(object):
         self.hScrollbar.config(command=self.xview)
         if self.__class__.updateId is None:
             self.updateAllLineNumbers()
-        self.text.bind('<KeyRelease>', self.syntax_coloring_after_type)
+        self.control = False
+        self.text.bind('<Key>', self.syntax_coloring_after_type)
+        self.text.bind('<KeyRelease>', self.key_release)
         #self.text.bind('<4>', self.update_display)
         #self.text.bind('<5>', self.update_display)
         self.text.bind('<Tab>', self.tab)
@@ -81,13 +99,55 @@ class EditorClass(object):
             self.text.bind('<ISO_Left_Tab>', self.reverse_tab)
         except:
             self.text.bind('<Shift-KeyPress-Tab>', self.reverse_tab)
+        self.text.bind('<Control_L>', self.control_down)
         self.text.bind('<Return>', self.enter)
         self.text.bind('<Escape>', self.remove_highlight)
         self.text.bind('<Control-q>', self.highlight_variable)
         self.text.bind('<Control-z>', self.undo)
+        self.text.bind('<Control-r>', self.syntax_coloring)
         self.text.bind('<space>', self.syntax_coloring_after_type)
         #self.text.bind('<MouseWheel>', self.syntax_coloring)
         #self.text.bind('<1>', self.syntax_coloring)
+        self.create_tags()
+
+    def control_up(self, event):
+        self.control = False
+
+    def control_down(self, event):
+        self.control = True
+
+    def get_lexer(self, filename):
+        extens = filename[filename.rfind('.') + 1:]
+        print(extens)
+        if extens == "py" or extens == "pyw" or extens == "sc" or extens == "sage" or extens == "tac":
+            lexer = PythonLexer()
+        elif extens == "txt" or extens == "README" or extens == "text":
+            lexer = TextLexer()
+        elif extens == "htm" or extens == "html" or extens == "css" or extens == "js" or extens == "md":
+            lexer = HtmlLexer()
+        elif extens == "xml" or extens == "xsl" or extens == "rss" or extens == "xslt" or extens == "xsd" or extens == "wsdl" or extens == "wsf":
+            lexer = XmlLexer()
+        elif extens == "php" or extens == "php5":
+            lexer = HtmlPhpLexer()
+        elif extens == "pl" or extens == "pm" or extens == "nqp" or extens == "p6" or extens == "6pl" or extens == "p6l" or extens == "pl6" or extens == "pm" or extens == "p6m" or extens == "pm6" or extens == "t":
+            lexer = Perl6Lexer()
+        elif extens == "rb" or extens == "rbw" or extens == "rake" or extens == "rbx" or extens == "duby" or extens == "gemspec":
+            lexer = RubyLexer()
+        elif extens == "ini" or extens == "init":
+            lexer = IniLexer()
+        elif extens == "conf" or extens == "cnf" or extens == "config":
+            lexer = ApacheConfLexer()
+        elif extens == "sh" or extens == "cmd" or extens == "bashrc" or extens == "bash_profile":
+            lexer = BashLexer()
+        elif extens == "diff" or extens == "patch":
+            lexer = DiffLexer()
+        elif extens == "cs":
+            lexer = CSharpLexer()
+        elif extens == "sql":
+            lexer = MySqlLexer()
+        else:
+            lexer = None
+        return lexer
 
     def undo(self, event):
         self.text.edit_undo()
@@ -291,6 +351,7 @@ class EditorClass(object):
         self.text.tag_remove('function_name', start, end)
 
     def syntax_coloring(self, event):
+        '''
         start = '1.0'
         end = END
         self.remove_all_tags(start, end, event)
@@ -306,11 +367,17 @@ class EditorClass(object):
         self.highlight_strings(start, end, event)
         self.highlight_comments(start, end, event)
         self.highlight_multiline_comments(start, end, event)
+        '''
+        self.colorize()
+        #return 'break'
+
+    def key_release(self, event):
+        if event.keycode == 82:
+            self.control_up(event)
 
     def syntax_coloring_after_type(self, event):
-        self.past_keys.pop(0)
-        self.past_keys.append(event.char)
-        self.sc(event)
+        if not self.control:
+            self.recolorize()
         '''
         #start=self.text.index('@0,0')
         #end=self.text.index('@0,%d' % self.text.winfo_height())
@@ -330,6 +397,118 @@ class EditorClass(object):
         self.highlight_comments(start, end, event)
         self.highlight_multiline_comments(start, end, event)
         '''
+
+    def create_tags(self):
+        """
+            thmethod creates the tags associated with each distinct style element of the
+            source code 'dressing'
+        """
+        bold_font = font.Font(self.text, self.text.cget("font"))
+        bold_font.configure(weight=font.BOLD)
+        italic_font = font.Font(self.text, self.text.cget("font"))
+        italic_font.configure(slant=font.ITALIC)
+        bold_italic_font = font.Font(self.text, self.text.cget("font"))
+        bold_italic_font.configure(weight=font.BOLD, slant=font.ITALIC)
+        style = get_style_by_name('default')
+
+        self.tag_names = []
+
+        for ttype, ndef in style:
+            tag_font = None
+
+            if ndef['bold'] and ndef['italic']:
+                tag_font = bold_italic_font
+            elif ndef['bold']:
+                tag_font = bold_font
+            elif ndef['italic']:
+                tag_font = italic_font
+
+            if ndef['color']:
+                foreground = "#%s" % ndef['color']
+            else:
+                foreground = None
+
+            self.tag_names.append(str(ttype))
+
+            self.text.tag_configure(str(ttype), foreground=foreground, font=tag_font)
+
+    def recolorize(self):
+        if self.lexer != None:
+
+            insert_index = self.text.index(INSERT)
+            row = int(insert_index[:insert_index.find('.')]) - 1
+            start = '{}.0'.format(row)
+            end = '{}.0'.format(row + 2)
+
+            column = 0
+            start_line = 1
+            start_index = column
+            end_line = 1
+            end_index = column
+
+            code = self.text.get(start, end)
+            tokensource = self.lexer.get_tokens(code)
+
+            for ttype, value in tokensource:
+                if "\n" in value:
+                    end_line += value.count("\n")
+                    end_index = len(value.rsplit("\n",1)[1])
+                else:
+                    end_index += len(value)
+
+                if value not in (" ", "\n"):
+                    index0 = "%s.%s" % (start_line + row - 1, start_index - 1)
+                    index1 = "%s.%s" % (start_line + row - 1, start_index)
+                    index2 = "%s.%s" % (end_line + row - 1, end_index)
+
+                    #if not 'Token.Literal.String.Doc' in self.text.tag_names(index1):
+
+                    for tagname in self.text.tag_names(index0):
+
+                        self.text.tag_remove(tagname, index1, index2)
+
+                    self.text.tag_add(str(ttype), index1, index2)
+
+                start_line = end_line
+                start_index = end_index
+
+    def colorize(self):
+        if self.lexer != None:
+
+            self.text.tag_ranges('Token.Literal.String.Doc')
+
+            for tag in self.tag_names:
+                indices = self.text.tag_ranges(tag)
+                for i in range(0, len(indices), 2):
+                    self.text.tag_remove(tag, indices[i], indices[i + 1])
+
+
+            code = self.text.get("1.0", "end-1c")
+            tokensource = self.lexer.get_tokens(code)
+            start_line=1
+            start_index = 0
+            end_line=1
+            end_index = 0
+
+            for ttype, value in tokensource:
+                if "\n" in value:
+                    end_line += value.count("\n")
+                    end_index = len(value.rsplit("\n",1)[1])
+                else:
+                    end_index += len(value)
+
+                if value not in (" ", "\n"):
+                    index0 = "%s.%s" % (start_line, start_index - 1)
+                    index1 = "%s.%s" % (start_line, start_index)
+                    index2 = "%s.%s" % (end_line, end_index)
+
+                    #for tagname in self.text.tag_names(index0):
+                    #    self.text.tag_remove(tagname, index1, index2)
+
+                    self.text.tag_add(str(ttype), index1, index2)
+
+                start_line = end_line
+                start_index = end_index
 
     def sc(self, event):
         text = self.text.get(1.0, END)
