@@ -53,24 +53,17 @@ class SSH:
                     strdata = str(alldata)
                     strdata = strdata.replace("b'", '')
                     strdata = strdata.replace("'", '')
-                    #strdata = str(alldata)[2:-1]
-                    #strdata = strdata[2:-1]
                     strdata = strdata.replace('\\r', '')
                     strdata = strdata.replace('\\n', '\n')
                     strdata = strdata.replace('\r', '')
                     temp_str = temp_str + strdata
-                    #strdata = strdata.replace('\n', ' ')
                     data = strdata.split(' ')
-                    #data = strdata.split(' ')
                     for dat in data:
                         if dat != '':
                             if dat.endswith("$"):
                                 should_return = True
                             else:
                                 pass
-                                #dat = dat.replace('/', '')
-                                #output.append(dat)
-                    #print(output)
                     if should_return:
                         temp = temp_str.split('\n')
                         print(temp)

@@ -2,10 +2,6 @@ import os
 
 class create_config:
     def __init__(self, meringue_path):
-        #try:
-        #    os.makedirs(os.environ['HOME'] + '/merengue')
-        #except:
-        #    pass
         with open(meringue_path + '/data/meringue_config.ini', 'w') as f_out:
             f_out.write('foreground=#ffffff\n')
             f_out.write('background=#000000\n')

@@ -48,18 +48,20 @@ class new_folder_dialog:
 
         self.entryLabel = Label(self.textFrame)
         self.entryLabel["text"] = "Name:"
-        self.entryLabel.pack()
+        self.entryLabel['width'] = 20
+        self.entryLabel.grid(row=0, column=0)
+
         self.entryWidget = Entry(self.textFrame)
         self.entryWidget["width"] = 50
-        self.entryWidget.pack()
+        self.entryWidget.grid(row=0, column=1)
         self.entryWidget.focus_set()
 
-        self.textFrame.pack()
+        self.textFrame.grid()
 
-        self.button = Button(top, text="Create New", command=self.find)
-        self.button.pack()
+        self.button = Button(self.textFrame, text="Create New", command=self.find)
+        self.button.grid(row=1, column=0, columnspan=2, sticky=E+W)
 
         self.button4 = Button(top, text="Cancel", command=self.end)
-        self.button4.pack()
+        self.button4.grid(row=2, column=0, columnspan=2, sticky=E+W)
 
         self.parent_obj = parent_obj

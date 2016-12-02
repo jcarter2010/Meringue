@@ -33,68 +33,6 @@ class access_ssh:
         self.parent_obj.password = password
         self.parent_obj.port = port
 
-        '''
-        #We're going to store the directory tree here
-
-        self.remote_tree_array = []
-
-        #Let's ssh into the remote machine
-
-        try:
-            ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(host, username=username, password=password)
-
-            #We need the 'tree' command on the remote machine so that we can pull the directory, hopefully this is already installed
-            #otherwise we need to install it, to do this though the user that they ssh'd into must have root privledges without
-            #a password at the moment
-
-            #print('Installing tree')
-
-            #tkMessageBox.showwarning("SSH Connect", "Intalling 'tree' command onto the system -- this might take a while")
-
-            #stdin, stdout, stderr = ssh.exec_command('sudo apt-get -y install tree')
-            #stdin.close()
-
-            #for line in stdout.read().splitlines():
-            #    print('%s$: %s' % (host, line))
-
-            #for line in stderr.read().splitlines():
-            #    print('%s$: %s' % (host, line + "\n"))
-
-            #Run the tree command and then capture the directory output
-
-            print('Running and capturing directories')
-
-            tkMessageBox.showwarning("SSH Connect", "Pulling the directory structure -- please wait")
-
-            stdin, stdout, stderr = ssh.exec_command('tree -f -i -l -d')
-            stdin.close()
-
-            #Extract the name of all of the directories from the tree and store them
-
-            for line in stdout.read().splitlines():
-                if ' -> ' in line:
-                    self.parent_obj.remote_tree_array.append(line[:line.find(' -> ')])
-                else:
-                    self.parent_obj.remote_tree_array.append(line)
-
-            #Elimiate the top directory as it is not needed
-
-            self.parent_obj.remote_tree_array = self.parent_obj.remote_tree_array[:-1]
-
-            #Go to letting the user select the directory that they want
-
-            rfc = remote_file_chooser(self.top, self.parent_obj, username, host, password, ssh, int(port))
-
-        except:
-
-            #If something failed throw an error message
-
-            tkMessageBox.showwarning("SSH Connect", "Something failed -- Please try again")
-
-        ssh.close()
-        '''
         self.top.destroy()
 
     def cancel(self):
@@ -110,48 +48,49 @@ class access_ssh:
 
         self.entryLabel = Label(self.textFrame)
         self.entryLabel["text"] = "Username:"
-        self.entryLabel.pack()
+        self.entryLabel['width'] = 20
+        self.entryLabel.grid(row=0, column=0)
 
         self.entryWidget = Entry(self.textFrame)
         self.entryWidget["width"] = 50
-        self.entryWidget.pack()
+        self.entryWidget.grid(row=0, column=1)
 
         self.entryLabel2 = Label(self.textFrame)
         self.entryLabel2["text"] = "IP Address/Hostname:"
-        self.entryLabel2.pack()
+        self.entryLabel2.grid(row=1, column=0)
 
         self.entryWidget2 = Entry(self.textFrame)
         self.entryWidget2["width"] = 50
-        self.entryWidget2.pack()
+        self.entryWidget2.grid(row=1, column=1)
 
         self.entryLabel3 = Label(self.textFrame)
         self.entryLabel3["text"] = "Password:"
-        self.entryLabel3.pack()
+        self.entryLabel3.grid(row=2, column=0)
 
         self.entryWidget3 = Entry(self.textFrame, show='*')
         self.entryWidget3["width"] = 50
-        self.entryWidget3.pack()
+        self.entryWidget3.grid(row=2, column=1)
 
         self.entryLabel4 = Label(self.textFrame)
         self.entryLabel4["text"] = "Port:"
-        self.entryLabel4.pack()
+        self.entryLabel4.grid(row=3, column=0)
 
         self.entryWidget4 = Entry(self.textFrame)
         self.entryWidget4["width"] = 50
-        self.entryWidget4.pack()
+        self.entryWidget4.grid(row=3, column=1)
 
         #Set focus to the top box so they don't have to go over and click on it
 
         self.entryWidget.focus_set()
 
-        self.textFrame.pack()
+        self.textFrame.grid()
 
         #Add the necessary buttons
 
-        self.button = Button(top, text="Connect", command=self.connect)
-        self.button.pack()
+        self.button = Button(self.textFrame, text="Connect", command=self.connect)
+        self.button.grid(row=4, column=0, columnspan=2, sticky=E+W)
 
-        self.button2 = Button(top, text='Done', command=self.cancel)
-        self.button2.pack()
+        self.button2 = Button(self.textFrame, text='Done', command=self.cancel)
+        self.button2.grid(row=5, column=0, columnspan=2, sticky=E+W)
 
         self.parent_obj = parent_obj

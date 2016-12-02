@@ -28,23 +28,6 @@ class change_color:
 
         print(out)
 
-        #Call the color picker java program to select a color
-
-        #args = ['java', '-cp', self.parent_obj.meringue_path, 'Color_Picker']
-        #p = Popen(args, stdin=PIPE, stdout=PIPE, shell=False)
-
-        #p.wait()
-
-        #capture the output from the java program
-
-        #out = p.stdout.read().split('\n')
-
-        #the output is r\ng\nb so get those values
-
-        #r = out[0]
-        #g = out[1]
-        #b = out[2]
-
         #Get all of the config values, set the color values for the parameter to be changed, rewrite the config to save them
         #And change all of the colors for the items in the text editor then exit the dialog
 
@@ -58,8 +41,6 @@ class change_color:
         self.parent_obj.read_config()
         self.parent_obj.change_ed_colors()
         self.top.destroy()
-        #except:
-        #    self.top.destroy()
 
     def write_config(self):
 
@@ -128,8 +109,6 @@ class change_color:
         self.parent_obj = parent_obj
 
         #all of the possible color values to change
-
-        #self.function_list = ['highlight_foreground','highlight_background','highlight_keyword','highlight_function_name','highlight_function','highlight_boolean','highlight_string','highlight_number','highlight_operator','highlight_comment','foreground','background','file_color','dir_color','line_num_color','line_num_background_color','file_bar_color','file_bar_text_color','notebook_background']
 
         self.function_list = []
 

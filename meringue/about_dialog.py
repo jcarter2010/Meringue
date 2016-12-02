@@ -35,15 +35,23 @@ class about_dialog:
 [Ctrl]-[h] -- Connect to remote machine\n\
 [Ctrl]-[q] -- Highlight all instances of a selected piece of code\n\
 [Ctrl]-[f] -- Find and replace dialog\n\
+[Ctrl]-[r] -- Refresh syntax coloring\n\
 [Ctrl]-[e] -- Hide/display the file explorer on the side\n\
-[Right Alt] -- Hide/display the menubar"
-        self.entryLabel4.pack()
+[Right Alt] -- Hide/display the menubar\n\
+\n\
+MOUSE COMMANDS\n\
+----------------\n\
+double click pane name to rename\n\
+right click pane name to close\n\
+double click file in explorer to open\n\
+right click file in explorer to bring up options menu"
+        self.entryLabel4.grid(row=0, column=0)
 
-        self.textFrame.pack()
+        self.textFrame.grid()
 
         #Add the necessary buttons
 
-        self.button = Button(self.top, text="Close", command=self.close)
-        self.button.pack()
+        self.button = Button(self.textFrame, text="Close", command=self.close)
+        self.button.grid(row=1, column=0, sticky=E+W)
 
         mainloop()

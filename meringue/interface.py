@@ -173,7 +173,7 @@ class Paramiko_Interface:
 
         tree = self.remote_tree_array
         #file_tree = self.parent_obj.remote_tree_file_array
-        os.chdir(self.parent_obj.merengue_path + '/local')
+        os.chdir(self.parent_obj.meringue_path + '/local')
         print(os.getcwd())
 
         #for each directory in the tree go through and create it in 'local' for preperation of cloning
@@ -257,12 +257,14 @@ class Paramiko_Interface:
                 self.progress["value"] = 50
                 sftp = paramiko.SFTPClient.from_transport(transport)
                 self.progress["value"] = 75
-                sftp.get(self.current_directory + '/' + self.tot[index], self.parent_obj.merengue_path + 'singular_editing_local/' + self.tot[index], None)
+                sftp.get(self.current_directory + '/' + self.tot[index], self.parent_obj.meringue_path + 'singular_editing_local/' + self.tot[index], None)
                 self.progress["value"] = 100
                 time.sleep(0.5)
                 self.progress.destroy()
 
     def Process_Output(self, command, output):
+        self.all_files_and_folders = []
+        self.current_folders = []
         if command == 'ls --color=never -d */':
             temp = output
             temp_command = command.replace(' ', '')
@@ -290,10 +292,10 @@ class Paramiko_Interface:
         #self.Draw()
 
     def Draw(self):
-        #folder_img = ImageTk.PhotoImage(Image.open(self.parent_obj.merengue_path + 'resources/folder_image.png'))
-        #file_img = ImageTk.PhotoImage(Image.open(self.parent_obj.merengue_path + 'resources/file_image.png'))
+        #folder_img = ImageTk.PhotoImage(Image.open(self.parent_obj.meringue_path + 'resources/folder_image.png'))
+        #file_img = ImageTk.PhotoImage(Image.open(self.parent_obj.meringue_path + 'resources/file_image.png'))
         self.labels = []
-        file_img = PhotoImage(self.parent_obj.merengue_path + 'resources/file_image.gif')
+        file_img = PhotoImage(self.parent_obj.meringue_path + 'resources/file_image.gif')
         self.canvas.delete('all')
         for widget in self.canvas.winfo_children():
             widget.destroy()
@@ -304,7 +306,12 @@ class Paramiko_Interface:
         self.items = []
         self.folders = []
         self.files = []
+        for label in self.labels:
+            label.destroy()
+        del(self.labels)
+        self.labels = []
         for f in self.current_folders:
+            print(f)
             lab = Label(self.canvas, text=f)
             lab.place(x = x, y = y + 90)
             self.canvas.create_rectangle(x + 5, y + 10, x + 65, y + 80, tags=str(index), fill="#D2B48C")
@@ -322,13 +329,14 @@ class Paramiko_Interface:
                 x = 10
                 y = y + 120
         for f in self.all_files_and_folders:
+            print(f)
             lab = Label(self.canvas, text=f)
             lab.place(x = x, y = y + 90)
             #self.canvas.create_rectangle(x, y, x + 70, y + 80, tags=str(index), fill="white")
             lab2 = Label(self.canvas, image = file_img)
             lab2.image = file_img
             lab2.place(x=x, y=y)
-            labels.append(lab2)
+            self.labels.append(lab2)
             self.items.append(f)
             self.files.append(index)
             index = index + 1

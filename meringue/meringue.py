@@ -27,7 +27,6 @@ import paramiko
 from access_ssh import access_ssh
 from method_dialog import method_dialog
 from editor import EditorClass
-from code_display import DisplayClass
 from find_and_replace_dialog import find_and_replace_dialog
 from remote_file_chooser import remote_file_chooser
 from new_dialog import new_dialog
@@ -85,82 +84,6 @@ class App:
                 #ed.color()
 
             self.n.select(self.tab_names.index(path))
-
-    def update_display(self, start, end):
-        #self.dis.highlight_current(start, end)
-        pass
-
-    def reset_display_text(self):
-        self.n.tab(self.n.select())['text']
-        try:
-            self.pane.destroy()
-        except:
-            pass
-        self.pane = PanedWindow(self.display_frame, orient=HORIZONTAL, opaqueresize=True)
-        self.dis = DisplayClass(self.display_frame, path)
-        self.pane.add(self.dis.frame)
-        self.pane.grid(row=0, column=0, rowspan=40, columnspan=60, sticky=N+S+E+W)
-        self.dis.text.config(insertbackground='white')
-        self.dis.text.config(background=self.background)
-        self.dis.text.config(foreground=self.foreground)
-        with open(path, 'r') as f_in:
-            text = f_in.read()
-            lines = text.split('\n')
-            for line in lines:
-                self.dis.text.insert(END, line+'\n')
-        self.dis.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
-        self.dis.text.tag_configure("keyword", foreground=self.highlight_keyword)
-        self.dis.text.tag_configure("function_name", foreground=self.highlight_function_name)
-        self.dis.text.tag_configure("function", foreground=self.highlight_function)
-        self.dis.text.tag_configure("boolean", foreground=self.highlight_boolean)
-        self.dis.text.tag_configure("string", foreground=self.highlight_string)
-        self.dis.text.tag_configure("number", foreground=self.highlight_number)
-        self.dis.text.tag_configure("operator", foreground=self.highlight_operator)
-        #self.dis.text.tag_configure('normal', foreground=self.highlight_normal)
-        self.dis.text.tag_configure('comment', foreground=self.highlight_comment)
-        self.dis.text.tag_configure('current_selection', background='#555555')
-        #self.dis.lnText.config(foreground=self.line_num_color)
-        #self.dis.lnText.config(background=self.line_num_background_color)
-        #self.dis.text.event_generate("<Key>", when='tail')
-        self.dis.syntax_coloring(None)
-        self.dis.text.config(state=DISABLED)
-
-        #self.display_frame.add(self.dis)
-
-    def set_display_text(self, path):
-        try:
-            self.pane.destroy()
-        except:
-            pass
-        self.pane = PanedWindow(self.display_frame, orient=HORIZONTAL, opaqueresize=True)
-        self.dis = DisplayClass(self.display_frame, path)
-        self.pane.add(self.dis.frame)
-        self.pane.pack(fill='both', expand=1)
-        self.dis.text.config(insertbackground='white')
-        self.dis.text.config(background=self.background)
-        self.dis.text.config(foreground=self.foreground)
-        with open(path, 'r') as f_in:
-            text = f_in.read()
-            lines = text.split('\n')
-            for line in lines:
-                self.dis.text.insert(END, line+'\n')
-        self.dis.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
-        self.dis.text.tag_configure("keyword", foreground=self.highlight_keyword)
-        self.dis.text.tag_configure("function_name", foreground=self.highlight_function_name)
-        self.dis.text.tag_configure("function", foreground=self.highlight_function)
-        self.dis.text.tag_configure("boolean", foreground=self.highlight_boolean)
-        self.dis.text.tag_configure("string", foreground=self.highlight_string)
-        self.dis.text.tag_configure("number", foreground=self.highlight_number)
-        self.dis.text.tag_configure("operator", foreground=self.highlight_operator)
-        #self.dis.text.tag_configure('normal', foreground=self.highlight_normal)
-        self.dis.text.tag_configure('comment', foreground=self.highlight_comment)
-        self.dis.text.tag_configure('current_selection', background='#555555')
-        #self.dis.lnText.config(foreground=self.line_num_color)
-        #self.dis.lnText.config(background=self.line_num_background_color)
-        #self.dis.text.event_generate("<Key>", when='tail')
-        self.dis.syntax_coloring(None)
-        self.dis.text.config(state=DISABLED)
-
 
     def change_ed_colors(self):
         for ed in self.eds:

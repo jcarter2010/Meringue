@@ -57,6 +57,9 @@ Commands:
       * C#
       * MySql
 
+  + [ctrl]-[e] is to hide/show the file explorer
+
+  + [Right alt] is to hide/show the menubar
 
   + Double click on the files in the directory tree on the left hand side to open them
     Right click on them to pull up a menu of actions that you can take such as delete, rename, copy, paste, create a new file, and create a new folder.

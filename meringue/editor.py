@@ -92,8 +92,6 @@ class EditorClass(object):
         self.control = False
         self.text.bind('<Key>', self.syntax_coloring_after_type)
         self.text.bind('<KeyRelease>', self.key_release)
-        #self.text.bind('<4>', self.update_display)
-        #self.text.bind('<5>', self.update_display)
         self.text.bind('<Tab>', self.tab)
         try:
             self.text.bind('<ISO_Left_Tab>', self.reverse_tab)
@@ -106,8 +104,6 @@ class EditorClass(object):
         self.text.bind('<Control-z>', self.undo)
         self.text.bind('<Control-r>', self.syntax_coloring)
         self.text.bind('<space>', self.syntax_coloring_after_type)
-        #self.text.bind('<MouseWheel>', self.syntax_coloring)
-        #self.text.bind('<1>', self.syntax_coloring)
         self.create_tags()
 
     def control_up(self, event):
@@ -183,11 +179,8 @@ class EditorClass(object):
     def tab(self, event):
         try:
             self.text.edit_separator()
-
             start = '1.0'
             end = END
-            #start=self.text.index('@0,0')
-            #end=self.text.index('@0,%d' % self.text.winfo_height())
             content = self.text.get(start, end)
             l_c = content.split('\n')
             t = self.text.selection_get()
@@ -196,19 +189,16 @@ class EditorClass(object):
             end_line = 0
             start_index = int(start[:start.find('.')])
             counter = start_index
-            #found_start = False
             found_end = False
             for line in l_c:
-                if l[len(l) - 1] in line and counter > start_line and found_end == False:
+                if l[len(l) - 1] in line and counter >= start_line and found_end == False:
                     end_line = counter
                     found_end = True
                 counter = counter + 1
             for i in range(start_line - start_index, end_line + 1 - start_index):
                 l_c[i] = '    ' + l_c[i]
             l_fin = '\n'.join(l_c)
-            #l_fin = []
-            #for line in l:
-            #    l_fin = '    ' + l
+            l_fin = l_fin[:-1]
             self.text.delete(start, end)
             self.text.insert(start, l_fin)
             self.syntax_coloring_after_type(event)
@@ -223,8 +213,6 @@ class EditorClass(object):
 
             start = '1.0'
             end = END
-            #start=self.text.index('@0,0')
-            #end=self.text.index('@0,%d' % self.text.winfo_height())
             content = self.text.get(start, end)
             l_c = content.split('\n')
             t = self.text.selection_get()
@@ -235,7 +223,7 @@ class EditorClass(object):
             counter = start_index
             found_end = False
             for line in l_c:
-                if l[len(l) - 1] in line and counter > start_line and found_end == False:
+                if l[len(l) - 1] in line and counter >= start_line and found_end == False:
                     end_line = counter
                     found_end = True
                 counter = counter + 1
@@ -243,6 +231,7 @@ class EditorClass(object):
                 if l_c[i].startswith('    '):
                     l_c[i] = l_c[i].replace('    ', '', 1)
             l_fin = '\n'.join(l_c)
+            l_fin = l_fin[:-1]
             self.text.delete(start, end)
             self.text.insert(start, l_fin)
             self.syntax_coloring_after_type(event)
@@ -265,11 +254,7 @@ class EditorClass(object):
             if count.get() == 0: break
             self.text.mark_set("matchStart", index)
             self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-            #print(index)
-            #print(count.get())
             return(index[:index.find('.')])
-        #    self.text.tag_add(tag, "matchStart", "matchEnd")
-        #print(start)
 
 
     def getLineNumbers(self):
@@ -314,7 +299,6 @@ class EditorClass(object):
                 if count.get() == 0: break
                 self.text.mark_set("matchStart", index)
                 self.text.mark_set("matchEnd", "%s+%sc" % (index, count_temp))
-                #self.text.tag_add(tag, "matchStart", "matchEnd")
                 function_names.append(self.text.get("matchStart", "matchEnd"))
         parent.function_list = function_names
 
@@ -339,37 +323,8 @@ class EditorClass(object):
             cls.UPDATE_PERIOD,
             cls.updateAllLineNumbers)
 
-    def remove_all_tags(self, start, end, event):
-        self.text.tag_remove('string', start, end)
-        self.text.tag_remove('boolean', start, end)
-        self.text.tag_remove('operator', start, end)
-        self.text.tag_remove('number', start, end)
-        #self.text.tag_remove('highlight', '1.0', END)
-        self.text.tag_remove('comment', start, end)
-        self.text.tag_remove('function', start, end)
-        self.text.tag_remove('keyword', start, end)
-        self.text.tag_remove('function_name', start, end)
-
     def syntax_coloring(self, event):
-        '''
-        start = '1.0'
-        end = END
-        self.remove_all_tags(start, end, event)
-        self.highlight_numbers(start, end, event)
-        self.highlight_keywords(start, end, event)
-        #self.remove_all_tags(event)
-        self.highlight_numbers(start, end, event)
-        self.highlight_keywords(start, end, event)
-        self.highlight_function_names(start, end, event)
-        #self.highlight_functions_and_variables(start, end, event)
-        self.highlight_True_False(start, end, event)
-        self.highlight_operators(start, end, event)
-        self.highlight_strings(start, end, event)
-        self.highlight_comments(start, end, event)
-        self.highlight_multiline_comments(start, end, event)
-        '''
         self.colorize()
-        #return 'break'
 
     def key_release(self, event):
         if event.keycode == 82:
@@ -378,62 +333,8 @@ class EditorClass(object):
     def syntax_coloring_after_type(self, event):
         if not self.control:
             self.recolorize()
-        '''
-        #start=self.text.index('@0,0')
-        #end=self.text.index('@0,%d' % self.text.winfo_height())
-        start = self.text.index("insert linestart")
-        end = self.text.index("insert lineend")
-
-        self.remove_all_tags(start, end, event)
-        self.highlight_numbers(start, end, event)
-        self.highlight_keywords(start, end, event)
-        self.highlight_numbers(start, end, event)
-        self.highlight_keywords(start, end, event)
-        self.highlight_function_names(start, end, event)
-        #self.highlight_functions_and_variables(start, end, event)
-        self.highlight_True_False(start, end, event)
-        self.highlight_operators(start, end, event)
-        self.highlight_strings(start, end, event)
-        self.highlight_comments(start, end, event)
-        self.highlight_multiline_comments(start, end, event)
-        '''
 
     def create_tags(self):
-        """
-            thmethod creates the tags associated with each distinct style element of the
-            source code 'dressing'
-        """
-        '''
-        bold_font = font.Font(self.text, self.text.cget("font"))
-        bold_font.configure(weight=font.BOLD)
-        italic_font = font.Font(self.text, self.text.cget("font"))
-        italic_font.configure(slant=font.ITALIC)
-        bold_italic_font = font.Font(self.text, self.text.cget("font"))
-        bold_italic_font.configure(weight=font.BOLD, slant=font.ITALIC)
-        style = get_style_by_name('default')
-
-        self.tag_names = []
-
-        for ttype, ndef in style:
-            tag_font = None
-
-            if ndef['bold'] and ndef['italic']:
-                tag_font = bold_italic_font
-            elif ndef['bold']:
-                tag_font = bold_font
-            elif ndef['italic']:
-                tag_font = italic_font
-
-            if ndef['color']:
-                foreground = "#%s" % ndef['color']
-            else:
-                foreground = None
-
-            self.tag_names.append(str(ttype))
-
-            self.text.tag_configure(str(ttype), foreground=foreground, font=tag_font)
-        '''
-
         style = get_style_by_name('default')
 
         self.tag_names = []
@@ -545,8 +446,6 @@ class EditorClass(object):
                     index1 = "%s.%s" % (start_line + row - 1, start_index)
                     index2 = "%s.%s" % (end_line + row - 1, end_index)
 
-                    #if not 'Token.Literal.String.Doc' in self.text.tag_names(index1):
-
                     for tagname in self.text.tag_names(index0):
 
                         self.text.tag_remove(tagname, index1, index2)
@@ -586,90 +485,10 @@ class EditorClass(object):
                     index1 = "%s.%s" % (start_line, start_index)
                     index2 = "%s.%s" % (end_line, end_index)
 
-                    #for tagname in self.text.tag_names(index0):
-                    #    self.text.tag_remove(tagname, index1, index2)
-
                     self.text.tag_add(str(ttype), index1, index2)
 
                 start_line = end_line
                 start_index = end_index
-
-    def sc(self, event):
-        text = self.text.get(1.0, END)
-        lines = text.split('\n')
-        start = self.text.index("insert linestart")
-        end = self.text.index("insert lineend")
-        line = self.text.get(start, end)
-        row_txt = self.text.index(start)
-        row = int(row_txt[:row_txt.find('.')])
-        start = self.text.index("{}.0 lineend".format(row - 1))
-        end = self.text.index("{}.0 linestart".format(row + 1))
-
-        if self.multiline:
-            if (self.past_keys[0] == "'" and self.past_keys[1] == "'" and self.past_keys[2] == "'"):
-                column = -1
-                r = row
-                for i in range(row, 0, -1):
-                    l = lines[i]
-                    if i == row:
-                        l = l[:-3]
-                    c = l.rfind("'''")
-                    if c != -1:
-                        r = i
-                        break
-                idx = '{}.{}'.format(r, c)
-                self.remove_all_tags(idx, end, event)
-                self.highlight_numbers(idx, end, event)
-                self.highlight_keywords(idx, end, event)
-                self.highlight_numbers(idx, end, event)
-                self.highlight_keywords(idx, end, event)
-                self.highlight_function_names(idx, end, event)
-                self.highlight_True_False(idx, end, event)
-                self.highlight_operators(idx, end, event)
-                self.highlight_strings(idx, end, event)
-                self.highlight_comments(idx, end, event)
-                self.highlight_multiline_comments(idx, end, event)
-                self.multiline = False
-            if (self.past_keys[0] == '"' and self.past_keys[1] == '"' and self.past_keys[2] == '"'):
-                column = -1
-                r = row
-                for i in range(row, 0, -1):
-                    l = lines[i]
-                    if i == row:
-                        l = l[:-3]
-                    c = l.rfind('"""')
-                    if c != -1:
-                        r = i
-                        break
-                idx = '{}.{}'.format(r, c)
-                self.remove_all_tags(idx, end, event)
-                self.highlight_numbers(idx, end, event)
-                self.highlight_keywords(idx, end, event)
-                self.highlight_numbers(idx, end, event)
-                self.highlight_keywords(idx, end, event)
-                self.highlight_function_names(idx, end, event)
-                self.highlight_True_False(idx, end, event)
-                self.highlight_operators(idx, end, event)
-                self.highlight_strings(idx, end, event)
-                self.highlight_comments(idx, end, event)
-                self.highlight_multiline_comments(idx, end, event)
-                self.multiline = False
-        else:
-            if (self.past_keys[0] == "'" and self.past_keys[1] == "'" and self.past_keys[2] == "'") or \
-                (self.past_keys[0] == '"' and self.past_keys[1] == '"' and self.past_keys[2] == '"'):
-                self.multiline = True
-            else:
-                self.remove_all_tags(start, end, event)
-                self.highlight_numbers(start, end, event)
-                self.highlight_keywords(start, end, event)
-                self.highlight_numbers(start, end, event)
-                self.highlight_keywords(start, end, event)
-                self.highlight_function_names(start, end, event)
-                self.highlight_True_False(start, end, event)
-                self.highlight_operators(start, end, event)
-                self.highlight_strings(start, end, event)
-                self.highlight_comments(start, end, event)
-                self.highlight_multiline_comments(start, end, event)
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end", regexp=False):
         self.remove_highlight(None)
@@ -719,353 +538,6 @@ class EditorClass(object):
                 self.syntax_coloring(None)
                 self.text.see(index)
             counter = counter + 1
-
-    def highlight_keywords(self, start, end, event):
-        if self.fname.endswith('.py') or self.fname.endswith('.sh') or self.fname.endswith('.java'):
-            tag = 'keyword'
-            regexp=True
-            keywords = []
-            if self.fname.endswith('.py'):
-                keywords = keyword.kwlist
-            if self.fname.endswith('.sh'):
-                keywords = self.keywords_bash
-            if self.fname.endswith('.java'):
-                keywords = self.keywords_java
-            for pattern in keywords:
-                start = self.text.index(start)
-                end = self.text.index(end)
-                self.text.mark_set("matchStart", start)
-                self.text.mark_set("matchEnd", start)
-                self.text.mark_set("searchLimit", end)
-                count = tk.IntVar()
-                while True:
-                    index = self.text.search('\y' + pattern + '\y', "matchEnd","searchLimit", count=count, regexp=regexp)
-                    if index == "": break
-                    if count.get() == 0: break
-                    self.text.mark_set("matchStart", index)
-                    self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                    self.text.tag_add(tag, "matchStart", "matchEnd")
-                    self.text.see(index)
-
-    def highlight_function_names(self, start, end, event):
-        if self.fname.endswith('.py'):
-            tag = 'function_name'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('def .*\\(', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                arr = index.split('.')
-                index = arr[0] + '.' + str(int(arr[1]) + 4)
-                count_temp = str(int(count.get()) - 5)
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count_temp))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-        if self.fname.endswith('.java') or self.fname.endswith('.sh'):
-            tag = 'function_name'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('\\S+\\(', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                arr = index.split('.')
-                index = arr[0] + '.' + str(int(arr[1]))
-                count_temp = str(int(count.get()) - 1)
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count_temp))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-
-    def highlight_functions_and_variables(self, start, end, event):
-        if self.fname.endswith('.py') or self.fname.endswith('.java'):
-            tag = 'function'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('\\..*', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                arr = index.split('.')
-                index = arr[0] + '.' + str(int(arr[1]) + 1)
-                count_temp = str(int(count.get()) - 2)
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count_temp))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-        if self.fname.endswith('.sh'):
-            tag = 'function'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('\\$\\S+', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                arr = index.split('.')
-                index = arr[0] + '.' + str(int(arr[1]))
-                count_temp = str(int(count.get()))
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count_temp))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-
-    def highlight_numbers(self, start, end, event):
-        if self.fname.endswith('.py'):
-            tag = 'number'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('[^a-zA-Z](\d+)', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-
-    def highlight_operators(self, start, end, event):
-        if self.fname.endswith('.py') or self.fname.endswith('.java') or self.fname.endswith('.sh'):
-            tag = 'operator'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('[\\(\\)\\+\\\\\-\\*\\/\\.\\]\\[\\=\\!\\{\\}\\<\\>\\;\\:]', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-
-    def highlight_comments(self, start, end, event):
-        if self.fname.endswith('.py') or self.fname.endswith('.sh'):
-            tag = 'comment'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('([ ]|^|[\'\"])#.*\n', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-        if self.fname.endswith('.java'):
-            tag = 'comment'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('[^\'\"]\\/\\/.*\n', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-
-    def highlight_multiline_comments(self, start, end, event):
-        if self.fname.endswith('.py'):
-            tag = 'comment'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('\"\"\"(.|\n)*\"\"\"', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_remove("matchStart", "matchEnd")
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search("\'\'\'(.|\n)*\'\'\'", "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_remove("matchStart", "matchEnd")
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-        if self.fname.endswith('.java'):
-            tag = 'comment'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search("\\/\\*\\*(.|\n)*\\*\\*\\/", "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_remove("matchStart", "matchEnd")
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search("\\/\\*(.|\n)*\\*\\/", "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_remove("matchStart", "matchEnd")
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-
-    def highlight_True_False(self, start, end, event):
-        if self.fname.endswith('.py'):
-            tag = 'boolean'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('\yTrue\y', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                arr = index.split('.')
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('\yFalse\y', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                arr = index.split('.')
-                count_temp = str(int(count.get()) - 5)
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-        if self.fname.endswith('.java') or self.fname.endswith('.sh'):
-            tag = 'boolean'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('\ytrue\y', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                arr = index.split('.')
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search('\yfalse\y', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                arr = index.split('.')
-                count_temp = str(int(count.get()) - 5)
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-
-    def highlight_strings(self, start, end, event):
-        if self.fname.endswith('.py') or self.fname.endswith('.sh'):
-            tag = 'string'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search(r'"(.*?)"', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search(r"'(.*?)'", "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-        if self.fname.endswith('.java'):
-            tag = 'string'
-            regexp=True
-            start = self.text.index(start)
-            end = self.text.index(end)
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
-            count = tk.IntVar()
-            while True:
-                index = self.text.search(r'"(.*?)"', "matchEnd", "searchLimit", count=count, regexp=regexp)
-                if index == "": break
-                if count.get() == 0: break
-                self.text.mark_set("matchStart", index)
-                self.text.mark_set("matchEnd", "%s+%sc" % (index, count.get()))
-                self.text.tag_add(tag, "matchStart", "matchEnd")
-            self.text.mark_set("matchStart", start)
-            self.text.mark_set("matchEnd", start)
-            self.text.mark_set("searchLimit", end)
 
     def remove_highlight(self, event):
         self.text.tag_remove('highlight', '1.0', END)

@@ -49,36 +49,37 @@ class find_and_replace_dialog:
 
         self.entryLabel = Label(self.textFrame)
         self.entryLabel["text"] = "Find:"
-        self.entryLabel.pack()
+        self.entryLabel["width"] = 20
+        self.entryLabel.grid(row=0, column=0)
 
         self.entryWidget = Entry(self.textFrame)
         self.entryWidget["width"] = 50
-        self.entryWidget.pack()
+        self.entryWidget.grid(row=0, column=1)
         self.entryWidget.focus_set()
 
         self.entryLabel2 = Label(self.textFrame)
         self.entryLabel2["text"] = "Replace:"
-        self.entryLabel2.pack()
+        self.entryLabel2.grid(row=1, column=0)
 
         self.entryWidget2 = Entry(self.textFrame)
         self.entryWidget2["width"] = 50
-        self.entryWidget2.pack()
+        self.entryWidget2.grid(row=1, column=1)
 
-        self.textFrame.pack()
+        self.textFrame.grid()
 
-        self.button = Button(top, text="Find All", command=self.find)
-        self.button.pack()
+        self.button = Button(self.textFrame, text="Find All", command=self.find)
+        self.button.grid(row=2, column=0, columnspan=2, sticky=E+W)
 
-        self.button1 = Button(top, text="Find Next", command=self.find_one)
-        self.button1.pack()
+        self.button1 = Button(self.textFrame, text="Find Next", command=self.find_one)
+        self.button1.grid(row=3, column=0, columnspan=2, sticky=E+W)
 
-        self.button2 = Button(top, text="Replace", command=self.replace)
-        self.button2.pack()
+        self.button2 = Button(self.textFrame, text="Replace", command=self.replace)
+        self.button2.grid(row=4, column=0, columnspan=2, sticky=E+W)
 
-        self.button3 = Button(top, text="Replace All", command=self.replace_all)
-        self.button3.pack()
+        self.button3 = Button(self.textFrame, text="Replace All", command=self.replace_all)
+        self.button3.grid(row=5, column=0, columnspan=2, sticky=E+W)
 
-        self.button4 = Button(top, text="Done", command=self.end)
-        self.button4.pack()
+        self.button4 = Button(self.textFrame, text="Done", command=self.end)
+        self.button4.grid(row=6, column=0, columnspan=2, sticky=E+W)
 
         self.parent_obj = parent_obj
