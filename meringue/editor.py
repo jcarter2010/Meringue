@@ -107,20 +107,10 @@ class EditorClass(object):
         self.parent.update_display(start, end)
 
     def yview(self, *args):
-        #self.syntax_coloring(None)
-        #self.parent.dis.text.tag_remove('current_selection', '1.0', END)
         self.text.yview(*args)
-        #start=self.text.index('@0,0')
-        #end=self.text.index('@0,%d' % self.text.winfo_height())
-        #self.update_display(None)
 
     def xview(self, *args):
-        #self.syntax_coloring(None)
-        #self.parent.dis.text.tag_remove('current_selection', '1.0', END)
         self.text.xview(*args)
-        #start=self.text.index('@0,0')
-        #end=self.text.index('@0,%d' % self.text.winfo_height())
-        #self.update_display(None)
 
     def enter(self, event):
         start = float(int(float(self.text.index(INSERT))))
@@ -349,8 +339,8 @@ class EditorClass(object):
         line = self.text.get(start, end)
         row_txt = self.text.index(start)
         row = int(row_txt[:row_txt.find('.')])
-        start = self.text.index("{}.0 linestart".format(row - 1))
-        end = self.text.index("{}.0 lineend".format(row + 1))
+        start = self.text.index("{}.0 lineend".format(row - 1))
+        end = self.text.index("{}.0 linestart".format(row + 1))
 
         if self.multiline:
             if (self.past_keys[0] == "'" and self.past_keys[1] == "'" and self.past_keys[2] == "'"):
