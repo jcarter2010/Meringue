@@ -119,16 +119,17 @@ class change_color:
         self.var1 = StringVar()
         self.var1.set('highlight_foreground')
         self.dropdown = OptionMenu(self.textFrame, self.var1, *lst1)
-        self.dropdown.pack()
-
-        self.textFrame.pack()
+        self.dropdown.grid(row=0, column=0, sticky=E+W)
+        self.dropdown['width'] = 50
 
         #Add the necessary buttons
 
-        self.button = Button(top, text="Select Color", command=self.change)
-        self.button.pack()
+        self.button = Button(self.textFrame, text="Select Color", command=self.change)
+        self.button.grid(row=1, column=0, sticky=E+W)
 
-        self.button4 = Button(top, text="Cancel", command=self.end)
-        self.button4.pack()
+        self.button4 = Button(self.textFrame, text="Cancel", command=self.end)
+        self.button4.grid(row=2, column=0, sticky=E+W)
+
+        self.textFrame.grid()
 
         self.parent_obj = parent_obj

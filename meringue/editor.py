@@ -29,6 +29,8 @@ class EditorClass(object):
     updateId = None
     #keyword_python =
     def __init__(self, master, filename, parent):
+        self.multiline = False
+        self.past_keys = [None, None, None]
         self.parent = parent
         self.keywords_bash = ['if','then','else','elif','fi','case','esac','for','select','while','until','do','done','in','function','time','coproc']
         self.keywords_java = ['abstract','continue','for','new','switch','assert','default','goto','package','synchronized','boolean','do','if','private','this','break','double','implements','protected','throw','byte','else','import','public','throws','case','enum','instanceof','return','transient','catch','extends','int','short','try','char','final','interface','static','void','class','finally','long','strictfp','volatile','const','float','native','super','while','String','Integer','Double','Boolean']
@@ -41,6 +43,8 @@ class EditorClass(object):
         # The widgets vertical scrollbar
         self.vScrollbar = Scrollbar(self.frame, orient=VERTICAL)
         self.vScrollbar.pack(fill='y', side=RIGHT)
+        self.hScrollbar = Scrollbar(self.frame, orient=HORIZONTAL)
+        self.hScrollbar.pack(fill='x', side=BOTTOM)
         # The Text widget holding the line numbers.
         self.lnText = Text(self.frame,
                 width = 4,
@@ -66,11 +70,12 @@ class EditorClass(object):
         self.text.pack(side=LEFT, fill=BOTH, expand=1)
         self.text.config(yscrollcommand=self.vScrollbar.set)
         self.vScrollbar.config(command=self.yview)
+        self.hScrollbar.config(command=self.xview)
         if self.__class__.updateId is None:
             self.updateAllLineNumbers()
-        self.text.bind('<Key>', self.syntax_coloring_after_type)
-        self.text.bind('<4>', self.update_display)
-        self.text.bind('<5>', self.update_display)
+        self.text.bind('<KeyRelease>', self.syntax_coloring_after_type)
+        #self.text.bind('<4>', self.update_display)
+        #self.text.bind('<5>', self.update_display)
         self.text.bind('<Tab>', self.tab)
         try:
             self.text.bind('<ISO_Left_Tab>', self.reverse_tab)
@@ -79,9 +84,18 @@ class EditorClass(object):
         self.text.bind('<Return>', self.enter)
         self.text.bind('<Escape>', self.remove_highlight)
         self.text.bind('<Control-q>', self.highlight_variable)
-        #self.text.bind('<Space>', self.add_word)
+        self.text.bind('<Control-z>', self.undo)
+        self.text.bind('<space>', self.syntax_coloring_after_type)
         #self.text.bind('<MouseWheel>', self.syntax_coloring)
         #self.text.bind('<1>', self.syntax_coloring)
+
+    def undo(self, event):
+        self.text.edit_undo()
+        self.syntax_coloring_after_type(event)
+
+    def redo(self, event):
+        self.text.edit_redo()
+        self.syntax_coloring_after_type(event)
 
     def add_word(self, event):
         pass
@@ -93,12 +107,20 @@ class EditorClass(object):
         self.parent.update_display(start, end)
 
     def yview(self, *args):
-        self.syntax_coloring(None)
+        #self.syntax_coloring(None)
         #self.parent.dis.text.tag_remove('current_selection', '1.0', END)
         self.text.yview(*args)
-        start=self.text.index('@0,0')
-        end=self.text.index('@0,%d' % self.text.winfo_height())
-        self.update_display(None)
+        #start=self.text.index('@0,0')
+        #end=self.text.index('@0,%d' % self.text.winfo_height())
+        #self.update_display(None)
+
+    def xview(self, *args):
+        #self.syntax_coloring(None)
+        #self.parent.dis.text.tag_remove('current_selection', '1.0', END)
+        self.text.xview(*args)
+        #start=self.text.index('@0,0')
+        #end=self.text.index('@0,%d' % self.text.winfo_height())
+        #self.update_display(None)
 
     def enter(self, event):
         start = float(int(float(self.text.index(INSERT))))
@@ -110,6 +132,8 @@ class EditorClass(object):
 
     def tab(self, event):
         try:
+            self.text.edit_separator()
+
             start = '1.0'
             end = END
             #start=self.text.index('@0,0')
@@ -144,6 +168,9 @@ class EditorClass(object):
 
     def reverse_tab(self, event):
         try:
+
+            self.text.edit_separator()
+
             start = '1.0'
             end = END
             #start=self.text.index('@0,0')
@@ -291,8 +318,15 @@ class EditorClass(object):
         self.highlight_multiline_comments(start, end, event)
 
     def syntax_coloring_after_type(self, event):
-        start=self.text.index('@0,0')
-        end=self.text.index('@0,%d' % self.text.winfo_height())
+        self.past_keys.pop(0)
+        self.past_keys.append(event.char)
+        self.sc(event)
+        '''
+        #start=self.text.index('@0,0')
+        #end=self.text.index('@0,%d' % self.text.winfo_height())
+        start = self.text.index("insert linestart")
+        end = self.text.index("insert lineend")
+
         self.remove_all_tags(start, end, event)
         self.highlight_numbers(start, end, event)
         self.highlight_keywords(start, end, event)
@@ -305,6 +339,84 @@ class EditorClass(object):
         self.highlight_strings(start, end, event)
         self.highlight_comments(start, end, event)
         self.highlight_multiline_comments(start, end, event)
+        '''
+
+    def sc(self, event):
+        text = self.text.get(1.0, END)
+        lines = text.split('\n')
+        start = self.text.index("insert linestart")
+        end = self.text.index("insert lineend")
+        line = self.text.get(start, end)
+        row_txt = self.text.index(start)
+        row = int(row_txt[:row_txt.find('.')])
+        start = self.text.index("{}.0 linestart".format(row - 1))
+        end = self.text.index("{}.0 lineend".format(row + 1))
+
+        if self.multiline:
+            if (self.past_keys[0] == "'" and self.past_keys[1] == "'" and self.past_keys[2] == "'"):
+                column = -1
+                r = row
+                for i in range(row, 0, -1):
+                    l = lines[i]
+                    if i == row:
+                        l = l[:-3]
+                    c = l.rfind("'''")
+                    if c != -1:
+                        r = i
+                        break
+                idx = '{}.{}'.format(r, c)
+                self.remove_all_tags(idx, end, event)
+                self.highlight_numbers(idx, end, event)
+                self.highlight_keywords(idx, end, event)
+                self.highlight_numbers(idx, end, event)
+                self.highlight_keywords(idx, end, event)
+                self.highlight_function_names(idx, end, event)
+                self.highlight_True_False(idx, end, event)
+                self.highlight_operators(idx, end, event)
+                self.highlight_strings(idx, end, event)
+                self.highlight_comments(idx, end, event)
+                self.highlight_multiline_comments(idx, end, event)
+                self.multiline = False
+            if (self.past_keys[0] == '"' and self.past_keys[1] == '"' and self.past_keys[2] == '"'):
+                column = -1
+                r = row
+                for i in range(row, 0, -1):
+                    l = lines[i]
+                    if i == row:
+                        l = l[:-3]
+                    c = l.rfind('"""')
+                    if c != -1:
+                        r = i
+                        break
+                idx = '{}.{}'.format(r, c)
+                self.remove_all_tags(idx, end, event)
+                self.highlight_numbers(idx, end, event)
+                self.highlight_keywords(idx, end, event)
+                self.highlight_numbers(idx, end, event)
+                self.highlight_keywords(idx, end, event)
+                self.highlight_function_names(idx, end, event)
+                self.highlight_True_False(idx, end, event)
+                self.highlight_operators(idx, end, event)
+                self.highlight_strings(idx, end, event)
+                self.highlight_comments(idx, end, event)
+                self.highlight_multiline_comments(idx, end, event)
+                self.multiline = False
+        else:
+            if (self.past_keys[0] == "'" and self.past_keys[1] == "'" and self.past_keys[2] == "'") or \
+                (self.past_keys[0] == '"' and self.past_keys[1] == '"' and self.past_keys[2] == '"'):
+                self.multiline = True
+            else:
+                self.remove_all_tags(start, end, event)
+                self.highlight_numbers(start, end, event)
+                self.highlight_keywords(start, end, event)
+                self.highlight_numbers(start, end, event)
+                self.highlight_keywords(start, end, event)
+                self.highlight_function_names(start, end, event)
+                self.highlight_True_False(start, end, event)
+                self.highlight_operators(start, end, event)
+                self.highlight_strings(start, end, event)
+                self.highlight_comments(start, end, event)
+                self.highlight_multiline_comments(start, end, event)
 
     def highlight_pattern(self, pattern, tag, start="1.0", end="end", regexp=False):
         self.remove_highlight(None)

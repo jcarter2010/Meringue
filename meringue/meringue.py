@@ -38,6 +38,9 @@ from interface import Paramiko_Interface
 from create_config import create_config
 from run_script import run_script_python_2
 from run_script import run_script_python_3
+from about_dialog import about_dialog
+from project_opener import project_opener
+from project_manager import project_manager
 
 class App:
 
@@ -251,6 +254,12 @@ class App:
         del(self.tab_names[index])
         del(self.eds[index])
 
+    def close_tab_event(self, event):
+        index = self.n.tabs().index(self.n.select())
+        self.n.forget(self.n.select())
+        del(self.tab_names[index])
+        del(self.eds[index])
+
     def open_click(self):
         of = open_file_dialog(self.root, self, os.getcwd().replace('\\', '/'))
 
@@ -311,6 +320,18 @@ class App:
             self.write_config()
             self.editing_pi = False
 
+    def open_folder(self, folder):
+        val = self.close_all_tabs()
+        if val:
+            os.chdir(folder)
+            self.tree.delete(*self.tree.get_children())
+            self.tree = self.list_files('.', self.tree, "", '.')
+            self.tree.item(os.getcwd(), open=True)
+            self.folder = folder
+            self.lines[19] = self.lines[19][:self.lines[19].find('=')+1]+self.folder
+            self.write_config()
+            self.editing_pi = False
+
     def find_text_dialog(self):
         temp = find_and_replace_dialog(self.root, self)
         self.root.wait_window(temp.top)
@@ -343,6 +364,14 @@ class App:
         self.eds[index].text.delete("1.0",END)
         text = text.replace(f, r)
         self.eds[index].text.insert(END, text[:-1])
+
+    def undo_command(self):
+        index = self.n.tabs().index(self.n.select())
+        self.eds[index].undo(None)
+
+    def redo_command(self):
+        index = self.n.tabs().index(self.n.select())
+        self.eds[index].redo(None)
 
     def reset_counters(self):
         self.find_counter = 0
@@ -448,6 +477,10 @@ class App:
             self.selected_file_dir = self.tree.selection()[0]
             self.show_menu(event)
 
+    def save_project(self):
+        with open(self.meringue_path + '/data/projects.txt', 'w') as f_out:
+            f_out.write('TEMP;{}'.format(self.folder))
+
     def tab_rename(self, event):
         path = self.n.tab(self.n.select())['text']
         if os.name == 'nt':
@@ -472,10 +505,18 @@ class App:
         dialog = access_ssh(self.root, self)
 
     def open_terminal(self):
-        if os.name == 'posix':
+        if sys.platform == "linux" or sys.platform == "linux2":
             os.system('gnome-terminal')
-        if os.name == 'nt':
+        if sys.platform == 'darwin':
+            os.system('open Terminal')
+        if sys.platform == 'win32':
             os.system('start cmd')
+
+    def open_project(self):
+        project_opener(self.root, self)
+
+    def manage_projects(self):
+        project_manager(self.root, self)
 
     def start(self, noOfEditors, noOfLines):
         '''
@@ -555,6 +596,8 @@ class App:
         #self.pane.pack(fill='both', expand=1)
         #self.n.add(self.pane, text='untitled')
         self.n.bind("<Double-1>", self.tab_rename)
+        self.n.bind('<3>', self.close_tab_event)
+        self.n.bind('<2>', self.close_tab_event)
         #self.n.bind("<1>", self.reset_display_text)
         self.n.grid(row=0, column=1, rowspan=40, columnspan=60, sticky=N+S+E+W)
         ttk.Style().configure("TNotebook", background=self.notebook_background)
@@ -565,16 +608,31 @@ class App:
         filemenu.add_command(label="Open", command=self.open_click)
         filemenu.add_command(label="Open Folder", command=self.open_folder_click)
         filemenu.add_command(label="Save", command=self.save_click)
+        filemenu.add_command(label="Close Tab", command=self.close_tab)
+        filemenu.add_separator()
+        filemenu.add_command(label='Open Project', command = self.open_project)
+        filemenu.add_command(label='Save Project', command = self.save_project)
+        filemenu.add_command(label='Manage Projects', command = self.manage_projects)
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.exit_click)
         self.menubar.add_cascade(label="File", menu=filemenu)
-        optionsmenu = Menu(self.menubar, tearoff=0)
-        optionsmenu.add_command(label="Change Colors", command=self.color_config)
-        self.menubar.add_cascade(label="Options", menu=optionsmenu)
+        editmenu = Menu(self.menubar, tearoff=0)
+        editmenu.add_command(label="Undo", command=self.undo_command)
+        editmenu.add_command(label="Redo", command=self.redo_command)
+        editmenu.add_separator()
+        editmenu.add_command(label="Change Editor Colors", command=self.color_config)
+        self.menubar.add_cascade(label="Edit", menu=editmenu)
+        viewmenu = Menu(self.menubar, tearoff=0)
+        viewmenu.add_command(label="Toggle Menubar", command=self.hide_show_menubar_command)
+        viewmenu.add_command(label="Toggle File Explorer", command=self.hide_show_tree_command)
+        self.menubar.add_cascade(label="View", menu=viewmenu)
+        #optionsmenu = Menu(self.menubar, tearoff=0)
+        #optionsmenu.add_command(label="Change Colors", command=self.color_config)
+        #self.menubar.add_cascade(label="Options", menu=optionsmenu)
         helpmenu = Menu(self.menubar, tearoff=0)
-        helpmenu.add_command(label="About")
+        helpmenu.add_command(label="About", command=self.open_about)
         self.menubar.add_cascade(label="Help", menu=helpmenu)
-        self.menubar.add_command(label="Close Tab", command=self.close_tab)
+        #self.menubar.add_command(label="Close Tab", command=self.close_tab)
         terminalmenu = Menu(self.menubar, tearoff=0)
         terminalmenu.add_command(label="Local Terminal", command=self.open_terminal)
         terminalmenu.add_command(label="Remote Terminal", command=self.open_remote_terminal)
@@ -599,6 +657,8 @@ class App:
         self.root.bind('<Escape>', self.end_find)
         self.root.bind('<Control-r>', self.function_dialog)
         self.root.bind('<Control-h>', self.ssh)
+        self.root.bind('<Alt_R>', self.hide_show_menubar);
+        self.root.bind('<Control-e>', self.hide_show_tree);
         #self.root.bind("<Configure>", self.configure)
         self.root['bg'] = 'black'
         self.root.geometry('{}x{}'.format(600, 400))
@@ -629,6 +689,35 @@ class App:
 
         for y in range(30):
             Grid.rowconfigure(self.root, y, weight=1)
+
+        self.hide_menubar = True;
+        self.hide_tree = True;
+        self.emptyMenu = Menu(self.root)
+
+    def open_about(self):
+        about_dialog(self)
+
+    def hide_show_menubar(self, event):
+        if self.hide_menubar:
+            self.root.config(menu=self.emptyMenu)
+            self.hide_menubar = False;
+        else:
+            self.root.config(menu=self.menubar)
+            self.hide_menubar = True
+
+    def hide_show_tree(self, event):
+        if self.hide_tree:
+            self.tree_frame.grid_forget()
+            self.hide_tree = False
+        else:
+            self.tree_frame.grid(row=0, column=0, rowspan=40, sticky=N+S)
+            self.hide_tree = True
+
+    def hide_show_menubar_command(self):
+        self.hide_show_menubar(None)
+
+    def hide_show_tree_command(self):
+        self.hide_show_tree(None)
 
     def run_file_python_2(self):
         index = self.n.tabs().index(self.n.select())
@@ -906,6 +995,7 @@ class App:
         #self.directory.menu.add_command(label='Copy', command=self.copy_item)
         #self.directory.menu.add_command(label='Paste', command=self.paste_item)
 
+
     def write_config(self):
         print('writing')
         with open(self.meringue_path + '/data/meringue_config.ini', 'w') as f_out:
@@ -923,9 +1013,9 @@ class App:
         sys.stdout.flush()
         #os.chdir(os.path.join(os.path.expanduser('~'), 'Documents'))
         self.root = Tk()
-        #img = PhotoImage(file=self.meringue_path + 'icon.gif')
-        #self.root.tk.call('wm', 'iconphoto', self.root._w, img)
-        #self.root.iconbitmap(self.meringue_path + '/' + 'meringue_icon.ico')
+        img = PhotoImage(file=self.meringue_path + 'icon.gif')
+        self.root.tk.call('wm', 'iconphoto', self.root._w, img)
+        #self.root.iconbitmap(self.meringue_path + '/' + 'icon.gif')
         self.eds = []
         self.n = ttk.Notebook(self.root)
         self.menubar = Menu(self.root)
