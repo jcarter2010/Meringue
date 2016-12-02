@@ -76,27 +76,47 @@ class change_color:
 
         with open(self.parent_obj.meringue_path+'data/meringue_config.ini', 'r') as f_in:
             self.lines = f_in.read().split('\n')
-            self.highlight_foreground = self.lines[0].split('=')[1]
-            self.highlight_background = self.lines[1].split('=')[1]
-            self.highlight_keyword = self.lines[2].split('=')[1]
-            self.highlight_function_name = self.lines[3].split('=')[1]
-            self.highlight_function = self.lines[4].split('=')[1]
-            self.highlight_boolean = self.lines[5].split('=')[1]
-            self.highlight_string = self.lines[6].split('=')[1]
-            self.highlight_number = self.lines[7].split('=')[1]
-            self.highlight_operator = self.lines[8].split('=')[1]
-            #self.highlight_normal = self.lines[9].split('=')[1]
-            self.highlight_comment = self.lines[9].split('=')[1]
-            self.foreground = self.lines[10].split('=')[1]
-            self.background = self.lines[11].split('=')[1]
-            self.file_color = self.lines[12].split('=')[1]
-            self.dir_color = self.lines[13].split('=')[1]
-            self.line_num_color = self.lines[14].split('=')[1]
-            self.line_num_background_color = self.lines[15].split('=')[1]
-            self.file_bar_color = self.lines[16].split('=')[1]
-            self.file_bar_text_color = self.lines[17].split('=')[1]
-            self.notebook_background = self.lines[18].split('=')[1]
-            self.folder = self.lines[19].split('=')[1]
+            self.foreground = self.lines[0].split('=')[1]
+            self.foreground = self.foreground[:7]
+            self.background = self.lines[1].split('=')[1]
+            self.background = self.background[:7]
+            self.file_color = self.lines[2].split('=')[1]
+            self.file_color = self.file_color[:7]
+            self.dir_color = self.lines[3].split('=')[1]
+            self.dir_color = self.dir_color[:7]
+            self.line_num_color = self.lines[4].split('=')[1]
+            self.line_num_color = self.line_num_color[:7]
+            self.line_num_background_color = self.lines[5].split('=')[1]
+            self.line_num_background_color = self.line_num_background_color[:7]
+            self.file_bar_color = self.lines[6].split('=')[1]
+            self.file_bar_color = self.file_bar_color[:7]
+            self.file_bar_text_color = self.lines[7].split('=')[1]
+            self.file_bar_text_color = self.file_bar_text_color[:7]
+            self.notebook_background = self.lines[8].split('=')[1]
+            self.notebook_background = self.notebook_background[:7]
+            self.highlight_foreground = self.lines[9].split('=')[1]
+            self.highlight_foreground = self.highlight_foreground[:7]
+            self.highlight_background = self.lines[10].split('=')[1]
+            self.highlight_background = self.highlight_background[:7]
+            self.token_keyword = self.lines[11].split('=')[1]
+            self.token_keyword = self.token_keyword[:7]
+            self.token_name = self.lines[12].split('=')[1]
+            self.token_name = self.token_name[:7]
+            self.token_literal = self.lines[13].split('=')[1]
+            self.token_literal = self.token_literal[:7]
+            self.token_string = self.lines[14].split('=')[1]
+            self.token_string = self.token_string[:7]
+            self.token_number = self.lines[15].split('=')[1]
+            self.token_number = self.token_number[:7]
+            self.token_operators = self.lines[16].split('=')[1]
+            self.token_operators = self.token_operators[:7]
+            self.token_punctuation = self.lines[17].split('=')[1]
+            self.token_punctuation = self.token_punctuation[:7]
+            self.token_comments = self.lines[18].split('=')[1]
+            self.token_comments = self.token_comments[:7]
+            self.token_generic = self.lines[19].split('=')[1]
+            self.token_generic = self.token_generic[:7]
+            self.folder = self.lines[20].split('=')[1]
 
     def end(self):
         self.top.destroy()
@@ -109,7 +129,16 @@ class change_color:
 
         #all of the possible color values to change
 
-        self.function_list = ['highlight_foreground','highlight_background','highlight_keyword','highlight_function_name','highlight_function','highlight_boolean','highlight_string','highlight_number','highlight_operator','highlight_comment','foreground','background','file_color','dir_color','line_num_color','line_num_background_color','file_bar_color','file_bar_text_color','notebook_background']
+        #self.function_list = ['highlight_foreground','highlight_background','highlight_keyword','highlight_function_name','highlight_function','highlight_boolean','highlight_string','highlight_number','highlight_operator','highlight_comment','foreground','background','file_color','dir_color','line_num_color','line_num_background_color','file_bar_color','file_bar_text_color','notebook_background']
+
+        self.function_list = []
+
+        with open(self.parent_obj.meringue_path+'data/meringue_config.ini', 'r') as f_in:
+            lines = f_in.read().split('\n')
+            for line in lines:
+                self.function_list.append(line[:line.find('=')])
+
+        print(self.function_list)
 
         self.textFrame = Frame(top)
 
