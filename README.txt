@@ -91,10 +91,14 @@ TO DO:
 
 -----------------
 
-  + Fix adding tabs to multiple lines
++ Fix adding tabs to multiple lines
 
-  + go to line
++ go to line
 
-  + more color customizations (for example, escape sequences, chars etc.)
++ more color customizations (for example, escape sequences, chars etc.)
 
-  + fix project manager
++ fix project manager
+
++ fix remote folder chooser
+
++ fix clone of remote directory
