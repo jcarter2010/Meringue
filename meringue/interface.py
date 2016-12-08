@@ -2,6 +2,7 @@ from interactive_paramiko import SSH
 import os
 try:
     from Tkinter import *
+    import Tkinter as tk
     import Tkinter as Tkinter
     import ttk
     import tkFileDialog
@@ -9,6 +10,7 @@ try:
     from tkFileDialog import askdirectory
 except:
     from tkinter import *
+    import tkinter as tk
     import tkinter as Tkinter
     import tkinter.ttk as ttk
     import tkinter.messagebox as tkMessageBox
@@ -60,7 +62,10 @@ class Paramiko_Interface:
         self.canvas.bind("<Button-3>", self.Right_Click)
         self.top.bind("<Up>", self.Scroll_Up)
         self.top.bind("<Down>", self.Scroll_Down)
-        self.menubar = Menu(self.top)
+        self.button0 = Button(self.top, text='Clone directory/copy file', command=self.clone)
+        self.button1 = Button(self.top, text='Close explorer', command=self.close)
+        #self.menubar = Menu(self.top)
+        #self.double = False
         #self.menubar.add_command(label="Help", command=self.display_commands)
         #openmenu = Menu(self.menubar, tearoff=0)
         #openmenu.add_command(label="Open", command=self.Open_Folder)
@@ -74,8 +79,58 @@ class Paramiko_Interface:
         self.connection.openShell()
         time.sleep(4)
         self.Open_Folder()
-        self.top.config(menu=self.menubar)
+        self.index = -1
+        #self.top.config(menu=self.menubar)
         self.top.mainloop()
+
+    def close(self, event):
+        self.top.destroy()
+
+    def clone(self, event):
+        if self.index in self.folders:
+            '''
+            self.connection.sendShell('cd ' + self.tot[index])
+
+            time.sleep(0.5)
+            self.connection.sendShell('ls --color=never')
+            '''
+            #v = tk.IntVar()
+            #self.current_directory = self.current_directory + '/' + self.tot[index]
+            #self.progress = ttk.Progressbar(self.canvas, orient="horizontal",length=800, mode="determinate", variable=v)
+            #self.progress.place(x = 0, y = 0)
+            #self.progress["maximum"] = 100
+            #self.progress["value"] = 0
+            transport = paramiko.Transport((self.server, self.port))
+            #v.set(25)
+            #self.progress["value"] = 25
+            transport.connect(username = self.username, password = self.password)
+            #v.set(50)
+            #self.progress["value"] = 50
+            sftp = paramiko.SFTPClient.from_transport(transport)
+            #v.set(75)
+            #self.progress["value"] = 75
+            self.clone_dir(self.current_directory)
+            #v.set(100)
+            #self.progress["value"] = 100
+            #time.sleep(0.5)
+            #self.progress.destroy()
+            self.top.destroy()
+        if self.index in self.files:
+            #self.progress = ttk.Progressbar(self.canvas, orient="horizontal",length=800, mode="determinate")
+            #self.progress.place(x = 0, y = 0)
+            #self.progress["maximum"] = 100
+            #self.progress["value"] = 0
+            transport = paramiko.Transport((self.server, self.port))
+            #self.progress["value"] = 25
+            transport.connect(username = self.username, password = self.password)
+            #self.progress["value"] = 50
+            sftp = paramiko.SFTPClient.from_transport(transport)
+            #self.progress["value"] = 75
+            sftp.get(self.current_directory + '/' + self.tot[index],os.getcwd() + '/' + self.tot[index], None)
+            #self.progress["value"] = 100
+            #time.sleep(0.5)
+            #self.progress.destroy()
+            self.top.destroy()
 
     def Scroll_Up(self, event):
         self.scroll_y = self.scroll_y - 600
@@ -90,33 +145,35 @@ class Paramiko_Interface:
     def Open_Folder(self):
         self.connection.sendShell('ls --color=never')
 
-    def Click(self, event):
-        x, y = event.x, event.y
-        if len(self.canvas.gettags('current')) > 0:
-            index = int(self.canvas.gettags('current')[0])
-            if index in self.folders:
-                self.current_directory = self.current_directory + '/' + self.tot[index]
-                self.connection.sendShell('cd ' + self.tot[index] + ' && ls --color=never')
+    def Click(self, event, index):
+        self.index = index
                 #time.sleep(2)
                 #self.connection.sendShell()
-            '''
-            if index in self.files:
-                print(self.tot[index])
-                self.progress = ttk.Progressbar(self.canvas, orient="horizontal",length=800, mode="determinate")
-                self.progress.place(x = 0, y = 0)
-                self.progress["maximum"] = 100
-                self.progress["value"] = 0
-                transport = paramiko.Transport((self.server, self.port))
-                self.progress["value"] = 25
-                transport.connect(username = self.username, password = self.password)
-                self.progress["value"] = 50
-                sftp = paramiko.SFTPClient.from_transport(transport)
-                self.progress["value"] = 75
-                sftp.get(self.current_directory + '/' + self.tot[index], './singular_editing_local/' + self.tot[index], None)
-                self.progress["value"] = 100
-                time.sleep(0.5)
-                self.progress.destroy()
-            '''
+        '''
+        if index in self.files:
+            print(self.tot[index])
+            self.progress = ttk.Progressbar(self.canvas, orient="horizontal",length=800, mode="determinate")
+            self.progress.place(x = 0, y = 0)
+            self.progress["maximum"] = 100
+            self.progress["value"] = 0
+            transport = paramiko.Transport((self.server, self.port))
+            self.progress["value"] = 25
+            transport.connect(username = self.username, password = self.password)
+            self.progress["value"] = 50
+            sftp = paramiko.SFTPClient.from_transport(transport)
+            self.progress["value"] = 75
+            sftp.get(self.current_directory + '/' + self.tot[index], './singular_editing_local/' + self.tot[index], None)
+            self.progress["value"] = 100
+            time.sleep(0.5)
+            self.progress.destroy()
+        '''
+
+    def double_click(self, event, index):
+        self.index = -1
+        if index in self.folders:
+            self.current_directory = self.current_directory + '/' + self.tot[index]
+            self.connection.sendShell('cd ' + self.tot[index] + ' && ls --color=never')
+
 
     def clone_dir(self, dir_name):
 
@@ -181,7 +238,8 @@ class Paramiko_Interface:
         for item in tree:
             if item.startswith(dir_name):
                 os.makedirs(item)
-        os.chdir(dir_name)
+        os.chdir(self.parent_obj.meringue_path + '/local')
+        #os.chdir(dir_name)
 
         #setup sftp from paramiko
 
@@ -192,7 +250,8 @@ class Paramiko_Interface:
 
         sftp = paramiko.SFTPClient.from_transport(transport)
 
-        sftp.chdir(dir_name[dir_name.find('./') + 2:])
+        print(dir_name[dir_name.find('./') + 2:dir_name.rfind('/')])
+        sftp.chdir(dir_name[dir_name.find('./') + 2:dir_name.rfind('/')])
 
         #copy all of the files from the selected tree
 
@@ -226,11 +285,19 @@ class Paramiko_Interface:
 
                     #if it's a directory then go into it and do the same thing
 
-                    os.chdir(files)
-                    sftp.chdir(files)
-                    self.copy_files('', sftp)
-                    sftp.chdir('..')
-                    os.chdir('..')
+                    if str(files).startswith("u'"):
+                        files = str(files)[2:-1]
+                        os.chdir(files)
+                        sftp.chdir(files)
+                        self.copy_files('', sftp)
+                        sftp.chdir('..')
+                        os.chdir('..')
+                    else:
+                        os.chdir(files)
+                        sftp.chdir(files)
+                        self.copy_files('', sftp)
+                        sftp.chdir('..')
+                        os.chdir('..')
 
     def Right_Click(self, event):
         x, y = event.x, event.y
@@ -263,9 +330,8 @@ class Paramiko_Interface:
                 self.progress.destroy()
 
     def Process_Output(self, command, output):
-        self.all_files_and_folders = []
-        self.current_folders = []
         if command == 'ls --color=never -d */':
+            self.current_folders = []
             temp = output
             temp_command = command.replace(' ', '')
             if len(temp) > 0:
@@ -279,6 +345,7 @@ class Paramiko_Interface:
             self.tot = self.current_folders + self.all_files_and_folders
             self.Draw()
         if command == 'ls --color=never':
+            self.all_files_and_folders = []
             temp = output
             temp_command = command.replace(' ', '')
             #print(temp_command)
@@ -292,13 +359,12 @@ class Paramiko_Interface:
         #self.Draw()
 
     def Draw(self):
-        #folder_img = ImageTk.PhotoImage(Image.open(self.parent_obj.meringue_path + 'resources/folder_image.png'))
-        #file_img = ImageTk.PhotoImage(Image.open(self.parent_obj.meringue_path + 'resources/file_image.png'))
-        self.labels = []
-        file_img = PhotoImage(self.parent_obj.meringue_path + 'resources/file_image.gif')
+        file_img = PhotoImage(file=self.parent_obj.meringue_path + '/resources/file_image.gif')
+        folder_img = PhotoImage(file=self.parent_obj.meringue_path + '/resources/folder_image.gif')
         self.canvas.delete('all')
-        for widget in self.canvas.winfo_children():
-            widget.destroy()
+        self.canvas.destroy()
+        self.canvas = Canvas(self.top, width=800, height=600)
+        self.canvas.pack()
         x = 10
         y = self.scroll_y
         counter = 0
@@ -306,19 +372,19 @@ class Paramiko_Interface:
         self.items = []
         self.folders = []
         self.files = []
-        for label in self.labels:
-            label.destroy()
-        del(self.labels)
         self.labels = []
         for f in self.current_folders:
-            print(f)
-            lab = Label(self.canvas, text=f)
-            lab.place(x = x, y = y + 90)
-            self.canvas.create_rectangle(x + 5, y + 10, x + 65, y + 80, tags=str(index), fill="#D2B48C")
-            self.canvas.create_rectangle(x + 5, y, x + 25, y + 10, tags=str(index), fill="#D2B48C")
-            self.canvas.create_rectangle(x, y + 10, x + 5, y + 80, tags=str(index), fill="#8B4513")
-            #lab2 = Label(self.canvas, image = folder_img)
-            #lab2.place(x=x, y=y)
+            lab = Label(self.canvas, text=f, wraplength=75)
+            lab.place(x = x, y = y + 80)
+            lab2 = Label(self.canvas, image=folder_img)
+            if self.index == index:
+                self.canvas.create_rectangle(x-5, y-5, 90, 80, fill='#6495ED')
+            lab2.bind("<Button-1>", lambda event, arg=index: self.Click(event, arg))
+            lab2.bind("<Double-Button-1>", lambda event, arg=index: self.double_click(event, arg))
+            lab2.photo = folder_img
+            lab2.place(x=x, y=y)
+            self.labels.append(lab)
+            self.labels.append(lab2)
             self.items.append(f)
             self.folders.append(index)
             index = index + 1
@@ -327,15 +393,18 @@ class Paramiko_Interface:
             if counter == 8:
                 counter = 0
                 x = 10
-                y = y + 120
+                y = y + 150
         for f in self.all_files_and_folders:
-            print(f)
-            lab = Label(self.canvas, text=f)
-            lab.place(x = x, y = y + 90)
-            #self.canvas.create_rectangle(x, y, x + 70, y + 80, tags=str(index), fill="white")
-            lab2 = Label(self.canvas, image = file_img)
-            lab2.image = file_img
+            lab = Label(self.canvas, text=f, wraplength=75)
+            lab.place(x = x, y = y + 80)
+            lab2 = Label(self.canvas, image=file_img)
+            if self.index == index:
+                self.canvas.create_rectangle(x-5, y-5, 90, 80, fill='#6495ED')
+            lab2.bind("<Button-1>", lambda event, arg=index: self.Click(event, arg))
+            lab2.bind("<Double-Button-1>", lambda event, arg=index: self.double_click(event, arg))
+            lab2.photo = file_img
             lab2.place(x=x, y=y)
+            self.labels.append(lab)
             self.labels.append(lab2)
             self.items.append(f)
             self.files.append(index)
@@ -345,6 +414,4 @@ class Paramiko_Interface:
             if counter == 8:
                 counter = 0
                 x = 10
-                y = y + 120
-
-    #def Open_Terminal(self):
+                y = y + 150
