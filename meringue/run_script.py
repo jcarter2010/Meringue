@@ -57,22 +57,26 @@ class run_script_python_2:
         self.top = Toplevel(parent)
 
         self.top.title("Run Script")
-        self.top["padx"] = 40
-        self.top["pady"] = 20
+        self.top.geometry('{}x{}'.format(600, 400))
 
         self.textFrame = Frame(self.top)
+        self.textFrame.grid(sticky=N+S+E+W)
+
+        for x in range(60):
+            Grid.columnconfigure(self.textFrame, x, weight=1)
+
+        for y in range(30):
+            Grid.rowconfigure(self.textFrame, y, weight=1)
 
         self.v = StringVar()
-        self.output = Label(self.textFrame, textvariable=self.v, justify=LEFT, bg='black', fg='lime', relief=SUNKEN)
-        self.output['height'] = 20
+        self.output = Label(self.textFrame, textvariable=self.v, justify=LEFT, bg='black', fg='lime')
+        #self.output['height'] = 20
 
-        self.output.grid(row=0, column=0, sticky=E+W)
+        self.output.grid(row=0, sticky=N+S+E+W)
 
         self.entryWidget = Entry(self.textFrame)
-        self.entryWidget.grid(row=1, column=0, sticky=E+W)
+        self.entryWidget.grid(row=1, sticky=N+S+E+W)
         self.entryWidget.focus_set()
-
-        self.textFrame.grid()
 
         self.top.bind('<Return>', self.enter_press)
         #self.top.geometry('500x600')

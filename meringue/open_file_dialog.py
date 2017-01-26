@@ -1,6 +1,6 @@
-from Tkinter import *
-import Tkinter as tk
-import tkMessageBox
+#from Tkinter import *
+#import Tkinter as tk
+#import tkMessageBox
 import tkFileDialog
 
 class open_file_dialog:

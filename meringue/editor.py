@@ -1,17 +1,11 @@
-try:
-    from Tkinter import *
-    import Tkinter as tk
-    import ttk
-    import tkFileDialog
-    import tkMessageBox
-    from tkFileDialog import askdirectory
-    import tkFont as font
-except:
-    from tkinter import *
-    import tkinter as tk
-    import tkinter.ttk as ttk
-    import tkinter.messagebox as tkMessageBox
-    from tkinter.filedialog import askdirectory
+
+from Tkinter import *
+import Tkinter as tk
+import ttk
+import tkFileDialog
+import tkMessageBox
+from tkFileDialog import askdirectory
+import tkFont as font
 import os
 from os import listdir
 from os.path import isfile, join

@@ -1,0 +1,1 @@
+python "C:\John's Data\PyInstaller-3.2\PyInstaller-3.2\pyinstaller.py" -F --onefile --hidden-import Tkinter meringue.py

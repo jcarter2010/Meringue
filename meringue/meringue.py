@@ -1,18 +1,12 @@
 #!/usr/bin/env python2
 
-try:
-    from Tkinter import *
-    import Tkinter as tk
-    import ttk
-    import tkFileDialog
-    import tkMessageBox
-    from tkFileDialog import askdirectory
-except:
-    from tkinter import *
-    import tkinter as tk
-    import tkinter.ttk as ttk
-    import tkinter.messagebox as tkMessageBox
-    from tkinter.filedialog import askdirectory
+from Tkinter import *
+import Tkinter as tk
+import ttk
+import tkFileDialog
+import tkMessageBox
+from tkFileDialog import askdirectory
+import six
 from pkg_resources import resource_stream
 import os
 from os import listdir
@@ -62,27 +56,10 @@ class App:
                     lines = text.split('\n')
                     for line in lines:
                         ed.text.insert(END, line+'\n')
-                #ed.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
-                #ed.text.tag_configure("keyword", foreground=self.highlight_keyword)
-                #ed.text.tag_configure("function_name", foreground=self.highlight_function_name)
-                #ed.text.tag_configure("function", foreground=self.highlight_function)
-                #ed.text.tag_configure("boolean", foreground=self.highlight_boolean)
-                #ed.text.tag_configure("string", foreground=self.highlight_string)
-                #ed.text.tag_configure("number", foreground=self.highlight_number)
-                #ed.text.tag_configure("operator", foreground=self.highlight_operator)
-                #ed.text.tag_configure('normal', foreground=self.highlight_normal)
-                #ed.text.tag_configure('comment', foreground=self.highlight_comment)
                 ed.lnText.config(foreground=self.line_num_color)
                 ed.lnText.config(background=self.line_num_background_color)
-                #ed.text.event_generate("<Key>", when='tail')
                 ed.syntax_coloring(None)
                 self.eds.append(ed)
-
-                #self.dis.place(x=100, y=0)
-                #self.dis.destroy()
-                #self.set_display_text(path)
-                #ed.color()
-
             self.n.select(self.tab_names.index(path))
 
     def change_ed_colors(self):
@@ -90,20 +67,6 @@ class App:
             ed.text.config(insertbackground='white')
             ed.text.config(background=self.background)
             ed.text.config(foreground=self.foreground)
-            '''
-            ed.text.tag_configure("highlight", background=self.highlight_background, foreground=self.highlight_foreground)
-            ed.text.tag_configure("keyword", foreground=self.highlight_keyword)
-            ed.text.tag_configure("function_name", foreground=self.highlight_function_name)
-            ed.text.tag_configure("function", foreground=self.highlight_function)
-            ed.text.tag_configure("boolean", foreground=self.highlight_boolean)
-            ed.text.tag_configure("string", foreground=self.highlight_string)
-            ed.text.tag_configure("number", foreground=self.highlight_number)
-            ed.text.tag_configure("operator", foreground=self.highlight_operator)
-            ed.lnText.config(foreground=self.line_num_color)
-            ed.lnText.config(background=self.line_num_background_color)
-            #ed.text.tag_configure('normal', foreground=self.highlight_normal)
-            ed.text.tag_configure('comment', foreground=self.highlight_comment)
-            '''
             ed.text.tag_configure('Token.Keyword', foreground=self.token_keyword)
             ed.text.tag_configure('Token.Keyword.Constant', foreground=self.token_keyword)
             ed.text.tag_configure('Token.Keyword.Declaration', foreground=self.token_keyword)
@@ -111,7 +74,6 @@ class App:
             ed.text.tag_configure('Token.Keyword.Pseudo', foreground=self.token_keyword)
             ed.text.tag_configure('Token.Keyword.Reserved', foreground=self.token_keyword)
             ed.text.tag_configure('Token.Keyword.Type', foreground=self.token_keyword)
-
             ed.text.tag_configure('Token.Name', foreground=self.token_name)
             ed.text.tag_configure('Token.Name.Attribute', foreground=self.token_name)
             ed.text.tag_configure('Token.Name.Builtin', foreground=self.token_name)
@@ -130,10 +92,8 @@ class App:
             ed.text.tag_configure('Token.Name.Variable.Class', foreground=self.token_name)
             ed.text.tag_configure('Token.Name.Variable.Global', foreground=self.token_name)
             ed.text.tag_configure('Token.Name.Variable.Instance', foreground=self.token_name)
-
             ed.text.tag_configure('Token.Literal', foreground=self.token_literal)
             ed.text.tag_configure('Token.Literal.Date', foreground=self.token_literal)
-
             ed.text.tag_configure('Token.Literal.String', foreground=self.token_string)
             ed.text.tag_configure('Token.Literal.String.Backtick', foreground=self.token_string)
             ed.text.tag_configure('Token.Literal.String.Char', foreground=self.token_string)
@@ -181,7 +141,6 @@ class App:
         self.tree.tag_configure('directory', background=self.background, foreground=self.dir_color)
         self.tree.tag_configure('file', background=self.background, foreground=self.file_color)
         self.menubar.config(background=self.file_bar_color)
-        #self.pane.configure(background=self.pane_color)
         self.root.configure(background=self.background)
         self.menubar.config(background=self.file_bar_color, foreground=self.file_bar_text_color)
         ttk.Style().configure("TNotebook", background=self.notebook_background)
@@ -201,6 +160,45 @@ class App:
         index = self.n.tabs().index(self.n.select())
         text = self.eds[index].text.selection_get(selection='CLIPBOARD')
         self.eds[index].text.insert('insert', text)
+
+    def recursive_find_nodes(self, rootDir, parent, indent):
+        for lists in os.listdir(rootDir):
+            path = os.path.join(rootDir, lists)
+            #self.files.append(path)
+            if os.name == 'posix':
+                if os.path.isdir(path):
+                    parent.children.append(node(path[path.rfind('/'):], parent, indent, path, 'folder', self.top, self))
+                    self.recursive_find(path, parent.children[len(parent.children) - 1], indent + 1)
+                else:
+                    parent.children.append(node(path[path.rfind('/'):], parent, indent, path, 'file', self.top, self))
+            else:
+                if os.path.isdir(path):
+                    parent.children.append(node(path[path.rfind('\\'):], parent, indent, path, 'folder', self.top, self))
+                    self.recursive_find(path, parent.children[len(parent.children) - 1], indent + 1)
+                else:
+                    parent.children.append(node(path[path.rfind('\\'):], parent, indent, path, 'file', self.top, self))
+        return parent
+
+    def recursive_print_nodes(self, parent):
+        for child in parent.children:
+            self.recursive_print(child)
+        print(('-' * parent.indent) + parent.name)
+
+    def list_nodes(self, path, tree, parent, full_path):
+        self.root = node(os.getcwd()[os.getcwd().rfind('\\'):], None, 0, os.getcwd(), 'folder', self.top, self)
+        self.root = self.recursive_find(os.getcwd(), self.root, 1)
+        self.recursive_print(self.root)
+
+    def draw_structure(self, parent, height):
+        parent.name_label.place(anchor=NW, x=parent.indent*10 + 20, y=height)
+        parent.image_label.place(anchor=NW, x=parent.indent*10, y=height)
+        self.name_labels.append(parent.name_label)
+        self.image_labels.append(parent.image_label)
+        if parent.display_children:
+            for child in parent.children:
+                height = height + 20
+                height = self.draw_structure(child, height)
+        return height
 
     def recursive_find(self, rootDir):
         for lists in os.listdir(rootDir):
